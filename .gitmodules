@@ -1,0 +1,6 @@
+[submodule "Source/QtInstrumentControl"]
+	path = Source/QtInstrumentControl
+	url = https://github.com/imperial-photonics/QtInstrumentControl
+[submodule "Source/fifo-flim"]
+	path = Source/fifo-flim
+	url = https://github.com/seanwarren/fifo-flim
