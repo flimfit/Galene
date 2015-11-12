@@ -36,7 +36,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 int main(int argc, char *argv[])
 {
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
-   qRegisterMetaType<rate_values>("rate_values");
+   qRegisterMetaType<FlimRates>("FlimRates");
 
    QCoreApplication::setOrganizationName("Garvan Institute of Medical Research");
    QCoreApplication::setOrganizationDomain("garvan.org.au");

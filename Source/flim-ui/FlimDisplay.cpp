@@ -18,7 +18,7 @@ ControlBinder(this, "HandheldScanner")
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::AcquireSequence);
    connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::SetAutoSaveFolder);
 
-   SetupBH();
+   SetupTCSPC();
   
    // Setup menu actions
    //============================================================
@@ -30,29 +30,30 @@ ControlBinder(this, "HandheldScanner")
 
 }
 
-void FlimDisplay::SetupBH()
+void FlimDisplay::SetupTCSPC()
 {
-   try
-   {
-      bh = new BH(this, M_SPC830);
-      
-      bh->SetImageSize(scanner->GetNLines());      
-      connect(scanner, &GalvoScanner::ScanSizeChanged, bh, &BH::SetImageSize);
-      connect(bh, &BH::RatesUpdated, bh_rates_widget, &BHRatesWidget::SetRates);
-      connect(bh, &BH::FifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
-      connect(bh, &BH::RecordingStatusChanged, save_flim_action, &QAction::setChecked);
-      connect(save_flim_action, &QAction::toggled, bh, &BH::SetRecording, Qt::DirectConnection);
+      try
+      {
+         tcspc = new Chronologic(this);
+      }
+      catch (std::runtime_error e)
+      {
+         QMessageBox msg(QMessageBox::Critical, "Fatal Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));
+         msg.exec();
+         QMetaObject::invokeMethod(this, "close", Qt::QueuedConnection);
+         return;
+      }
+ 
+      connect(tcspc, &FifoTcspc::RatesUpdated, bh_rates_widget, &BHRatesWidget::SetRates);
+      connect(tcspc, &FifoTcspc::FifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+      connect(tcspc, &FifoTcspc::RecordingStatusChanged, save_flim_action, &QAction::setChecked);
+      connect(save_flim_action, &QAction::toggled, tcspc, &FifoTcspc::SetRecording, Qt::DirectConnection);
 
 
-      Bind(frame_accumulation_spin, bh, &BH::SetFrameAccumulation, &BH::GetFrameAccumulation);
+      Bind(frame_accumulation_spin, tcspc, &FifoTcspc::SetFrameAccumulation, &FifoTcspc::GetFrameAccumulation);
 
-      flim_display = new ImageRenderWindow("FLIM", bh);
+      flim_display = new ImageRenderWindow("FLIM", tcspc);
       mdi_area->addSubWindow(flim_display);
-   }
-   catch (std::exception e)
-   {
-      std::cout << e.what() << "\n";
-   }
 
 }
 
@@ -79,21 +80,21 @@ void EmptyLayout(QLayout* layout)
 
 void FlimDisplay::Shutdown()
 {
-   if (bh)
-      bh->SetScanning(false);
+   if (tcspc)
+      tcspc->SetScanning(false);
 }
 
 
 
 void FlimDisplay::SetScanning(bool scanning)
 {
-   if (bh)
-      bh->SetScanning(scanning);
+   if (tcspc)
+      tcspc->SetScanning(scanning);
 }
 
 void FlimDisplay::AcquireSequence()
 {
-   if (bh == nullptr)
+   if (tcspc == nullptr)
       return;
 
    QSettings s;
@@ -107,10 +108,10 @@ void FlimDisplay::AcquireSequence()
    current_frame = 0;
    auto_sequence_in_progress = true;
 
-   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
+//TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
 
    SetScanning(true);
-   bh->StartRecording(flim_file_name);
+   tcspc->StartRecording(flim_file_name);
 
    acquire_sequence_button->setEnabled(false);
 }
@@ -125,8 +126,6 @@ void FlimDisplay::FrameIncremented()
    if (current_frame == n_auto_frames)
    {
       QApplication::beep();
-
-      controller_mode_combo->setCurrentIndex(0); //DriveMode::Stationary - should do this with a callback...
    }
    else if (current_frame == n_auto_frames * 2)
    {
@@ -134,7 +133,7 @@ void FlimDisplay::FrameIncremented()
       QApplication::beep();
 
       SetScanning(false);
-      bh->SetRecording(false);
+      tcspc->SetRecording(false);
       
       auto_sequence_in_progress = false;
       acquire_sequence_button->setEnabled(true);

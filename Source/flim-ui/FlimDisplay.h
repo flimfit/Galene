@@ -7,6 +7,7 @@
 #include "Oscilloscope.h"
 #include "ImageRenderWindow.h"
 #include "ui_FlimDisplay.h"
+#include "chronologic.h"
 #include <memory>
 
 
@@ -38,7 +39,7 @@ public:
 
 private:
 
-   void SetupBH();
+   void SetupTCSPC();
    void AcquireSequence();
 
    void PositionUpdated(double position);
@@ -51,5 +52,5 @@ private:
    ImageRenderWindow* flim_display = nullptr;
 
    QWidget* camera_control = nullptr;
-   BH* bh = nullptr;
+   FifoTcspc* tcspc = nullptr;
 };

@@ -27,17 +27,18 @@ set(SOURCE
 )
 
 set(HEADERS
-	FlimDisplay.h
-	qcustomplot.h
-    Oscilloscope.h
+   BHRatesWidget.h
+   FlimDisplay.h
+   qcustomplot.h
+   Oscilloscope.h
 )
 
 include_directories(
 					${COMMON_INCLUDE_DIR}
 					${fifo_flim_INCLUDE_DIR}
 					${InstrumentControl_INCLUDE_DIR}
-                    ${InstrumentControlUI_INCLUDE_DIR}
-                    ${QT_USE_FILE}
+               ${InstrumentControlUI_INCLUDE_DIR}
+               ${QT_USE_FILE}
 					${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(flim-ui ${SOURCE} ${HEADERS} 
@@ -49,7 +50,6 @@ add_executable(flim-ui ${SOURCE} ${HEADERS}
 qt5_use_modules(flim-ui Widgets PrintSupport SerialPort)
 
 target_link_libraries(flim-ui
-   GPUPhaseCorrelation
    ${OpenCV_LIBS} 
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES})

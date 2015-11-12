@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QWidget>
-#include "BH.h"
+#include "FifoTcspc.h"
 #include "ui_BHRatesWidget.h"
 
 class BHRatesWidget : public QWidget, public Ui::BHRatesWidget
@@ -13,17 +13,17 @@ public:
       setupUi(this);
    };
 
-   void SetRates(rate_values rates)
+   void SetRates(FlimRates rates)
    {
-      SYNC_bar->setValue(ConvertToLog(rates.sync_rate));
-      CFD_bar->setValue(ConvertToLog(rates.cfd_rate));
-      TAC_bar->setValue(ConvertToLog(rates.tac_rate));
-      ADC_bar->setValue(ConvertToLog(rates.adc_rate));
+      SYNC_bar->setValue(ConvertToLog(rates.sync));
+      CFD_bar->setValue(ConvertToLog(rates.cfd));
+      TAC_bar->setValue(ConvertToLog(rates.tac));
+      ADC_bar->setValue(ConvertToLog(rates.adc));
 
-      sync_rate_label->setText(CompactNumberString(rates.sync_rate));
-      cfd_rate_label->setText(CompactNumberString(rates.cfd_rate));
-      tac_rate_label->setText(CompactNumberString(rates.tac_rate));
-      adc_rate_label->setText(CompactNumberString(rates.adc_rate));
+      sync_rate_label->setText(CompactNumberString(rates.sync));
+      cfd_rate_label->setText(CompactNumberString(rates.cfd));
+      tac_rate_label->setText(CompactNumberString(rates.tac));
+      adc_rate_label->setText(CompactNumberString(rates.adc));
 
    }
 
