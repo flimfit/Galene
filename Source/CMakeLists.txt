@@ -7,4 +7,5 @@ set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
 
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
+add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
