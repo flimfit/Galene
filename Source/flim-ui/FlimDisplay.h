@@ -7,7 +7,7 @@
 #include "Oscilloscope.h"
 #include "ImageRenderWindow.h"
 #include "ui_FlimDisplay.h"
-#include "chronologic.h"
+#include "cronologic.h"
 #include <memory>
 
 

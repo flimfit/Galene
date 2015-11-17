@@ -34,7 +34,7 @@ void FlimDisplay::SetupTCSPC()
 {
       try
       {
-         tcspc = new Chronologic(this);
+         tcspc = new Cronologic(this);
       }
       catch (std::runtime_error e)
       {
@@ -44,13 +44,13 @@ void FlimDisplay::SetupTCSPC()
          return;
       }
  
-      connect(tcspc, &FifoTcspc::RatesUpdated, bh_rates_widget, &BHRatesWidget::SetRates);
-      connect(tcspc, &FifoTcspc::FifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
-      connect(tcspc, &FifoTcspc::RecordingStatusChanged, save_flim_action, &QAction::setChecked);
-      connect(save_flim_action, &QAction::toggled, tcspc, &FifoTcspc::SetRecording, Qt::DirectConnection);
+      connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates);
+      connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+      connect(tcspc, &FifoTcspc::recordingStatusChanged, save_flim_action, &QAction::setChecked);
+      connect(save_flim_action, &QAction::toggled, tcspc, &FifoTcspc::setRecording, Qt::DirectConnection);
 
 
-      Bind(frame_accumulation_spin, tcspc, &FifoTcspc::SetFrameAccumulation, &FifoTcspc::GetFrameAccumulation);
+      Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
 
       flim_display = new ImageRenderWindow("FLIM", tcspc);
       mdi_area->addSubWindow(flim_display);
@@ -81,7 +81,7 @@ void EmptyLayout(QLayout* layout)
 void FlimDisplay::Shutdown()
 {
    if (tcspc)
-      tcspc->SetScanning(false);
+      tcspc->setScanning(false);
 }
 
 
@@ -89,7 +89,7 @@ void FlimDisplay::Shutdown()
 void FlimDisplay::SetScanning(bool scanning)
 {
    if (tcspc)
-      tcspc->SetScanning(scanning);
+      tcspc->setScanning(scanning);
 }
 
 void FlimDisplay::AcquireSequence()
@@ -111,7 +111,7 @@ void FlimDisplay::AcquireSequence()
 //TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
 
    SetScanning(true);
-   tcspc->StartRecording(flim_file_name);
+   tcspc->startRecording(flim_file_name);
 
    acquire_sequence_button->setEnabled(false);
 }
@@ -133,7 +133,7 @@ void FlimDisplay::FrameIncremented()
       QApplication::beep();
 
       SetScanning(false);
-      tcspc->SetRecording(false);
+      tcspc->setRecording(false);
       
       auto_sequence_in_progress = false;
       acquire_sequence_button->setEnabled(true);
