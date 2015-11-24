@@ -16,6 +16,26 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QListView" name="file_list_view">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QMdiArea" name="mdi_area"/>
+    </item>
+    <item>
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -30,26 +50,6 @@
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QPushButton" name="scan_button">
-         <property name="text">
-          <string>Scan</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QGroupBox" name="groupBox_6">
          <property name="minimumSize">
@@ -76,6 +76,20 @@
             </property>
             <property name="maximum">
              <number>1000</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Prefix</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="prefix_edit">
+            <property name="text">
+             <string>Flim_Name_</string>
             </property>
            </widget>
           </item>
@@ -118,17 +132,17 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QPushButton" name="scan_button">
+         <property name="text">
+          <string>Scan</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
-        </spacer>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="acquire_sequence_button">
@@ -150,38 +164,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="readout_text">
-         <property name="enabled">
-          <bool>true</bool>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>20</width>
+           <height>40</height>
           </size>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="tabStopWidth">
-          <number>80</number>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
+        </spacer>
        </item>
        <item>
         <widget class="BHRatesWidget" name="bh_rates_widget" native="true">
@@ -201,9 +194,6 @@
        </item>
       </layout>
      </widget>
-    </item>
-    <item>
-     <widget class="QMdiArea" name="mdi_area"/>
     </item>
    </layout>
   </widget>
@@ -225,6 +215,8 @@
     <addaction name="set_output_folder_action"/>
     <addaction name="separator"/>
     <addaction name="quit_action"/>
+    <addaction name="new_workspace_action"/>
+    <addaction name="open_workspace_action"/>
    </widget>
    <addaction name="menuFiles"/>
   </widget>
@@ -323,6 +315,22 @@
   <action name="set_output_folder_action">
    <property name="text">
     <string>Set Auto Sequence Output Folder...</string>
+   </property>
+  </action>
+  <action name="new_workspace_action">
+   <property name="text">
+    <string>New Workspace...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="open_workspace_action">
+   <property name="text">
+    <string>Open Workspace...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>

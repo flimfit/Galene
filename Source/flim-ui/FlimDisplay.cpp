@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
+#include "SimTcspc.h"
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
@@ -27,20 +28,20 @@ ControlBinder(this, "HandheldScanner")
    Bind(n_auto_frames_spin, this, &FlimDisplay::SetNumAutoFrames, &FlimDisplay::GetNumAutoFrames);
    connect(scan_button, &QPushButton::toggled, this, &FlimDisplay::SetScanning);
 
-
 }
 
 void FlimDisplay::SetupTCSPC()
 {
+
       try
       {
-         tcspc = new Cronologic(this);
+         int a = 0;
+         tcspc = new SimTcspc(this);
       }
       catch (std::runtime_error e)
       {
-         QMessageBox msg(QMessageBox::Critical, "Fatal Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));
+         QMessageBox msg(QMessageBox::Critical, "Critial Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));
          msg.exec();
-         QMetaObject::invokeMethod(this, "close", Qt::QueuedConnection);
          return;
       }
  
@@ -52,9 +53,14 @@ void FlimDisplay::SetupTCSPC()
 
       Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
 
-      flim_display = new ImageRenderWindow("FLIM", tcspc);
+      flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
+      flim_display->setWindowTitle("Preview");
       mdi_area->addSubWindow(flim_display);
 
+      preview_widget = new LifetimeDisplayWidget(this);
+      mdi_area->addSubWindow(preview_widget);
+
+      preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
 }
 
 void EmptyLayout(QLayout* layout)

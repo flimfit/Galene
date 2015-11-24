@@ -6,6 +6,7 @@
 #include "ControlBinder.h"
 #include "Oscilloscope.h"
 #include "ImageRenderWindow.h"
+#include "LifetimeDisplayWidget.h"
 #include "ui_FlimDisplay.h"
 #include "cronologic.h"
 #include <memory>
@@ -53,4 +54,6 @@ private:
 
    QWidget* camera_control = nullptr;
    FifoTcspc* tcspc = nullptr;
+
+   LifetimeDisplayWidget* preview_widget;
 };

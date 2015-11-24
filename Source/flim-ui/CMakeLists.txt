@@ -16,7 +16,8 @@ add_definitions(${QT_DEFINITIONS})
 
 qt5_wrap_ui(UI_HEADERS 
 			FlimDisplay.ui
-			BHRatesWidget.ui)
+			BHRatesWidget.ui
+         LifetimeDisplayWidget.ui)
 
 qt5_add_resources(UI_RESOURCES Resources.qrc)
 
@@ -31,6 +32,7 @@ set(HEADERS
    FlimDisplay.h
    qcustomplot.h
    Oscilloscope.h
+   LifetimeDisplayWidget.h
 )
 
 include_directories(
