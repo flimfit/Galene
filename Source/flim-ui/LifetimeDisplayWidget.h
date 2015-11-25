@@ -34,9 +34,10 @@ protected:
 
       auto& d = (*flimage)->getCurrentDecay();
 
-      QVector<double> decay(d.size());
-      QVector<double> t(d.size());
-      for (int i = 0; i < decay.size(); i++)
+      int n = static_cast<int>(d.size());
+      QVector<double> decay(n);
+      QVector<double> t(n);
+      for (int i = 0; i < n; i++)
       {
          decay[i] = d[i];
          t[i] = i;

@@ -21,15 +21,15 @@ public:
    explicit FlimDisplay();
    ~FlimDisplay();
 
-   void Shutdown();
+   void shutdown();
 
-   void SetStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
+   void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
 
-   void SetScanning(bool scanning);
-   void SetNumAutoFrames(int n_auto_frames_) { n_auto_frames = n_auto_frames_; };
-   int GetNumAutoFrames() { return n_auto_frames; }
+   void setScanning(bool scanning);
+   void setNumImages(int n_seq_images_) { n_seq_images = n_seq_images_; };
+   int getNumImages() { return n_seq_images; }
    
-   void SetAutoSaveFolder() 
+   void setAutoSaveFolder() 
    {
       QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
       folder = QFileDialog::getExistingDirectory(nullptr, "Choose an output folder", folder);
@@ -40,15 +40,15 @@ public:
 
 private:
 
-   void SetupTCSPC();
-   void AcquireSequence();
+   void setupTCSPC();
+   void acquireSequence();
 
-   void PositionUpdated(double position);
-   void FrameIncremented();
+   void positionUpdated(double position);
+   void frameIncremented();
 
    bool auto_sequence_in_progress = false;
    int current_frame = 0;
-   int n_auto_frames = 10;
+   int n_seq_images = 10;
 
    ImageRenderWindow* flim_display = nullptr;
 

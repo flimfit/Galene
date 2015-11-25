@@ -17,21 +17,21 @@ ControlBinder(this, "HandheldScanner")
 {
    setupUi(this);
 
-   connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::AcquireSequence);
-   connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::SetAutoSaveFolder);
+   connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
+   connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::setAutoSaveFolder);
 
-   SetupTCSPC();
+   setupTCSPC();
   
    // Setup menu actions
    //============================================================
    //connect(acquire_background_action, &QAction::triggered, processor, &OCTProcessor::AcquireBackground);
    
-   Bind(n_auto_frames_spin, this, &FlimDisplay::SetNumAutoFrames, &FlimDisplay::GetNumAutoFrames);
-   connect(scan_button, &QPushButton::toggled, this, &FlimDisplay::SetScanning);
+   connect(scan_button, &QPushButton::toggled, this, &FlimDisplay::setScanning);
+   Bind(n_images_spin, this, &FlimDisplay::setNumImages, &FlimDisplay::getNumImages);
 
 }
 
-void FlimDisplay::SetupTCSPC()
+void FlimDisplay::setupTCSPC()
 {
 
       try
@@ -86,7 +86,7 @@ void EmptyLayout(QLayout* layout)
 }
 
 
-void FlimDisplay::Shutdown()
+void FlimDisplay::shutdown()
 {
    if (tcspc)
       tcspc->setScanning(false);
@@ -94,13 +94,13 @@ void FlimDisplay::Shutdown()
 
 
 
-void FlimDisplay::SetScanning(bool scanning)
+void FlimDisplay::setScanning(bool scanning)
 {
    if (tcspc)
       tcspc->setScanning(scanning);
 }
 
-void FlimDisplay::AcquireSequence()
+void FlimDisplay::acquireSequence()
 {
    if (tcspc == nullptr)
       return;
@@ -111,36 +111,31 @@ void FlimDisplay::AcquireSequence()
    QString unique_string = QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss");
 
    QString flim_file_name = path.filePath(QString("AutoSequence %1 FLIM.spc").arg(unique_string));
-   QString tracking_file_name = path.filePath(QString("AutoSequence %1 tracking.csv").arg(unique_string));
 
    current_frame = 0;
    auto_sequence_in_progress = true;
 
 //TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
 
-   SetScanning(true);
+   setScanning(true);
    tcspc->startRecording(flim_file_name);
 
    acquire_sequence_button->setEnabled(false);
 }
 
-void FlimDisplay::FrameIncremented()
+void FlimDisplay::frameIncremented()
 {
    if (!auto_sequence_in_progress)
       return;
 
    current_frame++;
 
-   if (current_frame == n_auto_frames)
-   {
-      QApplication::beep();
-   }
-   else if (current_frame == n_auto_frames * 2)
+   if (current_frame == n_seq_images)
    {
       QApplication::beep();
       QApplication::beep();
 
-      SetScanning(false);
+      setScanning(false);
       tcspc->setRecording(false);
       
       auto_sequence_in_progress = false;
@@ -151,5 +146,5 @@ void FlimDisplay::FrameIncremented()
 
 FlimDisplay::~FlimDisplay()
 {
-   Shutdown();
+   shutdown();
 }
