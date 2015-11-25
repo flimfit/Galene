@@ -50,8 +50,8 @@ public:
 
 
 private:
-   typename QVector<T> y;
-   typename QVector<double> x;
+   QVector<T> y;
+   QVector<double> x;
    typename QVector<T>::iterator it_y;
    typename QVector<double>::iterator it_x;
    int idx;

@@ -36,7 +36,6 @@ void FlimDisplay::SetupTCSPC()
 
       try
       {
-         int a = 0;
          tcspc = new SimTcspc(this);
       }
       catch (std::runtime_error e)

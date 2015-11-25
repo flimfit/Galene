@@ -2,11 +2,8 @@
 #include <QCoreApplication>
 #include "FlimDisplay.h"
 #include "BHRatesWidget.h"
-#include "HighPerformanceTimer.h"
 #include <memory>
 #include <iostream>
-
-HighPerformanceTimer sys_timer("System");
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 
@@ -15,6 +12,10 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
    switch (type)
    {
+   case QtInfoMsg:
+      fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+      break;
+      
    case QtDebugMsg:
       fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
       break;
@@ -30,6 +31,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
    case QtFatalMsg:
       fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
       abort();
+         
    }
 }
 

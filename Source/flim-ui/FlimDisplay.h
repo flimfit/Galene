@@ -8,7 +8,7 @@
 #include "ImageRenderWindow.h"
 #include "LifetimeDisplayWidget.h"
 #include "ui_FlimDisplay.h"
-#include "cronologic.h"
+#include "SimTcspc.h"
 #include <memory>
 
 
