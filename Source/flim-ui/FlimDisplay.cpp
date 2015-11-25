@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include "SimTcspc.h"
+#include "ConstrainedMdiSubWindow.h"
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
@@ -53,12 +54,14 @@ void FlimDisplay::SetupTCSPC()
 
       Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
 
-      flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
-      flim_display->setWindowTitle("Preview");
-      mdi_area->addSubWindow(flim_display);
+      //flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
+      //flim_display->setWindowTitle("Preview");
+      //mdi_area->addSubWindow(flim_display);
 
-      preview_widget = new LifetimeDisplayWidget(this);
-      mdi_area->addSubWindow(preview_widget);
+      preview_widget = new LifetimeDisplayWidget;
+      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+      sub->setWidget(preview_widget);
+      mdi_area->addSubWindow(sub);
 
       preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
 }

@@ -14,15 +14,15 @@ public:
       QWidget(parent)
    {
       setupUi(this);
-      lifetime_image_widget->layout()->setContentsMargins(QMargins(0, 0, 0, 0));
-
       setupPlots();
+      connect(lifetime_image_widget, &ImageRenderWidget::ConstrainWidth, this, &LifetimeDisplayWidget::setMaximumWidth);
    }
 
    void setFLIMage(FLIMage** flimage_)
    {
       flimage = flimage_;
       connect(*flimage, &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
+      connect(*flimage, &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    }
 
 protected:
@@ -57,14 +57,22 @@ protected:
       cv::Mat& intensity = f->getIntensity();
       cv::Mat& mar = f->getMeanArrivalTime();
 
-      double min_mar = 500;
-      double max_mar = 5000;
+      double min_mar = 30;
+      double max_mar = 200;
 
-      mar.convertTo(scaled_mar, CV_8U, 255.0 / (max_mar - min_mar), -255.0/min_mar);
-      cv::applyColorMap(mar, display, cv::COLORMAP_JET);
+      mar.convertTo(scaled_mar, CV_8U, 255.0 / (max_mar - min_mar), -255.0 / (max_mar - min_mar));
+      cv::applyColorMap(scaled_mar, scaled_mar, cv::COLORMAP_JET);
 
-      lifetime_image_widget->GetRenderWidget()->
+      double i_min, i_max;
+      cv::minMaxLoc(intensity, &i_min, &i_max);
+      i_min = 0;
+      intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 / (i_max - i_min));
+      
 
+      display = cv::Mat(scaled_mar.rows, scaled_mar.cols, CV_8UC4);
+      cv::mixChannels({ { scaled_mar, alpha } }, { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
+
+      lifetime_image_widget->SetImage(display);
    }
 
    void setupPlots()
@@ -86,7 +94,9 @@ protected:
    }
 
    FLIMage** flimage = nullptr;
-   cv::Mat display;
+   cv::Mat mapped_mar;
    cv::Mat scaled_mar;
+   cv::Mat display;
+   cv::Mat alpha;
 
 };
