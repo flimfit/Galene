@@ -13,9 +13,14 @@
 using namespace std;
 
 FlimDisplay::FlimDisplay() :
-ControlBinder(this, "HandheldScanner")
+ControlBinder(this, "FLIMDisplay")
 {
    setupUi(this);
+
+   workspace = new FlimWorkspace(this);
+
+   connect(new_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::makeNew);
+   connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::setAutoSaveFolder);
@@ -29,6 +34,10 @@ ControlBinder(this, "HandheldScanner")
    connect(scan_button, &QPushButton::toggled, this, &FlimDisplay::setScanning);
    Bind(n_images_spin, this, &FlimDisplay::setNumImages, &FlimDisplay::getNumImages);
 
+   Bind(prefix_edit, workspace, &FlimWorkspace::setFilePrefix, &FlimWorkspace::getFilePrefix);
+   Bind(seq_number_spin, workspace, &FlimWorkspace::setSequenceNumber, &FlimWorkspace::getSequenceNumber, &FlimWorkspace::sequenceNumberChanged);
+
+   file_list_view->setModel(workspace);
 }
 
 void FlimDisplay::setupTCSPC()
@@ -105,22 +114,32 @@ void FlimDisplay::acquireSequence()
    if (tcspc == nullptr)
       return;
 
-   QSettings s;
-   QDir path = s.value("sequence_acq_output_folder", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString();
+   //QSettings s;
+   //QDir path = s.value("sequence_acq_output_folder", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString();
+   //QString unique_string = QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss");
+   //QString flim_file_name = path.filePath(QString("AutoSequence %1 FLIM.spc").arg(unique_string));
 
-   QString unique_string = QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss");
+   try
+   {
+      QString flim_file_name = workspace->getNextFileName();
 
-   QString flim_file_name = path.filePath(QString("AutoSequence %1 FLIM.spc").arg(unique_string));
 
-   current_frame = 0;
-   auto_sequence_in_progress = true;
+      current_frame = 0;
+      auto_sequence_in_progress = true;
 
-//TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
+      //TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
 
-   setScanning(true);
-   tcspc->startRecording(flim_file_name);
+      setScanning(true);
+      tcspc->startRecording(flim_file_name);
 
-   acquire_sequence_button->setEnabled(false);
+      acquire_sequence_button->setEnabled(false);
+   }
+   catch (std::runtime_error e)
+   {
+      QMessageBox::critical(this, "Error Occured", e.what());
+      return;
+   }
+
 }
 
 void FlimDisplay::frameIncremented()

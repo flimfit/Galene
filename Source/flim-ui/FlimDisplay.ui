@@ -28,6 +28,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="spacing">
+         <number>10</number>
+        </property>
        </widget>
       </item>
      </layout>
@@ -101,7 +104,7 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="prefix_edit">
             <property name="text">
-             <string>Flim_Name_</string>
+             <string>Flim_Name</string>
             </property>
            </widget>
           </item>
@@ -122,6 +125,23 @@
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Images</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Seq #</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="seq_number_spin">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>1000000</number>
             </property>
            </widget>
           </item>
@@ -167,9 +187,12 @@
         </widget>
        </item>
        <item>
-        <widget class="QProgressBar" name="progressBar">
+        <widget class="QProgressBar" name="progress_bar">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -220,13 +243,13 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="save_flim_action"/>
+    <addaction name="new_workspace_action"/>
+    <addaction name="open_workspace_action"/>
     <addaction name="separator"/>
+    <addaction name="save_flim_action"/>
     <addaction name="set_output_folder_action"/>
     <addaction name="separator"/>
     <addaction name="quit_action"/>
-    <addaction name="new_workspace_action"/>
-    <addaction name="open_workspace_action"/>
    </widget>
    <addaction name="menuFiles"/>
   </widget>
