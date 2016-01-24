@@ -37,11 +37,17 @@ protected:
       int n = static_cast<int>(d.size());
       QVector<double> decay(n);
       QVector<double> t(n);
+
+      int n_tot = 0;
+
       for (int i = 0; i < n; i++)
       {
+         n_tot += d[i];
          decay[i] = d[i];
          t[i] = i;
       }
+
+      //std::cout << n_tot << "\n";
 
       decay_plot->graph(0)->setData(t, decay);
       decay_plot->rescaleAxes();
@@ -79,9 +85,11 @@ protected:
    void setupPlots()
    {
       decay_plot->addGraph();
+      decay_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
 
       decay_plot->xAxis->setLabel("Time (ns)");
       decay_plot->yAxis->setLabel("Counts");
+
       decay_plot->replot();
 
 

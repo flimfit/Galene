@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
-#include "SimTcspc.h"
+#include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
@@ -45,7 +45,7 @@ void FlimDisplay::setupTCSPC()
 
       try
       {
-         tcspc = new SimTcspc(this);
+         tcspc = new Cronologic(this);
       }
       catch (std::runtime_error e)
       {
