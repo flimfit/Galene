@@ -82,11 +82,14 @@ protected:
 
       auto f = *flimage;
 
-      cv::Mat& intensity = f->getIntensity();
-      cv::Mat& mar = f->getMeanArrivalTime();
+      cv::Mat intensity = f->getIntensity();
+      cv::Mat mar = f->getMeanArrivalTime();
 
-      double min_mar = 30;
-      double max_mar = 200;
+      double min_mar = 0;
+      double max_mar = 20;
+
+      double l_min, l_max;
+      cv::minMaxLoc(mar, &l_min, &l_max);
 
       mar.convertTo(scaled_mar, CV_8U, 255.0 / (max_mar - min_mar), -255.0 / (max_mar - min_mar));
       cv::applyColorMap(scaled_mar, scaled_mar, cv::COLORMAP_JET);
