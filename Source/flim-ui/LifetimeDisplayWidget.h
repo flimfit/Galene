@@ -16,6 +16,11 @@ public:
       setupUi(this);
       setupPlots();
       connect(lifetime_image_widget, &ImageRenderWidget::ConstrainWidth, this, &LifetimeDisplayWidget::setMaximumWidth);
+
+      line_colors.push_back(Qt::blue);
+      line_colors.push_back(Qt::red);
+      line_colors.push_back(Qt::green);
+      line_colors.push_back(Qt::magenta);
    }
 
    void setFLIMage(FLIMage** flimage_)
@@ -32,26 +37,42 @@ protected:
       if (flimage == nullptr)
          return;
 
-      auto& d = (*flimage)->getCurrentDecay();
+      int n_chan = (*flimage)->getNumChannels();
+      int n_graphs = decay_plot->graphCount();
 
-      int n = static_cast<int>(d.size());
-      QVector<double> decay(n);
-      QVector<double> t(n);
-
-      int n_tot = 0;
-
-      for (int i = 0; i < n; i++)
+      for (int i = n_graphs; i < n_chan; i++)
       {
-         n_tot += d[i];
-         decay[i] = d[i];
-         t[i] = i;
+         int color_idx = i % line_colors.size();
+
+         decay_plot->addGraph();
+         decay_plot->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+         decay_plot->graph(i)->setPen(line_colors[color_idx]);
       }
 
-      //std::cout << n_tot << "\n";
+      for (int c = 0; c < n_chan; c++)
+      {
 
-      decay_plot->graph(0)->setData(t, decay);
-      decay_plot->rescaleAxes();
-      decay_plot->replot();
+         auto& d = (*flimage)->getCurrentDecay(c);
+
+         int n = static_cast<int>(d.size());
+         QVector<double> decay(n);
+         QVector<double> t(n);
+
+         int n_tot = 0;
+
+         for (int i = 0; i < n; i++)
+         {
+            n_tot += d[i];
+            decay[i] = d[i];
+            t[i] = i;
+         }
+
+         //std::cout << n_tot << "\n";
+
+         decay_plot->graph(c)->setData(t, decay);
+         decay_plot->rescaleAxes();
+         decay_plot->replot();
+      }
    }
 
    void updateLifetimeImage()
@@ -84,9 +105,6 @@ protected:
 
    void setupPlots()
    {
-      decay_plot->addGraph();
-      decay_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
-
       decay_plot->xAxis->setLabel("Time (ns)");
       decay_plot->yAxis->setLabel("Counts");
 
@@ -107,5 +125,7 @@ protected:
    cv::Mat scaled_mar;
    cv::Mat display;
    cv::Mat alpha;
+
+   std::vector<QColor> line_colors;
 
 };
