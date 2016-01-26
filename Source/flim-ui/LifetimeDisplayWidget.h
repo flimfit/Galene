@@ -2,8 +2,9 @@
 
 #include "ui_LifetimeDisplayWidget.h"
 #include "FLIMage.h"
+#include <memory>
 
-#include <opencv2/contrib/contrib.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
 class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget
@@ -23,11 +24,11 @@ public:
       line_colors.push_back(Qt::magenta);
    }
 
-   void setFLIMage(FLIMage** flimage_)
+   void setFLIMage(std::shared_ptr<FLIMage> flimage_)
    {
       flimage = flimage_;
-      connect(*flimage, &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
-      connect(*flimage, &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
+      connect(flimage.get(), &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
+      connect(flimage.get(), &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    }
 
 protected:
@@ -37,7 +38,7 @@ protected:
       if (flimage == nullptr)
          return;
 
-      int n_chan = (*flimage)->getNumChannels();
+      int n_chan = flimage->getNumChannels();
       int n_graphs = decay_plot->graphCount();
 
       for (int i = n_graphs; i < n_chan; i++)
@@ -52,7 +53,7 @@ protected:
       for (int c = 0; c < n_chan; c++)
       {
 
-         auto& d = (*flimage)->getCurrentDecay(c);
+         auto& d = flimage->getCurrentDecay(c);
 
          int n = static_cast<int>(d.size());
          QVector<double> decay(n);
@@ -80,16 +81,14 @@ protected:
       if (flimage == nullptr)
          return;
 
-      auto f = *flimage;
-
-      cv::Mat intensity = f->getIntensity();
-      cv::Mat mar = f->getMeanArrivalTime();
+      cv::Mat intensity = flimage->getIntensity();
+      cv::Mat mar = flimage->getMeanArrivalTime();
 
       double min_mar = 0;
       double max_mar = 20;
 
-      double l_min, l_max;
-      cv::minMaxLoc(mar, &l_min, &l_max);
+      //double l_min, l_max;
+      //cv::minMaxLoc(mar, &l_min, &l_max);
 
       mar.convertTo(scaled_mar, CV_8U, 255.0 / (max_mar - min_mar), -255.0 / (max_mar - min_mar));
       cv::applyColorMap(scaled_mar, scaled_mar, cv::COLORMAP_JET);
@@ -123,7 +122,7 @@ protected:
 
    }
 
-   FLIMage** flimage = nullptr;
+   std::shared_ptr<FLIMage> flimage;
    cv::Mat mapped_mar;
    cv::Mat scaled_mar;
    cv::Mat display;

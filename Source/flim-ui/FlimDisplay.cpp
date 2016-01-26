@@ -23,7 +23,11 @@ ControlBinder(this, "FLIMDisplay")
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
+   connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
    connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::setAutoSaveFolder);
+
+   file_writer = std::make_shared<FlimFileWriter>();
+
 
    setupTCSPC();
   
@@ -31,7 +35,7 @@ ControlBinder(this, "FLIMDisplay")
    //============================================================
    //connect(acquire_background_action, &QAction::triggered, processor, &OCTProcessor::AcquireBackground);
    
-   connect(scan_button, &QPushButton::toggled, this, &FlimDisplay::setScanning);
+   connect(live_button, &QPushButton::toggled, this, &FlimDisplay::setScanning);
    Bind(n_images_spin, this, &FlimDisplay::setNumImages, &FlimDisplay::getNumImages);
 
    Bind(prefix_edit, workspace, &FlimWorkspace::setFilePrefix, &FlimWorkspace::getFilePrefix);
@@ -43,35 +47,34 @@ ControlBinder(this, "FLIMDisplay")
 void FlimDisplay::setupTCSPC()
 {
 
-      try
-      {
-         tcspc = new Cronologic(this);
-      }
-      catch (std::runtime_error e)
-      {
-         QMessageBox msg(QMessageBox::Critical, "Critial Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));
-         msg.exec();
-         return;
-      }
- 
-      connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates);
-      connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
-      connect(tcspc, &FifoTcspc::recordingStatusChanged, save_flim_action, &QAction::setChecked);
-      connect(save_flim_action, &QAction::toggled, tcspc, &FifoTcspc::setRecording, Qt::DirectConnection);
+   try
+   {
+      tcspc = new SimTcspc(this);
+   }
+   catch (std::runtime_error e)
+   {
+      QMessageBox msg(QMessageBox::Critical, "Critial Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));
+      msg.exec();
+      return;
+   }
 
+   file_writer->setFifoTcspc(tcspc);
 
-      Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
+   connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
+   connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+   tcspc->addTcspcEventConsumer(file_writer);
+   Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
 
-      //flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
-      //flim_display->setWindowTitle("Preview");
-      //mdi_area->addSubWindow(flim_display);
+   //flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
+   //flim_display->setWindowTitle("Preview");
+   //mdi_area->addSubWindow(flim_display);
 
-      preview_widget = new LifetimeDisplayWidget;
-      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
-      sub->setWidget(preview_widget);
-      mdi_area->addSubWindow(sub);
+   preview_widget = new LifetimeDisplayWidget;
+   ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+   sub->setWidget(preview_widget);
+   mdi_area->addSubWindow(sub);
 
-      preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
+   preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
 }
 
 void EmptyLayout(QLayout* layout)
@@ -105,6 +108,7 @@ void FlimDisplay::shutdown()
 
 void FlimDisplay::setScanning(bool scanning)
 {
+   acquire_sequence_button->setEnabled(!scanning);
    if (tcspc)
       tcspc->setScanning(scanning);
 }
@@ -114,31 +118,35 @@ void FlimDisplay::acquireSequence()
    if (tcspc == nullptr)
       return;
 
-   //QSettings s;
-   //QDir path = s.value("sequence_acq_output_folder", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString();
-   //QString unique_string = QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss");
-   //QString flim_file_name = path.filePath(QString("AutoSequence %1 FLIM.spc").arg(unique_string));
-
    try
    {
-      QString flim_file_name = workspace->getNextFileName();
-
-
       current_frame = 0;
       auto_sequence_in_progress = true;
 
-      //TODO   connect(scanner, &GalvoScanner::FrameIncremented, this, &FlimDisplay::FrameIncremented);
+      QString flim_file_name = workspace->getNextFileName();
+      file_writer->startRecording(flim_file_name);
 
       setScanning(true);
-      tcspc->startRecording(flim_file_name);
 
-      acquire_sequence_button->setEnabled(false);
+      live_button->setEnabled(false);
+      stop_button->setEnabled(true);
    }
    catch (std::runtime_error e)
    {
       QMessageBox::critical(this, "Error Occured", e.what());
       return;
    }
+
+}
+
+void FlimDisplay::stopSequence()
+{
+
+   file_writer->stopRecording();
+   setScanning(false);
+
+   stop_button->setEnabled(false);
+   live_button->setEnabled(true);
 
 }
 
@@ -155,7 +163,6 @@ void FlimDisplay::frameIncremented()
       QApplication::beep();
 
       setScanning(false);
-      tcspc->setRecording(false);
       
       auto_sequence_in_progress = false;
       acquire_sequence_button->setEnabled(true);
