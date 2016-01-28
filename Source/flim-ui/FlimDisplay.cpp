@@ -49,7 +49,7 @@ void FlimDisplay::setupTCSPC()
 
    try
    {
-      tcspc = new SimTcspc(this);
+      tcspc = new Cronologic(this);
    }
    catch (std::runtime_error e)
    {
