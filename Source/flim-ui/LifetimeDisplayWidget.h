@@ -32,6 +32,8 @@ public:
       QueuedBind(tau_max_spin, this, &LifetimeDisplayWidget::setDisplayTauMax, &LifetimeDisplayWidget::getDisplayTauMax, &LifetimeDisplayWidget::displayTauMaxChanged);
       QueuedBind(intensity_min_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMin, &LifetimeDisplayWidget::getDisplayIntensityMin, &LifetimeDisplayWidget::displayIntensityMinChanged);
       QueuedBind(intensity_max_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMax, &LifetimeDisplayWidget::getDisplayIntensityMax, &LifetimeDisplayWidget::displayIntensityMaxChanged);
+
+      connect(rate_type_combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &LifetimeDisplayWidget::updateCountRates);
    }
 
    void setFLIMage(std::shared_ptr<FLIMage> flimage_)
@@ -39,6 +41,51 @@ public:
       flimage = flimage_;
       connect(flimage.get(), &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
       connect(flimage.get(), &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
+      connect(flimage.get(), &FLIMage::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
+
+      while (auto w = count_rate_layout->findChild<QWidget*>())
+         delete w;
+
+      int n_chan = flimage->getNumChannels();
+      for (int i = 0; i < n_chan; i++)
+      {
+         QPalette p;
+         p.setColor(QPalette::Window, line_colors[i].lighter());
+
+         auto w = new QLabel("---");
+         w->setFrameShape(QFrame::Shape::StyledPanel);
+         w->setMargin(2);
+         w->setAlignment(Qt::AlignCenter);
+         w->setAutoFillBackground(true);
+         w->setPalette(p);
+         count_rate_layout->addWidget(w);
+
+         rate_labels.push_back(w);
+      }
+   }
+
+   void updateCountRates()
+   {      
+      if (!flimage)
+         return;
+
+      auto& rates = (rate_type_combo->currentIndex()) ? flimage->getMaxInstantCountRates() : flimage->getCountRates();
+      QStringList label = { "", "k", "M", "G" };
+
+      for (int i = 0; i < rate_labels.size(); i++)
+      {
+         int idx = 0;
+         double rate = rates[i];
+         int dp = 0;
+         while ((rate > 1e3) && (idx < label.size()-1))
+         {
+            rate *= 1e-3;
+            idx++;
+            dp = 1;
+         }
+         QString text = QString("%1 %2cps").arg(rate,0,'f',dp).arg(label[idx]);
+         rate_labels[i]->setText(text);
+      }
    }
 
 signals:
@@ -227,6 +274,7 @@ protected:
    cv::Mat alpha;
 
    std::vector<QColor> line_colors;
+   std::vector<QLabel*> rate_labels;
 
    double display_tau_min;
    double display_tau_max;
