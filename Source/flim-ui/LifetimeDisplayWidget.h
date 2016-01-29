@@ -7,12 +7,15 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, public ControlBinder
 {
+   Q_OBJECT
+
 public:
    
    LifetimeDisplayWidget(QWidget* parent = 0) :
-      QWidget(parent)
+      QWidget(parent),
+      ControlBinder(parent, "LifetimeDisplayWidget")
    {
       setupUi(this);
       setupPlots();
@@ -22,6 +25,13 @@ public:
       line_colors.push_back(Qt::red);
       line_colors.push_back(Qt::green);
       line_colors.push_back(Qt::magenta);
+
+      QueuedBind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau);
+      QueuedBind(intensity_auto_check, this, &LifetimeDisplayWidget::setAutoscaleIntensity, &LifetimeDisplayWidget::getAutoscaleIntensity);
+      QueuedBind(tau_min_spin, this, &LifetimeDisplayWidget::setDisplayTauMin, &LifetimeDisplayWidget::getDisplayTauMin, &LifetimeDisplayWidget::displayTauMinChanged);
+      QueuedBind(tau_max_spin, this, &LifetimeDisplayWidget::setDisplayTauMax, &LifetimeDisplayWidget::getDisplayTauMax, &LifetimeDisplayWidget::displayTauMaxChanged);
+      QueuedBind(intensity_min_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMin, &LifetimeDisplayWidget::getDisplayIntensityMin, &LifetimeDisplayWidget::displayIntensityMinChanged);
+      QueuedBind(intensity_max_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMax, &LifetimeDisplayWidget::getDisplayIntensityMax, &LifetimeDisplayWidget::displayIntensityMaxChanged);
    }
 
    void setFLIMage(std::shared_ptr<FLIMage> flimage_)
@@ -31,7 +41,58 @@ public:
       connect(flimage.get(), &FLIMage::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    }
 
+signals:
+
+   void displayTauMinChanged(double);
+   void displayTauMaxChanged(double);
+   void displayIntensityMinChanged(int);
+   void displayIntensityMaxChanged(int);
+
 protected:
+
+   void setAutoscaleIntensity(bool autoscale_intensity_)
+   {
+      autoscale_intensity = autoscale_intensity_;
+      updateLifetimeScale();
+   }
+
+   void setAutoscaleTau(bool autoscale_tau_)
+   {
+      autoscale_tau = autoscale_tau_;
+      updateLifetimeScale();
+   }
+
+   void setDisplayTauMin(double display_tau_min_)
+   {
+      display_tau_min = display_tau_min_;
+      updateLifetimeScale();
+   }
+   
+   void setDisplayTauMax(double display_tau_max_)
+   {
+      display_tau_max = display_tau_max_;
+      updateLifetimeScale();
+   }
+
+   void setDisplayIntensityMin(int display_intensity_min_)
+   {
+      display_intensity_min = display_intensity_min_;
+      updateLifetimeScale();
+   }
+
+   void setDisplayIntensityMax(int display_intensity_max_)
+   {
+      display_intensity_max = display_intensity_max_;
+      updateLifetimeScale();
+   }
+   
+   bool getAutoscaleTau() { return autoscale_tau; }
+   bool getAutoscaleIntensity() { return autoscale_intensity; }
+   double getDisplayTauMin() { return display_tau_min; };
+   double getDisplayTauMax() { return display_tau_max; }
+   int getDisplayIntensityMin() { return display_intensity_min; };
+   int getDisplayIntensityMax() { return display_intensity_max; };
+
 
    void updateDecay()
    {
@@ -78,29 +139,66 @@ protected:
 
    void updateLifetimeImage()
    {
+      updateLifetimeImageImpl(true);
+   }
+
+   void updateLifetimeScale()
+   {
+      updateLifetimeImageImpl(false);
+   }
+
+   void updateLifetimeImageImpl(bool rescale)
+   {
       if (flimage == nullptr)
          return;
 
       cv::Mat intensity = flimage->getIntensity();
       cv::Mat mar = flimage->getMeanArrivalTime();
 
-      double min_mar = 0;
-      double max_mar = 20;
+      double mar_min, mar_max;
+      if (autoscale_tau && rescale)
+      {
+         cv::minMaxLoc(mar, &mar_min, &mar_max);
 
-      //double l_min, l_max;
-      //cv::minMaxLoc(mar, &l_min, &l_max);
+         display_tau_min = mar_min * 1e-3;
+         display_tau_max = mar_max * 1e-3;
 
-      mar.convertTo(scaled_mar, CV_8U, 255.0 / (max_mar - min_mar), -255.0 / (max_mar - min_mar));
-      cv::applyColorMap(scaled_mar, scaled_mar, cv::COLORMAP_JET);
+         emit displayTauMinChanged(display_tau_min);
+         emit displayTauMaxChanged(display_tau_max);
+      }
+      else
+      {
+         mar_min = display_tau_min * 1e3;
+         mar_max = display_tau_max * 1e3;
+      }
+
+      mar.convertTo(scaled_mar, CV_8U, 255.0 / (mar_max - mar_min), -255.0 * mar_min / (mar_max - mar_min));
+
+      cv::minMaxLoc(scaled_mar, &mar_min, &mar_max);
+
+
+      cv::applyColorMap(scaled_mar, mapped_mar, cv::COLORMAP_JET);
 
       double i_min, i_max;
-      cv::minMaxLoc(intensity, &i_min, &i_max);
-      i_min = 0;
-      intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 / (i_max - i_min));
+      if (autoscale_intensity && rescale)
+      {
+         cv::minMaxLoc(intensity, &i_min, &i_max);
+         display_intensity_min = 0;
+         display_intensity_max = i_max;
+         emit displayIntensityMinChanged(display_intensity_min);
+         emit displayIntensityMaxChanged(display_intensity_max);
+      }
+      else
+      {
+         i_min = display_intensity_min;
+         i_max = display_intensity_max;
+      }
+
+      intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 * i_min / (i_max - i_min));
       
 
-      display = cv::Mat(scaled_mar.rows, scaled_mar.cols, CV_8UC4);
-      cv::mixChannels({ { scaled_mar, alpha } }, { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
+      display = cv::Mat(mapped_mar.rows, mapped_mar.cols, CV_8UC4);
+      cv::mixChannels({ { mapped_mar, alpha } }, { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
 
       lifetime_image_widget->SetImage(display);
    }
@@ -130,4 +228,10 @@ protected:
 
    std::vector<QColor> line_colors;
 
+   double display_tau_min;
+   double display_tau_max;
+   bool autoscale_tau = true;
+   int display_intensity_min;
+   int display_intensity_max;
+   bool autoscale_intensity = true;
 };
