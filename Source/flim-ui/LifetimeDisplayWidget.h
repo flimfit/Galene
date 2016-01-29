@@ -115,6 +115,7 @@ protected:
       {
 
          auto& d = flimage->getCurrentDecay(c);
+         double time_resolution = flimage->getTimeResolution();
 
          int n = static_cast<int>(d.size());
          QVector<double> decay(n);
@@ -126,7 +127,7 @@ protected:
          {
             n_tot += d[i];
             decay[i] = d[i];
-            t[i] = i;
+            t[i] = i * time_resolution * 1e-3;
          }
 
          //std::cout << n_tot << "\n";
@@ -194,8 +195,7 @@ protected:
          i_max = display_intensity_max;
       }
 
-      intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 * i_min / (i_max - i_min));
-      
+      intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 * i_min / (i_max - i_min));     
 
       display = cv::Mat(mapped_mar.rows, mapped_mar.cols, CV_8UC4);
       cv::mixChannels({ { mapped_mar, alpha } }, { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
