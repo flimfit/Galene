@@ -24,7 +24,6 @@ ControlBinder(this, "FLIMDisplay")
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
-   connect(set_output_folder_action, &QAction::triggered, this, &FlimDisplay::setAutoSaveFolder);
 
    file_writer = std::make_shared<FlimFileWriter>();
 
@@ -35,9 +34,8 @@ ControlBinder(this, "FLIMDisplay")
    //============================================================
    //connect(acquire_background_action, &QAction::triggered, processor, &OCTProcessor::AcquireBackground);
    
-   connect(live_button, &QPushButton::toggled, this, &FlimDisplay::setScanning);
-   Bind(n_images_spin, this, &FlimDisplay::setNumImages, &FlimDisplay::getNumImages);
-
+   connect(live_button, &QPushButton::toggled, this, &FlimDisplay::setLive);
+   
    Bind(prefix_edit, workspace, &FlimWorkspace::setFilePrefix, &FlimWorkspace::getFilePrefix);
    Bind(seq_number_spin, workspace, &FlimWorkspace::setSequenceNumber, &FlimWorkspace::getSequenceNumber, &FlimWorkspace::sequenceNumberChanged);
 
@@ -49,7 +47,7 @@ void FlimDisplay::setupTCSPC()
 
    try
    {
-      tcspc = new Cronologic(this);
+      tcspc = new SimTcspc(this); //Cronologic(this);
    }
    catch (std::runtime_error e)
    {
@@ -60,10 +58,14 @@ void FlimDisplay::setupTCSPC()
 
    file_writer->setFifoTcspc(tcspc);
 
+   connect(tcspc, &FifoTcspc::acquisitionStatusChanged, this, &FlimDisplay::acquisitionStatusChanged);
    connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
    connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+   connect(tcspc, &FifoTcspc::progressUpdated, this, &FlimDisplay::updateProgress);
+
    tcspc->addTcspcEventConsumer(file_writer);
    Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
+   Bind(n_images_spin, tcspc, &FifoTcspc::setNumImages, &FifoTcspc::getNumImages);
 
    //flim_display = new ImageRenderWindow(nullptr, "FLIM", tcspc);
    //flim_display->setWindowTitle("Preview");
@@ -100,17 +102,33 @@ void EmptyLayout(QLayout* layout)
 
 void FlimDisplay::shutdown()
 {
-   if (tcspc)
-      tcspc->setScanning(false);
+//   if (tcspc)
+//      tcspc->setScanning(false);
 }
 
 
+void FlimDisplay::updateProgress(double progress)
+{
+   progress_bar->setValue(progress * 100);
+}
 
-void FlimDisplay::setScanning(bool scanning)
+
+void FlimDisplay::setLive(bool scanning)
 {
    acquire_sequence_button->setEnabled(!scanning);
    if (tcspc)
-      tcspc->setScanning(scanning);
+      tcspc->setLive(scanning);
+}
+
+void FlimDisplay::acquisitionStatusChanged(bool acq_in_progress)
+{
+   acquire_sequence_button->setEnabled(!acq_in_progress);
+   live_button->setEnabled(!acq_in_progress);
+   stop_button->setEnabled(acq_in_progress);
+   progress_bar->setEnabled(acq_in_progress);
+
+   if (!acq_in_progress)
+      progress_bar->setValue(0);
 }
 
 void FlimDisplay::acquireSequence()
@@ -120,19 +138,14 @@ void FlimDisplay::acquireSequence()
 
    try
    {
-      current_frame = 0;
-      auto_sequence_in_progress = true;
-
       QString flim_file_name = workspace->getNextFileName();
       file_writer->startRecording(flim_file_name);
 
-      setScanning(true);
-
-      live_button->setEnabled(false);
-      stop_button->setEnabled(true);
+      tcspc->startAcquisition();
    }
    catch (std::runtime_error e)
    {
+      stopSequence();
       QMessageBox::critical(this, "Error Occured", e.what());
       return;
    }
@@ -141,15 +154,11 @@ void FlimDisplay::acquireSequence()
 
 void FlimDisplay::stopSequence()
 {
-
    file_writer->stopRecording();
-   setScanning(false);
-
-   stop_button->setEnabled(false);
-   live_button->setEnabled(true);
-
+   tcspc->cancelAcquisition();
 }
 
+/*
 void FlimDisplay::frameIncremented()
 {
    if (!auto_sequence_in_progress)
@@ -169,6 +178,7 @@ void FlimDisplay::frameIncremented()
    }
    
 }
+*/
 
 FlimDisplay::~FlimDisplay()
 {

@@ -29,18 +29,9 @@ public:
 
    void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
 
-   void setScanning(bool scanning);
-   void setNumImages(int n_seq_images_) { n_seq_images = n_seq_images_; };
-   int getNumImages() { return n_seq_images; }
-   
-   void setAutoSaveFolder() 
-   {
-      QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-      folder = QFileDialog::getExistingDirectory(nullptr, "Choose an output folder", folder);
+   void setLive(bool live);
 
-      QSettings s;
-      s.setValue("sequence_acq_output_folder", folder);
-   }
+   void updateProgress(double progress);
 
 private:
 
@@ -48,12 +39,7 @@ private:
    void acquireSequence();
    void stopSequence();
 
-   void positionUpdated(double position);
-   void frameIncremented();
-
-   bool auto_sequence_in_progress = false;
-   int current_frame = 0;
-   int n_seq_images = 10;
+   void acquisitionStatusChanged(bool acq_in_progress);
 
    ImageRenderWindow* flim_display = nullptr;
 
@@ -61,8 +47,6 @@ private:
    FifoTcspc* tcspc = nullptr;
 
    std::shared_ptr<FlimFileWriter> file_writer;
-
    LifetimeDisplayWidget* preview_widget;
-
    FlimWorkspace* workspace;
 };
