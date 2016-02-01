@@ -177,8 +177,6 @@ protected:
             t[i] = i * time_resolution * 1e-3;
          }
 
-         //std::cout << n_tot << "\n";
-
          decay_plot->graph(c)->setData(t, decay);
          decay_plot->rescaleAxes();
          decay_plot->replot();

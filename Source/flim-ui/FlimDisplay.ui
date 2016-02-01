@@ -390,6 +390,16 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>file_list_view</tabstop>
+  <tabstop>frame_accumulation_spin</tabstop>
+  <tabstop>n_images_spin</tabstop>
+  <tabstop>prefix_edit</tabstop>
+  <tabstop>seq_number_spin</tabstop>
+  <tabstop>live_button</tabstop>
+  <tabstop>acquire_sequence_button</tabstop>
+  <tabstop>stop_button</tabstop>
+ </tabstops>
  <resources>
   <include location="Resources.qrc"/>
  </resources>

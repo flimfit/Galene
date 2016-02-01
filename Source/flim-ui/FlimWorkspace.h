@@ -3,6 +3,8 @@
 #include <QFileDialog>
 #include <QAbstractListModel>
 #include <QFileSystemWatcher>
+#include <QSettings>
+#include <QStringList>
 
 class FlimWorkspace : public QAbstractListModel
 {
@@ -12,6 +14,9 @@ public:
    FlimWorkspace(QObject* parent = 0, const QString& dir = "") :
       QAbstractListModel(parent)
    {
+      folder_watcher = new QFileSystemWatcher(this);
+      connect(folder_watcher, &QFileSystemWatcher::directoryChanged, this, &FlimWorkspace::update);
+
       if (dir != "")
       {
          if (QDir(dir).exists())
@@ -19,9 +24,13 @@ public:
          else
             makeNewFromFolder(dir);
       }
-
-      folder_watcher = new QFileSystemWatcher(this);
-      connect(folder_watcher, &QFileSystemWatcher::directoryChanged, this, &FlimWorkspace::update);
+      else 
+      {
+         QSettings settings;
+         QString last_workspace = settings.value("workspace/last_workspace","").toString();
+         if (!last_workspace.isEmpty())
+            openFromFolder(last_workspace);
+      }
    }
 
    void update()
@@ -71,23 +80,14 @@ public:
       if (!QDir(dir).exists())
          QDir().mkdir(dir);
 
-      folder_watcher->removePath(workspace.absolutePath());
-      folder_watcher->addPath(dir);
-
-      workspace = dir;
-      has_workspace = true;
-      update();
+      setWorkspace(dir);
    }
 
    void openFromFolder(const QString& dir)
    {
-      folder_watcher->removePath(workspace.absolutePath());
-      folder_watcher->addPath(dir);
-
-      workspace = dir;
-      has_workspace = true;
-      update();
+      setWorkspace(dir);
    }
+
 
    QString getNextFileName()
    {
@@ -112,10 +112,26 @@ signals:
 
 protected:
 
-   void enumerate()
+   void setWorkspace(const QString& dir)
    {
+      folder_watcher->removePath(workspace.absolutePath());
+      folder_watcher->addPath(dir);
 
+      workspace = dir;
+      has_workspace = true;
+      update();
+
+      QSettings settings;
+      settings.setValue("workspace/last_workspace", dir);
+
+      QStringList recent_workspaces = settings.value("workspace/recent_workspaces").toStringList();
+      recent_workspaces.push_front(dir);
+      while (recent_workspaces.size() > 20)
+         recent_workspaces.pop_back();
+      recent_workspaces.removeDuplicates();
+      settings.setValue("workspace/recent_workspaces", recent_workspaces);
    }
+
 
    bool has_workspace = false;
    QDir workspace;
