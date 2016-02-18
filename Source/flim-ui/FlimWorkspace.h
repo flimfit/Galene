@@ -101,7 +101,13 @@ public:
       return next_file;
    }
 
-   void setFilePrefix(const QString& prefix_) { file_prefix = prefix_; }
+   void setFilePrefix(const QString& prefix_)
+   { 
+      file_prefix = prefix_;
+      sequence_number = 1;
+      emit sequenceNumberChanged(sequence_number);
+   }
+   
    const QString& getFilePrefix() { return file_prefix; }
 
    void setSequenceNumber(int sequence_number_) { sequence_number = sequence_number_; }
