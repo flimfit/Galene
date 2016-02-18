@@ -252,6 +252,7 @@ protected:
    {
       decay_plot->xAxis->setLabel("Time (ns)");
       decay_plot->yAxis->setLabel("Counts");
+      decay_plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
 
       decay_plot->replot();
 
