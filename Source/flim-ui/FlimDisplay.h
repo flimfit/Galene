@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QMdiSubWindow>
 #include "qcustomplot.h"
 
 #include "ControlBinder.h"
@@ -33,6 +34,8 @@ public:
 
    void updateProgress(double progress);
 
+   void showTcspcSettings();
+
 private:
 
    void setupTCSPC();
@@ -43,7 +46,8 @@ private:
 
    ImageRenderWindow* flim_display = nullptr;
 
-   QWidget* camera_control = nullptr;
+   QWidget* tcspc_control = nullptr;
+   QMdiSubWindow* tcspc_settings_window = nullptr;
    FifoTcspc* tcspc = nullptr;
 
    std::shared_ptr<FlimFileWriter> file_writer;

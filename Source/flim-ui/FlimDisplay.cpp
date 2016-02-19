@@ -7,6 +7,7 @@
 #include <fstream>
 #include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
+#include "FifoTcspcControlDisplayFactory.h"
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
@@ -32,8 +33,8 @@ ControlBinder(this, "FLIMDisplay")
   
    // Setup menu actions
    //============================================================
-   //connect(acquire_background_action, &QAction::triggered, processor, &OCTProcessor::AcquireBackground);
-   
+   connect(tcspc_settings_action, &QAction::triggered, this, &FlimDisplay::showTcspcSettings);
+
    connect(live_button, &QPushButton::toggled, this, &FlimDisplay::setLive);
    
    Bind(prefix_edit, workspace, &FlimWorkspace::setFilePrefix, &FlimWorkspace::getFilePrefix);
@@ -44,10 +45,21 @@ ControlBinder(this, "FLIMDisplay")
 
 void FlimDisplay::setupTCSPC()
 {
-
+   bool use_simulated = true;
    try
    {
-      tcspc = new SimTcspc(this); //Cronologic(this);
+      if (use_simulated)
+      {
+         tcspc = new SimTcspc(this); //Cronologic(this);
+         tcspc_control = new QWidget();
+      }
+      else
+      {
+         Cronologic* c = new Cronologic(this);
+         tcspc_control = new CronologicControlDisplay(c);
+         tcspc = c;
+      }
+
    }
    catch (std::runtime_error e)
    {
@@ -57,6 +69,8 @@ void FlimDisplay::setupTCSPC()
    }
 
    file_writer->setFifoTcspc(tcspc);
+
+   tcspc_control->setWindowTitle("TCSPC Settings");
 
    connect(tcspc, &FifoTcspc::acquisitionStatusChanged, this, &FlimDisplay::acquisitionStatusChanged);
    connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
@@ -74,9 +88,23 @@ void FlimDisplay::setupTCSPC()
    preview_widget = new LifetimeDisplayWidget;
    ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
    sub->setWidget(preview_widget);
+   sub->setAttribute(Qt::WA_DeleteOnClose);
    mdi_area->addSubWindow(sub);
 
    preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
+}
+
+void FlimDisplay::showTcspcSettings()
+{
+   if (tcspc_settings_window == nullptr)
+   {
+      tcspc_settings_window = mdi_area->addSubWindow(tcspc_control);
+      tcspc_settings_window->show();
+      connect(tcspc_settings_window, &QObject::destroyed, [&]() {
+         tcspc_control->setParent(this);
+         tcspc_settings_window = nullptr;
+      });
+   }
 }
 
 void EmptyLayout(QLayout* layout)

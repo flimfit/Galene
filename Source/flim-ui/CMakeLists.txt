@@ -25,6 +25,7 @@ set(SOURCE
 	FlimDisplay.cpp
 	Main.cpp
 	qcustomplot.cpp
+   CronologicControlDisplay.cpp
 )
 
 set(HEADERS
@@ -34,6 +35,8 @@ set(HEADERS
    Oscilloscope.h
    LifetimeDisplayWidget.h
    FlimWorkspace.h
+   CronologicControlDisplay.h
+   FifoTcspcControlDisplayFactory.h
 )
 
 include_directories(${COMMON_INCLUDE_DIR}

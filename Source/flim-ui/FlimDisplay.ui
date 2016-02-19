@@ -76,11 +76,11 @@
          <property name="title">
           <string>Sequence</string>
          </property>
-         <layout class="QFormLayout" name="formLayout_9">
+         <layout class="QFormLayout" name="formLayout_2">
           <item row="0" column="0">
            <widget class="QLabel" name="label_28">
             <property name="text">
-             <string>Frames</string>
+             <string>Frame Accum.</string>
             </property>
            </widget>
           </item>
@@ -94,17 +94,10 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>Prefix</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="prefix_edit">
-            <property name="text">
-             <string>Flim_Name</string>
+             <string>Images</string>
             </property>
            </widget>
           </item>
@@ -121,21 +114,37 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_12">
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Experiment Name</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>Images</string>
+             <string>Prefix</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="prefix_edit">
+            <property name="text">
+             <string>Flim_Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Seq #</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="1" column="1">
            <widget class="QSpinBox" name="seq_number_spin">
             <property name="minimum">
              <number>1</number>
@@ -267,7 +276,14 @@
     <addaction name="separator"/>
     <addaction name="quit_action"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="tcspc_settings_action"/>
+   </widget>
    <addaction name="menuFiles"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -381,6 +397,11 @@
     <string>Ctrl+O</string>
    </property>
   </action>
+  <action name="tcspc_settings_action">
+   <property name="text">
+    <string>TCSPC Settings...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -394,8 +415,6 @@
   <tabstop>file_list_view</tabstop>
   <tabstop>frame_accumulation_spin</tabstop>
   <tabstop>n_images_spin</tabstop>
-  <tabstop>prefix_edit</tabstop>
-  <tabstop>seq_number_spin</tabstop>
   <tabstop>live_button</tabstop>
   <tabstop>acquire_sequence_button</tabstop>
   <tabstop>stop_button</tabstop>
