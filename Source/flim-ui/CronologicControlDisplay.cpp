@@ -13,21 +13,33 @@ CronologicControlDisplay::CronologicControlDisplay(Cronologic* tcspc, QWidget* p
    tcspc(tcspc), QWidget(parent)
 {
 
-   // ROI Controls
+   // Threshold Controls
    //===================================================
    QFormLayout* thresh_layout = new QFormLayout();
-   addWidget(thresh_layout, "Threshold_0", Integer);
-   addWidget(thresh_layout, "Threshold_1", Integer);
-   addWidget(thresh_layout, "Threshold_2", Integer);
+   addWidget(thresh_layout, "Start_Threshold", Float);
+   addWidget(thresh_layout, "Threshold_0", Float);
+   addWidget(thresh_layout, "Threshold_1", Float);
+   addWidget(thresh_layout, "Threshold_2", Float);
 
    QGroupBox* thresh_group = new QGroupBox("Thresholds");
    thresh_group->setLayout(thresh_layout);
+
+   // Threshold Controls
+   //===================================================
+   QFormLayout* time_shift_layout = new QFormLayout();
+   addWidget(time_shift_layout, "Time_Shift_0", Integer);
+   addWidget(time_shift_layout, "Time_Shift_1", Integer);
+   addWidget(time_shift_layout, "Time_Shift_2", Integer);
+
+   QGroupBox* time_shift_group = new QGroupBox("Time Shifts");
+   time_shift_group->setLayout(time_shift_layout);
 
 
    // Add control panels to window
    //==================================================
    QVBoxLayout* side_layout = new QVBoxLayout();
    side_layout->addWidget(thresh_group);
+   side_layout->addWidget(time_shift_group);
    side_layout->setMargin(0);
 
    setLayout(side_layout);

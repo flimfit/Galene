@@ -45,7 +45,7 @@ ControlBinder(this, "FLIMDisplay")
 
 void FlimDisplay::setupTCSPC()
 {
-   bool use_simulated = true;
+   bool use_simulated = false;
    try
    {
       if (use_simulated)

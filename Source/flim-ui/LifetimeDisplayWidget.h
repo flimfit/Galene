@@ -22,8 +22,8 @@ public:
       connect(lifetime_image_widget, &ImageRenderWidget::ConstrainWidth, this, &LifetimeDisplayWidget::setMaximumWidth);
 
       line_colors.push_back(Qt::blue);
-      line_colors.push_back(Qt::red);
       line_colors.push_back(Qt::green);
+      line_colors.push_back(Qt::red);
       line_colors.push_back(Qt::magenta);
 
       QueuedBind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau);
