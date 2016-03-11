@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QVector>
 #include <QDateTime>
+#include <QMessageBox>
 #include <iostream>
 #include <fstream>
 #include "Cronologic.h"
@@ -48,16 +49,24 @@ ControlBinder(this, "FLIMDisplay")
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
 
    connect(workspace, &FlimWorkspace::openRequest, [&](const QString& filename) {
-      FlimFileReader* reader = new FlimFileReader(filename);
+      try
+      {
 
-      LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
-      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
-      sub->setWidget(widget);
-      sub->setAttribute(Qt::WA_DeleteOnClose);
-      mdi_area->addSubWindow(sub);
-      widget->setFLIMage(reader->getFLIMage());
-      widget->show();
-      widget->setWindowTitle(QFileInfo(filename).baseName());
+         FlimFileReader* reader = new FlimFileReader(filename);
+
+         LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
+         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+         sub->setWidget(widget);
+         sub->setAttribute(Qt::WA_DeleteOnClose);
+         mdi_area->addSubWindow(sub);
+         widget->setFLIMage(reader->getFLIMage());
+         widget->show();
+         widget->setWindowTitle(QFileInfo(filename).baseName());
+      }
+      catch (std::runtime_error e)
+      {
+         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1'").arg(filename));
+      }
    });
 
 }

@@ -145,7 +145,9 @@ public:
 
    void setFilePrefix(const QString& prefix_)
    { 
-      file_prefix = prefix_;
+      QString new_prefix = prefix_; 
+      new_prefix.remove(QRegExp("[/\\\\:\\.""\\*<>\\?|]")); // attempt to remove illegal characters - this isn't comprehensive
+      file_prefix = new_prefix;
       sequence_number = 1;
       emit sequenceNumberChanged(sequence_number);
    }
