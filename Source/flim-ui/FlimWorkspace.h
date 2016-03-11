@@ -135,7 +135,7 @@ public:
       if (!has_workspace)
          throw std::runtime_error("No workspace selected. Please select a workspace from the file menu.");
 
-      QString next_file = workspace.absoluteFilePath(QString("%1_%2.%3").arg(file_prefix).arg(sequence_number, 3, 10, QChar('0')).arg(file_extension));
+      QString next_file = workspace.absoluteFilePath(QString("%1_%2%3").arg(file_prefix).arg(sequence_number, 3, 10, QChar('0')).arg(file_extension));
 
       emit sequenceNumberChanged(++sequence_number);
 
