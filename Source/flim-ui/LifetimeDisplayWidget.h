@@ -88,6 +88,16 @@ public:
       }
    }
 
+   void setClosable(bool closable_) { closable = closable_; }
+
+   void closeEvent(QCloseEvent *event)
+   {
+      if (closable)
+         event->accept();
+      else
+         event->ignore();
+   }
+
 signals:
 
    void displayTauMinChanged(double);
@@ -281,4 +291,5 @@ protected:
    int display_intensity_min;
    int display_intensity_max;
    bool autoscale_intensity = true;
+   bool closable = true;
 };
