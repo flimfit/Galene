@@ -8,6 +8,7 @@
 #include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
+#include "FlimFileReader.h"
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
@@ -41,11 +42,29 @@ ControlBinder(this, "FLIMDisplay")
    Bind(seq_number_spin, workspace, &FlimWorkspace::setSequenceNumber, &FlimWorkspace::getSequenceNumber, &FlimWorkspace::sequenceNumberChanged);
 
    file_list_view->setModel(workspace);
+   file_list_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+   file_list_view->setEditTriggers(QAbstractItemView::EditKeyPressed);
+   file_list_view->installEventFilter(new WorkspaceEventFilter(workspace));
+   connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
+
+   connect(workspace, &FlimWorkspace::openRequest, [&](const QString& filename) {
+      FlimFileReader* reader = new FlimFileReader(filename);
+
+      LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
+      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+      sub->setWidget(widget);
+      sub->setAttribute(Qt::WA_DeleteOnClose);
+      mdi_area->addSubWindow(sub);
+      widget->setFLIMage(reader->getFLIMage());
+      widget->show();
+      widget->setWindowTitle(QFileInfo(filename).baseName());
+   });
+
 }
 
 void FlimDisplay::setupTCSPC()
 {
-   bool use_simulated = false;
+   bool use_simulated = true;
    try
    {
       if (use_simulated)

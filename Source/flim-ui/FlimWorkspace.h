@@ -38,7 +38,10 @@ public:
       if (has_workspace)
       {
          beginResetModel();
-         files = workspace.entryList({ "*.ffd" }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+         auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension) }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+         files.clear();
+         for (auto& info : file_info)
+            files.append(info.baseName());
          endResetModel();
       }
    }
@@ -50,7 +53,7 @@ public:
 
    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const
    {
-      if (role == Qt::DisplayRole)
+      if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
          if (index.row() < files.size())
             return files[index.row()];
@@ -58,6 +61,44 @@ public:
 
       return QVariant();
    }
+
+   Qt::ItemFlags flags(const QModelIndex &index) const
+   {
+      return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+   }
+
+   bool setData(const QModelIndex &index, const QVariant &value, int role)
+   {
+      if (role == Qt::EditRole)
+         return workspace.rename(index.data().toString().append(file_extension), value.toString().append(file_extension));
+      return false;
+   }
+
+
+   void deleteFiles(const QModelIndexList& indexes, bool request_confirmation = true)
+   {
+      if (request_confirmation)
+      {
+         auto response = QMessageBox::question(nullptr, "Confirm File Deletion", "Are you sure you want to delete the selected files?");
+         if (response == QMessageBox::StandardButton::No) return;
+      }
+
+      for (auto& idx : indexes)
+         workspace.remove(idx.data().toString());
+   }
+
+   void requestOpenFiles(const QModelIndexList& indexes)
+   {
+      for (auto& idx : indexes)
+         requestOpenFile(idx);
+   }
+
+   void requestOpenFile(const QModelIndex index)
+   {
+      QString full_file = workspace.absoluteFilePath(QString("%1%2").arg(index.data().toString()).arg(file_extension));
+      emit openRequest(full_file);
+   }
+
 
    void makeNew()
    {
@@ -94,12 +135,13 @@ public:
       if (!has_workspace)
          throw std::runtime_error("No workspace selected. Please select a workspace from the file menu.");
 
-      QString next_file = workspace.absoluteFilePath(QString("%1_%2.ffd").arg(file_prefix).arg(sequence_number, 3, 10, QChar('0')));
+      QString next_file = workspace.absoluteFilePath(QString("%1_%2.%3").arg(file_prefix).arg(sequence_number, 3, 10, QChar('0')).arg(file_extension));
 
       emit sequenceNumberChanged(++sequence_number);
 
       return next_file;
    }
+
 
    void setFilePrefix(const QString& prefix_)
    { 
@@ -115,6 +157,7 @@ public:
 
 signals:
    void sequenceNumberChanged(int sequence_number);
+   void openRequest(const QString& file);
 
 protected:
 
@@ -143,9 +186,84 @@ protected:
    QDir workspace;
    QString file_prefix = "FLIM_Data_";
    int sequence_number = 0;
+   QString file_extension = ".ffd";
 
    int n_files;
    QStringList files;
 
    QFileSystemWatcher* folder_watcher;
+};
+
+
+class WorkspaceEventFilter : public QObject
+{
+   Q_OBJECT
+
+public:
+   WorkspaceEventFilter(FlimWorkspace* workspace) :
+      workspace(workspace)
+   {
+
+   }
+
+
+protected: 
+   bool eventFilter(QObject *obj, QEvent* event)
+   {
+      QListView* view = reinterpret_cast<QListView*>(obj);
+
+      if (event->type() == QEvent::KeyPress)
+      {
+         QKeyEvent *key_event = static_cast<QKeyEvent *>(event);
+         
+         if (key_event->matches(QKeySequence::Delete))
+         {
+            deleteSelected(obj);
+            return true; 
+         }
+      }
+      else if (event->type() == QEvent::ContextMenu)
+      {
+         QContextMenuEvent *menu_event = static_cast<QContextMenuEvent*>(event);
+
+         int n_sel = selected(obj).length();
+
+         if (n_sel == 0)
+            return true;
+
+         QMenu menu(view);
+         
+         menu.addAction("Open", [this, obj]() { requestOpenSelected(obj); });
+         menu.addAction("Delete...", [this, obj]() { deleteSelected(obj); }, QKeySequence::StandardKey::Delete);
+         
+         if (n_sel == 1)
+            menu.addAction("Rename...", [this, obj]() { // this is a bit of a nasty fudge! must be a better way...
+            QKeyEvent evt(QEvent::KeyPress, Qt::Key_F2, Qt::NoModifier);
+            QCoreApplication::sendEvent(obj, &evt);
+         }, QKeySequence("F2"));
+
+         menu.exec(menu_event->globalPos());
+      }
+
+      return QObject::eventFilter(obj, event);
+      
+   }
+
+   void deleteSelected(QObject* obj)
+   {
+      workspace->deleteFiles(selected(obj));
+   }
+
+   QModelIndexList selected(QObject* obj)
+   {
+      QListView* view = reinterpret_cast<QListView*>(obj);
+      return view->selectionModel()->selectedRows();
+   }
+
+   void requestOpenSelected(QObject* obj)
+   {
+      workspace->requestOpenFiles(selected(obj));
+   }
+
+   FlimWorkspace* workspace;
 };
