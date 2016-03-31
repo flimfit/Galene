@@ -26,8 +26,8 @@ public:
       line_colors.push_back(Qt::red);
       line_colors.push_back(Qt::magenta);
 
-      QueuedBind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau);
-      QueuedBind(intensity_auto_check, this, &LifetimeDisplayWidget::setAutoscaleIntensity, &LifetimeDisplayWidget::getAutoscaleIntensity);
+      QueuedBind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau, true);
+      QueuedBind(intensity_auto_check, this, &LifetimeDisplayWidget::setAutoscaleIntensity, &LifetimeDisplayWidget::getAutoscaleIntensity, true);
       QueuedBind(tau_min_spin, this, &LifetimeDisplayWidget::setDisplayTauMin, &LifetimeDisplayWidget::getDisplayTauMin, &LifetimeDisplayWidget::displayTauMinChanged);
       QueuedBind(tau_max_spin, this, &LifetimeDisplayWidget::setDisplayTauMax, &LifetimeDisplayWidget::getDisplayTauMax, &LifetimeDisplayWidget::displayTauMaxChanged);
       QueuedBind(intensity_min_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMin, &LifetimeDisplayWidget::getDisplayIntensityMin, &LifetimeDisplayWidget::displayIntensityMinChanged);
@@ -200,7 +200,7 @@ protected:
 
    void updateLifetimeScale()
    {
-      updateLifetimeImageImpl(false);
+      updateLifetimeImageImpl(true);
    }
 
    void updateLifetimeImageImpl(bool rescale)
@@ -285,11 +285,11 @@ protected:
    std::vector<QColor> line_colors;
    std::vector<QLabel*> rate_labels;
 
-   double display_tau_min;
-   double display_tau_max;
-   bool autoscale_tau = true;
-   int display_intensity_min;
-   int display_intensity_max;
+   double display_tau_min = 1;
+   double display_tau_max = 5;
+   bool autoscale_tau = false;
+   int display_intensity_min = 0;
+   int display_intensity_max = 100;
    bool autoscale_intensity = true;
    bool closable = true;
 };
