@@ -200,7 +200,7 @@ protected:
 
    void updateLifetimeScale()
    {
-      updateLifetimeImageImpl(true);
+      updateLifetimeImageImpl(false);
    }
 
    void updateLifetimeImageImpl(bool rescale)
@@ -239,10 +239,17 @@ protected:
       if (autoscale_intensity && rescale)
       {
          cv::minMaxLoc(intensity, &i_min, &i_max);
-         display_intensity_min = 0;
-         display_intensity_max = i_max;
-         emit displayIntensityMinChanged(display_intensity_min);
-         emit displayIntensityMaxChanged(display_intensity_max);
+
+         if (display_intensity_min != 0)
+         {
+            display_intensity_min = 0;
+            emit displayIntensityMinChanged(display_intensity_min);
+         }
+         if (display_intensity_max != i_max)
+         {
+            display_intensity_max = i_max;
+            emit displayIntensityMaxChanged(display_intensity_max);
+         }
       }
       else
       {
