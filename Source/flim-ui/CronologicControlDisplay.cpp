@@ -34,12 +34,20 @@ CronologicControlDisplay::CronologicControlDisplay(Cronologic* tcspc, QWidget* p
    QGroupBox* time_shift_group = new QGroupBox("Time Shifts");
    time_shift_group->setLayout(time_shift_layout);
 
+   // PLIM Controls
+   QFormLayout* plim_layout = new QFormLayout();
+   addWidget(plim_layout, "Num_Pixels_PLIM", Integer);
+
+   QGroupBox* plim_group = new QGroupBox("PLIM Settings");
+   plim_group->setLayout(plim_layout);
+
 
    // Add control panels to window
    //==================================================
    QVBoxLayout* side_layout = new QVBoxLayout();
    side_layout->addWidget(thresh_group);
    side_layout->addWidget(time_shift_group);
+   side_layout->addWidget(plim_group);
    side_layout->setMargin(0);
 
    setLayout(side_layout);
