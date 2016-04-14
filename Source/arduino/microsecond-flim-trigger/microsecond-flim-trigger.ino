@@ -3,7 +3,7 @@ const uint32_t TCLK = 1;
 const uint32_t TIOA = 2;
 const uint32_t TIOB = 4;
 
-const int n_px = 512;
+const int n_px = 128;
 const int divider = 16;
 
 int cycle_length, pulse_length;
@@ -48,6 +48,7 @@ void setup()
   REG_TC2_RC1 = 10000; //cycle_length;
   REG_TC2_RA1 = 1000; //pulse_length;  
 
+  // Measure EOM pulse width
   TC_Configure(TC2, 0,
     TC_CMR_TCCLKS_TIMER_CLOCK1 |
     TC_CMR_ETRGEDG_RISING | 

@@ -142,7 +142,7 @@ public:
          sequence_number++;
       } while (workspace.exists(next_file));
 
-      emit sequenceNumberChanged(++sequence_number);
+      emit sequenceNumberChanged(sequence_number);
 
       return next_file;
    }

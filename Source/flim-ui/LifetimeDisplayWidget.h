@@ -184,7 +184,7 @@ protected:
          {
             n_tot += d[i];
             decay[i] = d[i];
-            t[i] = i * time_resolution * 1e-3;
+            t[i] = i * time_resolution * scale_factor;
          }
 
          decay_plot->graph(c)->setData(t, decay);
@@ -216,16 +216,16 @@ protected:
       {
          cv::minMaxLoc(mar, &mar_min, &mar_max);
 
-         display_tau_min = mar_min * 1e-3;
-         display_tau_max = mar_max * 1e-3;
+         display_tau_min = mar_min * scale_factor;
+         display_tau_max = mar_max * scale_factor;
 
          emit displayTauMinChanged(display_tau_min);
          emit displayTauMaxChanged(display_tau_max);
       }
       else
       {
-         mar_min = display_tau_min * 1e3;
-         mar_max = display_tau_max * 1e3;
+         mar_min = display_tau_min / scale_factor;
+         mar_max = display_tau_max / scale_factor;
       }
 
       mar.convertTo(scaled_mar, CV_8U, 255.0 / (mar_max - mar_min), -255.0 * mar_min / (mar_max - mar_min));
@@ -267,7 +267,7 @@ protected:
 
    void setupPlots()
    {
-      decay_plot->xAxis->setLabel("Time (ns)");
+      decay_plot->xAxis->setLabel("Time (us)");
       decay_plot->yAxis->setLabel("Counts");
       decay_plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
 
@@ -277,7 +277,7 @@ protected:
 
       lifetime_histogram_plot->addGraph();
 
-      lifetime_histogram_plot->xAxis->setLabel("Lifetime (ns)");
+      lifetime_histogram_plot->xAxis->setLabel("Lifetime (us)");
       lifetime_histogram_plot->yAxis->setLabel("Frequency");
       lifetime_histogram_plot->replot();
 
@@ -299,4 +299,6 @@ protected:
    int display_intensity_max = 100;
    bool autoscale_intensity = true;
    bool closable = true;
+
+   double scale_factor = 1e-6;
 };

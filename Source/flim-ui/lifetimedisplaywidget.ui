@@ -116,6 +116,9 @@
               <property name="suffix">
                <string> ns</string>
               </property>
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
               <property name="singleStep">
                <double>0.250000000000000</double>
               </property>
@@ -138,6 +141,9 @@
               </property>
               <property name="suffix">
                <string> ns</string>
+              </property>
+              <property name="maximum">
+               <double>100000.000000000000000</double>
               </property>
               <property name="singleStep">
                <double>0.250000000000000</double>
