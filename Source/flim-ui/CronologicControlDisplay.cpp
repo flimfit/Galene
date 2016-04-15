@@ -36,7 +36,7 @@ CronologicControlDisplay::CronologicControlDisplay(Cronologic* tcspc, QWidget* p
 
    // PLIM Controls
    QFormLayout* plim_layout = new QFormLayout();
-   addWidget(plim_layout, "Num_Pixels_PLIM", Integer);
+   addWidget(plim_layout, "Num_Pixel_PLIM", Integer);
 
    QGroupBox* plim_group = new QGroupBox("PLIM Settings");
    plim_group->setLayout(plim_layout);

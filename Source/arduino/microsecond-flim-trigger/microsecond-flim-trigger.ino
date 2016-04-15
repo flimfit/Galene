@@ -44,17 +44,23 @@ void TC7_Handler() // we finish one pixel
 {
   int state = REG_TC2_SR1;  
 
+
   // Make sure we stop after n_px 
 
-  px++;
-  if (px == (n_px-1))
+  if (active_modulation)
   {
-    px = 0;
-    REG_TC2_CMR2 |= TC_CMR_CPCSTOP;
-  }
-  elseif (active_modulation)
-  {
-    REG_TC2_CMR2 &= (!TC_CMR_CPCSTOP);
+    if (state & TC_SR_ETRGS)
+    {
+      px = 0;
+      configureRepeat();
+    }
+    else if (state & TC_SR_CPAS)
+    {
+      px++;
+      if (px == n_px)
+        configureSingle();
+    }
+         
   }
 }
 
@@ -67,11 +73,36 @@ void setTimerRegisters()
   } 
   else 
   {
-    REG_TC2_RC1 = eom_pulse_length;
+    REG_TC2_RC1 = eom_pulse_length * 2;
     REG_TC2_RA1 = eom_pulse_length;  
   }
 }
 
+void configureSingle()
+{
+  REG_TC2_CMR1 =  TC_CMR_TCCLKS_TIMER_CLOCK1 |
+                  TC_CMR_WAVE |
+                  TC_CMR_WAVSEL_UP | //TC_CMR_WAVSEL_UP_RC |
+                  TC_CMR_EEVTEDG_RISING |
+                  TC_CMR_EEVT_TIOB |
+                  TC_CMR_ACPA_CLEAR |
+                  TC_CMR_AEEVT_SET |
+                  //TC_CMR_ACPC_SET |
+                  TC_CMR_ENETRG;
+}
+
+void configureRepeat()
+{
+  REG_TC2_CMR1 =  TC_CMR_TCCLKS_TIMER_CLOCK1 |
+                  TC_CMR_WAVE |
+                  TC_CMR_WAVSEL_UP_RC |
+                  TC_CMR_EEVTEDG_RISING |
+                  TC_CMR_EEVT_TIOB |
+                  TC_CMR_ACPA_CLEAR |
+                  TC_CMR_AEEVT_SET |
+                  TC_CMR_ACPC_SET |
+                  TC_CMR_ENETRG;
+}
 
 void setup() 
 {
@@ -81,21 +112,22 @@ void setup()
   
   pmc_enable_periph_clk(ID_TC6);    
   pmc_enable_periph_clk(ID_TC7); 
-  TC_EnablePin(TC2, 1, TIOA | TIOB);
+    
+  TC_Configure(TC2, 1,
+      TC_CMR_TCCLKS_TIMER_CLOCK1 |
+      TC_CMR_WAVE |
+      TC_CMR_WAVSEL_UP | //TC_CMR_WAVSEL_UP_RC |
+      TC_CMR_EEVTEDG_RISING |
+      TC_CMR_EEVT_TIOB |
+      TC_CMR_ACPA_CLEAR |
+      TC_CMR_AEEVT_SET |
+      //TC_CMR_ACPC_SET |
+      TC_CMR_ENETRG
+    );
 
-    TC_Configure(TC2, 1,
-    TC_CMR_TCCLKS_TIMER_CLOCK1 |
-    TC_CMR_WAVE |
-    TC_CMR_WAVSEL_UP_RC |
-    TC_CMR_EEVTEDG_RISING |
-    TC_CMR_EEVT_TIOB |
-    TC_CMR_ACPA_CLEAR |
-    TC_CMR_AEEVT_SET |
-    TC_CMR_ACPC_SET |
-    TC_CMR_ENETRG
-  );
+  TC_EnablePin(TC2, 1, TIOA | TIOB);
+  TC_EnableInterrupt(TC2, 1, TC_IER_CPAS | TC_IER_ETRGS); 
   TC_Start(TC2, 1);    
-  TC_EnableInterrupt(TC2, 1, TC_IER_CPAS); // Enable interrupt on RA loading
 
   setTimerRegisters();
 
@@ -113,41 +145,40 @@ void setup()
 }
 
 void loop() {
-  if (SerialUSB.available() > 0) 
+  if (SerialUSB.available()) 
   {
-   
-   if (SerialUSB.available()) 
-   {
-      // get command
-      char command = (char) SerialUSB.read();
+    // get command
+    char command = (char) SerialUSB.read();
       
-      // get parameter
-      SerialUSB.readBytes(param, 4);
-      switch (command)
+    // get parameter
+    SerialUSB.readBytes(param, 4);
+    
+    switch (command)
+    {
+      // Admin commands
+      //================================================
+      case MSG_IDENTIFY:
+      {            
+        SendMessage(MSG_IDENTITY, "PLIM Laser Modulator", 20);
+      } break;
+       
+      // Setup commands
+      //================================================
+      case MSG_SET_MODULATION:
       {
-         // Admin commands
-         //================================================
-         case MSG_IDENTIFY:
-         {            
-            SendMessage(MSG_IDENTITY, "PLIM Laser Modulator", 20);
-         } break;
-         
-         // Setup commands
-         //================================================
-         case MSG_SET_MODULATION:
-         {
-            active_modulation = *param_ui;
-            setTimerRegisters();
-         } break;
-         //------------------------------------------------
-         case MSG_SET_NUM_PIXELS:
-         {
-            n_px = *param_ui;
-         } break;
-
-      }
-
-   }
+        active_modulation = *param_ui;
+        if (active_modulation)
+          configureRepeat();
+        else
+          configureSingle();
+        setTimerRegisters();
+      } break;
+      //------------------------------------------------
+      case MSG_SET_NUM_PIXELS:
+      {
+        n_px = *param_ui;
+      } break;
+    
+    }
   }
-
 }
