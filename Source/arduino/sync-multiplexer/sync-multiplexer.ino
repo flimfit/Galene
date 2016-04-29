@@ -65,12 +65,11 @@ void PIOC_Handler()
    isr1 = REG_PIOC_ISR; 
    // 168 or 192 ns pulse on pin 3      // old - 36 ns pulse on pin 3
    SET_OUTPUT_PIN_HIGH;
-   if (REG_PIOC_PDSR & 1<<25)
-   {
-      __asm__("nop\n\t"); 
-      __asm__("nop\n\t"); 
-      __asm__("nop\n\t"); 
-   }
+   __asm__("nop\n\t"); 
+   __asm__("nop\n\t"); 
+   __asm__("nop\n\t"); 
+   __asm__("nop\n\t"); 
+   __asm__("nop\n\t"); 
    SET_OUTPUT_PIN_LOW;
 }
 
@@ -115,15 +114,12 @@ void setup()
   pinMode(3, OUTPUT); // Output
   
 
-  pinMode(14, OUTPUT);
-  digitalWrite(14, HIGH);
-
-
   // Set interrupts
-  attachInterrupt(0, dummy, RISING); // Pixel 
-  attachInterrupt(5, dummy, CHANGE); // Line
+  attachInterrupt(0, dummy, FALLING); // Line end 
+  attachInterrupt(5, dummy, RISING); // Line begin
   attachInterrupt(2, dummy, RISING); // Frame
- 
+
+ /*
   // Setup a 5MHz signal on pin 8 for testing
   pmc_enable_periph_clk(PWM_INTERFACE_ID);
   PWMC_ConfigureClocks(clkAFreq, 0, VARIANT_MCK);
@@ -139,7 +135,7 @@ void setup()
   PWMC_SetPeriod(PWM_INTERFACE, channel, maxDutyCount);
   PWMC_EnableChannel(PWM_INTERFACE, channel);
   PWMC_SetDutyCycle(PWM_INTERFACE, channel, 1);
- 
+ */
 //  pmc_mck_set_prescaler(1);
 }
 
