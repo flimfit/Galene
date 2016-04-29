@@ -32,11 +32,14 @@ void TC6_Handler()
   int state = REG_TC2_SR0;  
   int count = REG_TC2_RA0;
 
-  eom_pulse_length = count;
-  cycle_length = count / n_px;
-  pulse_length = count / n_px / divider;
+  if (abs(eom_pulse_length - count) > 10)
+  {
+    eom_pulse_length = count - 10; // TODO: figure out why we need this
+    cycle_length = count / n_px;
+    pulse_length = count / n_px / divider;
 
-  setTimerRegisters();
+    setTimerRegisters();
+  }
 }
 
 int px = 0;
@@ -73,7 +76,7 @@ void setTimerRegisters()
   } 
   else 
   {
-    REG_TC2_RC1 = eom_pulse_length * 2;
+    REG_TC2_RC1 = eom_pulse_length;
     REG_TC2_RA1 = eom_pulse_length;  
   }
 }
@@ -82,12 +85,11 @@ void configureSingle()
 {
   REG_TC2_CMR1 =  TC_CMR_TCCLKS_TIMER_CLOCK1 |
                   TC_CMR_WAVE |
-                  TC_CMR_WAVSEL_UP | //TC_CMR_WAVSEL_UP_RC |
+                  TC_CMR_WAVSEL_UP |
                   TC_CMR_EEVTEDG_RISING |
                   TC_CMR_EEVT_TIOB |
                   TC_CMR_ACPA_CLEAR |
                   TC_CMR_AEEVT_SET |
-                  //TC_CMR_ACPC_SET |
                   TC_CMR_ENETRG;
 }
 
@@ -113,17 +115,7 @@ void setup()
   pmc_enable_periph_clk(ID_TC6);    
   pmc_enable_periph_clk(ID_TC7); 
     
-  TC_Configure(TC2, 1,
-      TC_CMR_TCCLKS_TIMER_CLOCK1 |
-      TC_CMR_WAVE |
-      TC_CMR_WAVSEL_UP | //TC_CMR_WAVSEL_UP_RC |
-      TC_CMR_EEVTEDG_RISING |
-      TC_CMR_EEVT_TIOB |
-      TC_CMR_ACPA_CLEAR |
-      TC_CMR_AEEVT_SET |
-      //TC_CMR_ACPC_SET |
-      TC_CMR_ENETRG
-    );
+  configureSingle();
 
   TC_EnablePin(TC2, 1, TIOA | TIOB);
   TC_EnableInterrupt(TC2, 1, TC_IER_CPAS | TC_IER_ETRGS); 
