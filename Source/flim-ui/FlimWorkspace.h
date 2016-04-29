@@ -84,7 +84,7 @@ public:
       }
 
       for (auto& idx : indexes)
-         workspace.remove(idx.data().toString());
+         workspace.remove(idx.data().toString().append(file_extension));
    }
 
    void requestOpenFiles(const QModelIndexList& indexes)
