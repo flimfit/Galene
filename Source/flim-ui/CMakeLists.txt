@@ -24,6 +24,7 @@ qt5_add_resources(UI_RESOURCES Resources.qrc)
 
 set(SOURCE
 	FlimDisplay.cpp
+   FlimServer.cpp
 	Main.cpp
 	qcustomplot.cpp
    CronologicControlDisplay.cpp
