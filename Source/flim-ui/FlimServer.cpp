@@ -2,8 +2,14 @@
 #include <QThread>
 #include <cassert>
 
+
 FlimServer::FlimServer(QObject* parent) :
-   QObject(parent)
+   ThreadedObject(parent)
+{
+   startThread();
+}
+
+void FlimServer::init()
 {
    server = new QTcpServer(this);
    if (!server->listen(QHostAddress::Any, port))
@@ -13,19 +19,20 @@ FlimServer::FlimServer(QObject* parent) :
    }
 
    connect(server, &QTcpServer::newConnection, this, &FlimServer::newConnection);
-
 }
 
-void FlimServer::sendStatusMessage(E_PQ_MESSAGE_TYPE message_type, E_ERROR_CODES status, const std::string& explainatory_text, QTcpSocket* client)
+void FlimServer::sendStatusMessage(E_PQ_MESSAGE_TYPE message_type, E_ERROR_CODES status, const QString& explainatory_text, QTcpSocket* client)
 {
    if (client == nullptr)
       client = this->client;
+   if (client == nullptr)
+      return;
 
    T_MESSAGEHDR hdr;
    hdr.msg_type = message_type;
    std::memcpy(hdr.magic, "PQSPT", 5);
 
-   if (explainatory_text.empty())
+   if (explainatory_text.isEmpty())
    {
       hdr.msg_len = sizeof(T_ENCODED_STATUSMSG);
 
@@ -37,8 +44,8 @@ void FlimServer::sendStatusMessage(E_PQ_MESSAGE_TYPE message_type, E_ERROR_CODES
    }
    else
    {
-      size_t max_explain_size = std::numeric_limits<uint16_t>::max() - sizeof(T_EXPLAINED_STATUSMSG);
-      uint16_t explain_size = (uint16_t)std::min(max_explain_size, explainatory_text.size());
+      int max_explain_size = std::numeric_limits<uint16_t>::max() - sizeof(T_EXPLAINED_STATUSMSG);
+      uint16_t explain_size = (uint16_t) std::min(max_explain_size, explainatory_text.size());
 
       hdr.msg_len = sizeof(T_EXPLAINED_STATUSMSG) + explain_size;
 
@@ -48,13 +55,16 @@ void FlimServer::sendStatusMessage(E_PQ_MESSAGE_TYPE message_type, E_ERROR_CODES
       msg.exp_length = explain_size;
 
       client->write((char*)&msg, sizeof(msg));
-      client->write(explainatory_text.data(), explainatory_text.size());
+      client->write(explainatory_text.toLatin1(), explainatory_text.size());
    }
 
 }
 
-void FlimServer::sendProgress(E_PQ_MEAS_TYPE measurement_type, std::vector<OptionalData> optional_data)
+void FlimServer::sendProgress(E_PQ_MEAS_TYPE measurement_type, std::map<QString, QVariant> optional_data)
 {
+   if (client == nullptr)
+      return;
+
    assert(optional_data.size() < std::numeric_limits<int32_t>::max());
 
    T_MESSAGEHDR hdr;
@@ -67,20 +77,22 @@ void FlimServer::sendProgress(E_PQ_MEAS_TYPE measurement_type, std::vector<Optio
    frame.opt_record_count = (int32_t) optional_data.size();
 
    hdr.msg_len = sizeof(frame);
-   for (auto&& od : optional_data)
-      hdr.msg_len += od.getSize();
 
-   client->write((char*)&frame, sizeof(frame));
+   QByteArray all_optional;
    for (auto&& od : optional_data)
    {
-      client->write((char*)&od.header, sizeof(od.header));
-      client->write(od.extra_data);
+      QByteArray ba = OptionalData::makeRecord(od);
+      all_optional.append(ba);
+      hdr.msg_len += ba.size();
    }
+
+   client->write((char*)&frame, sizeof(frame));
+   client->write(all_optional);
 }
 
-void FlimServer::sendError(E_ERROR_CODES error)
+void FlimServer::sendError(E_ERROR_CODES error, const QString& msg)
 {
-   sendStatusMessage(PQ_MSGTYP_ENCODED_STATUSMSG, error);
+   sendStatusMessage(PQ_MSGTYP_ENCODED_STATUSMSG, error, msg);
 }
 
 void FlimServer::sendMesurementRequestResponse(E_ERROR_CODES response)
@@ -153,16 +165,16 @@ void FlimServer::processClientResponse(E_STOPREASON_CODES status, const QString&
 
 
 
-std::vector<OptionalData> FlimServer::readOptionalData(int opt_record_count)
+std::map<QString, QVariant> FlimServer::readOptionalData(int opt_record_count)
 {
-   std::vector<OptionalData> optional_data;
+   std::map<QString, QVariant> optional_data;
    for (int i = 0; i < opt_record_count; i++)
    {
       QByteArray extra_data;
       auto header = readStruct<T_OPTIONAL_DATA_HEADER>();
       if (header.type & 0xF)
          extra_data = readData(header.data);
-      optional_data.push_back(OptionalData(header, extra_data));
+      optional_data.insert(OptionalData::process(header, extra_data));
    }
    return optional_data;
 }

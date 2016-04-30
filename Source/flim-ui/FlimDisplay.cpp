@@ -27,8 +27,17 @@ ControlBinder(this, "FLIMDisplay")
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
+   connect(status_timer, &QTimer::timeout, this, &FlimDisplay::sendStatusUpdate);
 
    file_writer = std::make_shared<FlimFileWriter>();
+
+   server = new FlimServer(this);
+   status_timer = new QTimer(this);
+
+   connect(server, &FlimServer::measurementRequest, this, &FlimDisplay::processMeasurementRequest);
+   connect(server, &FlimServer::clientError, this, &FlimDisplay::processClientError);
+   connect(server, &FlimServer::userBreakRequest, this, &FlimDisplay::processUserBreakRequest);
+   connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
 
 
    setupTCSPC();
@@ -70,6 +79,75 @@ ControlBinder(this, "FLIMDisplay")
    });
 
 }
+
+void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std::map<QString, QVariant> metadata)
+{
+   if (!tcspc->readyForAcquisition())
+   {
+      server->sendError(PQ_ERRCODE_SERVER_BUSY);
+      return;
+   }
+
+   if (request.scanning_pattern == 1)
+   {
+      server->sendError(PQ_ERRCODE_UNKNOWN_ERROR, "Scanning pattern not supported");
+      return;
+   }
+
+   tcspc->getPreviewFLIMage()->setImageSize(request.n_x, request.n_y);
+
+   if (request.measurement_type == PQ_MEASTYPE_TEST_IMAGESCAN)
+   {
+      setLive(true);
+   }
+   else if (request.measurement_type == PQ_MEASTYPE_IMAGESCAN)
+   {
+      file_writer->addMetadata("NumX", request.n_x);
+      file_writer->addMetadata("NumY", request.n_y);
+      file_writer->addMetadata("SpatialResolution_um", request.spatial_resolution);
+
+      for(auto&& m : metadata)
+         file_writer->addMetadata(m.first, m.second);
+
+      acquireSequence();
+
+      status_timer->start(1000); // TODO: should we start this for both types?
+   }
+   else
+   {
+      server->sendError(PQ_ERRCODE_UNKNOWN_ERROR);
+   }
+
+   assert(request.measurement_type == PQ_MEASTYPE_IMAGESCAN);
+}
+
+void FlimDisplay::processClientError(const QString error)
+{
+   QMessageBox::warning(this, "FLIM client error", error);
+}
+
+void FlimDisplay::processUserBreakRequest()
+{
+   status_timer->stop();
+
+   if (tcspc->isLive())
+      setLive(false);
+   if (tcspc->acquisitionInProgress())
+      stopSequence();
+}
+
+void FlimDisplay::sendStatusUpdate()
+{
+   E_PQ_MEAS_TYPE type = (tcspc->isLive()) ? PQ_MEASTYPE_TEST_IMAGESCAN : PQ_MEASTYPE_IMAGESCAN;
+   std::map<QString, QVariant> data;
+
+   auto rates = tcspc->getRates();
+   data[QString('rate')] = rates.sync; // TODO: figure out what Leica wants here
+
+   emit statusUpdate(type, data);
+}
+
+
 
 void FlimDisplay::setupTCSPC()
 {

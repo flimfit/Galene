@@ -3,6 +3,7 @@
 #include "FlimDisplay.h"
 #include "BHRatesWidget.h"
 #include <memory>
+#include <vector>
 #include <iostream>
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -240,6 +241,9 @@ int main(int argc, char *argv[])
 
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
    qRegisterMetaType<FlimRates>("FlimRates");
+   qRegisterMetaType<std::vector<int64_t>>("std::vector<int32_t>");
+   qRegisterMetaType<std::vector<uint64_t>>("std::vector<uint32_t>");
+   qRegisterMetaType<std::vector<double>>("std::vector<double>");
 
    QCoreApplication::setOrganizationName("Garvan Institute of Medical Research");
    QCoreApplication::setOrganizationDomain("garvan.org.au");
