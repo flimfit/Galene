@@ -93,12 +93,11 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
       return;
    }
 
-//   if (request.scanning_pattern == 1)
-//      code = PQ_ERRCODE_UNKNOWN_ERROR;
-
    if (code == PQ_ERRCODE_NO_ERROR)
    {
-      tcspc->getPreviewFLIMage()->setImageSize(request.n_x, request.n_y);
+      auto flimage = tcspc->getPreviewFLIMage();
+      flimage->setImageSize(request.n_x, request.n_y);
+      flimage->setBidirectional(request.scanning_pattern);
 
       if (request.measurement_type == PQ_MEASTYPE_TEST_IMAGESCAN)
       {
@@ -110,6 +109,7 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
          file_writer->addMetadata("NumX", request.n_x);
          file_writer->addMetadata("NumY", request.n_y);
          file_writer->addMetadata("SpatialResolution_um", request.spatial_resolution);
+         file_writer->addMetadata("BidirectionalScan", (bool) request.scanning_pattern);
 
          QString filename = "";
          std::map<QString, QVariant>::iterator it;
