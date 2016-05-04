@@ -10,6 +10,7 @@
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
 #include "FlimFileReader.h"
+#include <functional>
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
@@ -27,7 +28,6 @@ ControlBinder(this, "FLIMDisplay")
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
-   connect(status_timer, &QTimer::timeout, this, &FlimDisplay::sendStatusUpdate);
 
    file_writer = std::make_shared<FlimFileWriter>();
 
@@ -37,7 +37,9 @@ ControlBinder(this, "FLIMDisplay")
    connect(server, &FlimServer::measurementRequest, this, &FlimDisplay::processMeasurementRequest);
    connect(server, &FlimServer::clientError, this, &FlimDisplay::processClientError);
    connect(server, &FlimServer::userBreakRequest, this, &FlimDisplay::processUserBreakRequest);
+   connect(status_timer, &QTimer::timeout, this, &FlimDisplay::sendStatusUpdate);
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
+   connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
 
 
    setupTCSPC();
@@ -82,43 +84,51 @@ ControlBinder(this, "FLIMDisplay")
 
 void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std::map<QString, QVariant> metadata)
 {
+   E_ERROR_CODES code = PQ_ERRCODE_NO_ERROR;
+
    if (!tcspc->readyForAcquisition())
    {
-      server->sendError(PQ_ERRCODE_SERVER_BUSY);
+      code = PQ_ERRCODE_UNKNOWN_ERROR;
+      std::cout << "unexpected measurement request\n";
       return;
    }
 
-   if (request.scanning_pattern == 1)
+//   if (request.scanning_pattern == 1)
+//      code = PQ_ERRCODE_UNKNOWN_ERROR;
+
+   if (code == PQ_ERRCODE_NO_ERROR)
    {
-      server->sendError(PQ_ERRCODE_UNKNOWN_ERROR, "Scanning pattern not supported");
-      return;
+      tcspc->getPreviewFLIMage()->setImageSize(request.n_x, request.n_y);
+
+      if (request.measurement_type == PQ_MEASTYPE_TEST_IMAGESCAN)
+      {
+         setLive(true);
+         status_timer->start(1000);
+      }
+      else if (request.measurement_type == PQ_MEASTYPE_IMAGESCAN)
+      {
+         file_writer->addMetadata("NumX", request.n_x);
+         file_writer->addMetadata("NumY", request.n_y);
+         file_writer->addMetadata("SpatialResolution_um", request.spatial_resolution);
+
+         QString filename = "";
+         std::map<QString, QVariant>::iterator it;
+         if ((it = metadata.find("Filename")) != metadata.end())
+            filename = it->second.toString();
+
+         for (auto&& m : metadata)
+            file_writer->addMetadata(m.first, m.second);
+
+         acquireSequenceImpl(filename);
+         status_timer->start(1000);
+      }
+      else
+      {
+         code = PQ_ERRCODE_UNKNOWN_ERROR;
+      }
    }
 
-   tcspc->getPreviewFLIMage()->setImageSize(request.n_x, request.n_y);
-
-   if (request.measurement_type == PQ_MEASTYPE_TEST_IMAGESCAN)
-   {
-      setLive(true);
-   }
-   else if (request.measurement_type == PQ_MEASTYPE_IMAGESCAN)
-   {
-      file_writer->addMetadata("NumX", request.n_x);
-      file_writer->addMetadata("NumY", request.n_y);
-      file_writer->addMetadata("SpatialResolution_um", request.spatial_resolution);
-
-      for(auto&& m : metadata)
-         file_writer->addMetadata(m.first, m.second);
-
-      acquireSequence();
-
-      status_timer->start(1000); // TODO: should we start this for both types?
-   }
-   else
-   {
-      server->sendError(PQ_ERRCODE_UNKNOWN_ERROR);
-   }
-
-   assert(request.measurement_type == PQ_MEASTYPE_IMAGESCAN);
+   emit measurementRequestResponse(code);
 }
 
 void FlimDisplay::processClientError(const QString error)
@@ -139,11 +149,22 @@ void FlimDisplay::processUserBreakRequest()
 void FlimDisplay::sendStatusUpdate()
 {
    E_PQ_MEAS_TYPE type = (tcspc->isLive()) ? PQ_MEASTYPE_TEST_IMAGESCAN : PQ_MEASTYPE_IMAGESCAN;
-   std::map<QString, QVariant> data;
+   std::vector<std::pair<QString, QVariant>> data;
 
-   auto rates = tcspc->getRates();
-   data[QString('rate')] = rates.sync; // TODO: figure out what Leica wants here
+   auto flimage = tcspc->getPreviewFLIMage();
+   auto rates = flimage->getCountRates();
+   uint32_t maxcps = flimage->getMaxCountInPixel();
 
+   auto add = [&](QString a, QVariant b) { data.push_back(std::make_pair(a, b)); };
+
+   add("cps1", (uint32_t)0); // counts per sec on FCS channel 1
+   add("cps1", (uint32_t)0); // counts per sec on FCS channel 2
+   add("maxcpp", maxcps); // max counts per pixel
+
+   for (int i = 0; i < rates.size(); i++)
+      add(QString("det%1").arg(i+1), (uint32_t) rates[i]); // counts per sec on detector i
+   add("ServerVersion", (uint32_t)0x05030203); // emulate SymphoTime 5.3.2.3
+   
    emit statusUpdate(type, data);
 }
 
@@ -246,6 +267,7 @@ void FlimDisplay::updateProgress(double progress)
 
 void FlimDisplay::setLive(bool scanning)
 {
+   live_button->setChecked(scanning);
    acquire_sequence_button->setEnabled(!scanning);
    if (tcspc)
       tcspc->setLive(scanning);
@@ -264,13 +286,21 @@ void FlimDisplay::acquisitionStatusChanged(bool acq_in_progress)
 
 void FlimDisplay::acquireSequence()
 {
+   acquireSequenceImpl();
+}
+
+void FlimDisplay::acquireSequenceImpl(QString filename)
+{
    if (tcspc == nullptr)
       return;
 
    try
-   {
-      QString flim_file_name = workspace->getNextFileName();
-      file_writer->startRecording(flim_file_name);
+   {      
+      if (filename.isEmpty())
+         filename = workspace->getNextFileName();
+      else
+         filename = workspace->getFileName(filename); // todo: add this to workspace
+      file_writer->startRecording(filename);
 
       tcspc->startAcquisition();
    }

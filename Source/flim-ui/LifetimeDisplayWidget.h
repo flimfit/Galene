@@ -238,11 +238,14 @@ protected:
       double i_min, i_max;
       if (autoscale_intensity && rescale)
       {
-         cv::minMaxLoc(intensity, &i_min, &i_max);
+         cv::Scalar mean, std;
+         cv::meanStdDev(intensity, mean, std);
+         i_max = mean[0] + 1.96 * std[0]; // 97.5% 
+         i_min = 0;
 
-         if (display_intensity_min != 0)
+         if (display_intensity_min != i_min)
          {
-            display_intensity_min = 0;
+            display_intensity_min = i_min;
             emit displayIntensityMinChanged(display_intensity_min);
          }
          if (display_intensity_max != i_max)
@@ -267,7 +270,7 @@ protected:
 
    void setupPlots()
    {
-      decay_plot->xAxis->setLabel("Time (us)");
+      decay_plot->xAxis->setLabel(QString("Time (%1)").arg(unit));
       decay_plot->yAxis->setLabel("Counts");
       decay_plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
 
@@ -277,7 +280,7 @@ protected:
 
       lifetime_histogram_plot->addGraph();
 
-      lifetime_histogram_plot->xAxis->setLabel("Lifetime (us)");
+      lifetime_histogram_plot->xAxis->setLabel(QString("Lifetime (%1)").arg(unit));
       lifetime_histogram_plot->yAxis->setLabel("Frequency");
       lifetime_histogram_plot->replot();
 
@@ -300,5 +303,6 @@ protected:
    bool autoscale_intensity = true;
    bool closable = true;
 
-   double scale_factor = 1e-6;
+   QString unit = "ps";
+   double scale_factor = 1e-3;
 };

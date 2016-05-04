@@ -147,6 +147,11 @@ public:
       return next_file;
    }
 
+   QString getFileName(const QString& filename)
+   {
+      return workspace.absoluteFilePath(filename).append(file_extension);
+   }
+
 
    void setFilePrefix(const QString& prefix_)
    { 
