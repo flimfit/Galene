@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QMdiSubWindow>
+#include <QTimer>
 #include "qcustomplot.h"
 
 #include "ControlBinder.h"
@@ -11,6 +12,7 @@
 #include "SimTcspc.h"
 #include "FlimFileWriter.h"
 #include "FlimWorkspace.h"
+#include "FlimServer.h"
 
 #include "ui_FlimDisplay.h"
 #include <memory>
@@ -27,19 +29,28 @@ public:
    ~FlimDisplay();
 
    void shutdown();
-
    void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
-
    void setLive(bool live);
-
    void updateProgress(double progress);
-
    void showTcspcSettings();
+
+signals:
+   void statusUpdate(E_PQ_MEAS_TYPE measurement_type, std::vector<std::pair<QString, QVariant>> optional_data);
+   void measurementRequestResponse(E_ERROR_CODES code);
+
+protected:
+
+   void processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std::map<QString, QVariant> metadata);
+   void processClientError(const QString);
+   void processUserBreakRequest();
+   void sendStatusUpdate();
+
 
 private:
 
    void setupTCSPC();
    void acquireSequence();
+   void acquireSequenceImpl(QString filename = "");
    void stopSequence();
 
    void acquisitionStatusChanged(bool acq_in_progress);
@@ -53,4 +64,7 @@ private:
    std::shared_ptr<FlimFileWriter> file_writer;
    LifetimeDisplayWidget* preview_widget;
    FlimWorkspace* workspace;
+   FlimServer* server;
+
+   QTimer* status_timer;
 };

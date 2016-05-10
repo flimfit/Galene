@@ -11,7 +11,7 @@ namespace ServerInterface
    typedef int16_t E_ERROR_CODES ;
    typedef int16_t E_STOPREASON_CODES ;
 
-   const int PQ_OPT_DATATYPE_NAME_MAX_LEN = 30;
+   const int PQ_OPT_DATATYPE_NAME_MAX_LEN = 31;
 
    // E_PQ_MESSAGE_TYPE
    const E_PQ_MESSAGE_TYPE PQ_MSGTYP_DATAFRAME_SRVREQUEST = 0x44;
@@ -76,9 +76,33 @@ namespace ServerInterface
       char magic[5];
    };
 
+   struct T_DATAFRAME_SRVNACK
+   {
+      uint32_t rec_version; //for future record version management current record version is 1.0.2.0   (i.e.  0x00, 0x02, 0x00, 0x01  on stream)
+      E_PQ_MEAS_TYPE measurement_type; //type of running measurement
+      int32_t nack_rec_number; //consecutive increasing record number
+      int32_t opt_record_count; //number of optional data records to follow
+   };
+
+   struct T_OPTIONAL_DATA_HEADER
+   {
+      char name[PQ_OPT_DATATYPE_NAME_MAX_LEN];
+      E_PQ_OPT_DATATYPE type;
+   };
+
+   struct T_ENCODED_STATUSMSG
+   {
+      E_ERROR_CODES status; // status code
+   };
+
+   struct T_EXPLAINED_STATUSMSG
+   {
+      E_ERROR_CODES status; // status code
+      uint32_t exp_length; // length of explaining text;
+   };
+
    struct T_DATAFRAME_SRVREQUEST
    {
-      T_MESSAGEHDR hdr; //obligatory message header identifying this message type
       char rec_version[4]; //for future record version management current record version is 1.0.2.0   (i.e.  0x00, 0x02, 0x00, 0x01  on stream)
       E_PQ_MEAS_TYPE measurement_type; //type of requested measurement
       int32_t n_x; //if type of measurement is image, this denotes the image width
@@ -89,45 +113,13 @@ namespace ServerInterface
       int32_t opt_record_count; //number of optional data records to follow
    };
 
-   struct T_DATAFRAME_SRVNACK
-   {
-      T_MESSAGEHDR hdr; //obligatory message header identifying this message type
-      char rec_version[4]; //for future record version management current record version is 1.0.2.0   (i.e.  0x00, 0x02, 0x00, 0x01  on stream)
-      E_PQ_MEAS_TYPE measurement_type; //type of running measurement
-      int32_t nack_rec_number; //consecutive increasing record number
-      int32_t opt_record_count; //number of optional data records to follow
-   };
-
-   struct T_OPTIONAL_DATA_HEADER
-   {
-      char name[PQ_OPT_DATATYPE_NAME_MAX_LEN];
-      E_PQ_OPT_DATATYPE type;
-      uint32_t data;
-   };
-
-   struct T_ENCODED_STATUSMSG
-   {
-      T_MESSAGEHDR hdr; // obligatory message header identifying message type
-      E_ERROR_CODES status; // status code
-   };
-
    struct T_ENCODED_STATUSREPLY
    {
-      T_MESSAGEHDR hdr; // obligatory message header identifying message type
       E_STOPREASON_CODES status; // status code
-   };
-
-
-   struct T_EXPLAINED_STATUSMSG
-   {
-      T_MESSAGEHDR hdr; // obligatory message header identifying message type
-      E_ERROR_CODES status; // status code
-      uint32_t exp_length; // length of explaining text;
    };
 
    struct T_EXPLAINED_STATUSREPLY
    {
-      T_MESSAGEHDR hdr; // obligatory message header identifying message type
       E_STOPREASON_CODES status; // status code
       uint32_t exp_length; // length of explaining text;
    };
