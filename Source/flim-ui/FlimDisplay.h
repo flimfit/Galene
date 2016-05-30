@@ -50,7 +50,7 @@ private:
 
    void setupTCSPC();
    void acquireSequence();
-   void acquireSequenceImpl(QString filename = "");
+   void acquireSequenceImpl(QString filename = "", bool indeterminate = false);
    void stopSequence();
 
    void acquisitionStatusChanged(bool acq_in_progress);

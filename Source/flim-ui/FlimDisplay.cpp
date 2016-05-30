@@ -87,11 +87,10 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
    E_ERROR_CODES code = PQ_ERRCODE_NO_ERROR;
 
    if (!tcspc->readyForAcquisition())
-   {
       code = PQ_ERRCODE_UNKNOWN_ERROR;
-      std::cout << "unexpected measurement request\n";
-      return;
-   }
+
+   if (!workspace->hasWorkspace())
+      code = PQ_ERRCODE_NO_WORKSPACE;
 
    if (code == PQ_ERRCODE_NO_ERROR)
    {
@@ -119,7 +118,7 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
          for (auto&& m : metadata)
             file_writer->addMetadata(m.first, m.second);
 
-         acquireSequenceImpl(filename);
+         acquireSequenceImpl(filename, true); // use indeterminate acquisition
          status_timer->start(1000);
       }
       else
@@ -289,7 +288,7 @@ void FlimDisplay::acquireSequence()
    acquireSequenceImpl();
 }
 
-void FlimDisplay::acquireSequenceImpl(QString filename)
+void FlimDisplay::acquireSequenceImpl(QString filename, bool indeterminate = false)
 {
    if (tcspc == nullptr)
       return;
@@ -302,7 +301,7 @@ void FlimDisplay::acquireSequenceImpl(QString filename)
          filename = workspace->getFileName(filename); // todo: add this to workspace
       file_writer->startRecording(filename);
 
-      tcspc->startAcquisition();
+      tcspc->startAcquisition(indeterminate);
    }
    catch (std::runtime_error e)
    {
