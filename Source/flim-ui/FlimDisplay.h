@@ -55,6 +55,8 @@ private:
 
    void acquisitionStatusChanged(bool acq_in_progress);
 
+   void displayErrorMessage(const QString error);
+
    ImageRenderWindow* flim_display = nullptr;
 
    QWidget* tcspc_control = nullptr;
