@@ -50,10 +50,12 @@ private:
 
    void setupTCSPC();
    void acquireSequence();
-   void acquireSequenceImpl(QString filename = "");
+   void acquireSequenceImpl(QString filename = "", bool indeterminate = false);
    void stopSequence();
 
    void acquisitionStatusChanged(bool acq_in_progress);
+
+   void displayErrorMessage(const QString error);
 
    ImageRenderWindow* flim_display = nullptr;
 

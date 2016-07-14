@@ -30,6 +30,7 @@ ControlBinder(this, "FLIMDisplay")
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
 
    file_writer = std::make_shared<FlimFileWriter>();
+   connect(file_writer.get(), &FlimFileWriter::error, this, &FlimDisplay::displayErrorMessage);
 
    server = new FlimServer(this);
    status_timer = new QTimer(this);
@@ -82,16 +83,20 @@ ControlBinder(this, "FLIMDisplay")
 
 }
 
+void FlimDisplay::displayErrorMessage(const QString msg)
+{
+   QMessageBox::critical(this, "Error", msg);
+}
+
 void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std::map<QString, QVariant> metadata)
 {
    E_ERROR_CODES code = PQ_ERRCODE_NO_ERROR;
 
    if (!tcspc->readyForAcquisition())
-   {
       code = PQ_ERRCODE_UNKNOWN_ERROR;
-      std::cout << "unexpected measurement request\n";
-      return;
-   }
+
+   if (!workspace->hasWorkspace())
+      code = PQ_ERRCODE_NO_WORKSPACE;
 
    if (code == PQ_ERRCODE_NO_ERROR)
    {
@@ -116,10 +121,14 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
          if ((it = metadata.find("Filename")) != metadata.end())
             filename = it->second.toString();
 
+         filename.remove(QRegExp("[/\\\\:\\.""\\*<>\\?|]")); // attempt to remove illegal characters - this isn't comprehensive
+
+
          for (auto&& m : metadata)
             file_writer->addMetadata(m.first, m.second);
 
-         acquireSequenceImpl(filename);
+         tcspc->setFrameAccumulation(1000); // Kludge
+         acquireSequenceImpl(filename, true); // use indeterminate acquisition
          status_timer->start(1000);
       }
       else
@@ -205,7 +214,7 @@ void FlimDisplay::setupTCSPC()
    connect(tcspc, &FifoTcspc::progressUpdated, this, &FlimDisplay::updateProgress);
 
    tcspc->addTcspcEventConsumer(file_writer);
-   Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation);
+   Bind(frame_accumulation_spin, tcspc, &FifoTcspc::setFrameAccumulation, &FifoTcspc::getFrameAccumulation, &FifoTcspc::frameAccumulationChanged);
    Bind(n_images_spin, tcspc, &FifoTcspc::setNumImages, &FifoTcspc::getNumImages);
 
    preview_widget = new LifetimeDisplayWidget;
@@ -289,7 +298,7 @@ void FlimDisplay::acquireSequence()
    acquireSequenceImpl();
 }
 
-void FlimDisplay::acquireSequenceImpl(QString filename)
+void FlimDisplay::acquireSequenceImpl(QString filename, bool indeterminate)
 {
    if (tcspc == nullptr)
       return;
@@ -302,7 +311,7 @@ void FlimDisplay::acquireSequenceImpl(QString filename)
          filename = workspace->getFileName(filename); // todo: add this to workspace
       file_writer->startRecording(filename);
 
-      tcspc->startAcquisition();
+      tcspc->startAcquisition(indeterminate);
    }
    catch (std::runtime_error e)
    {

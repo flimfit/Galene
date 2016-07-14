@@ -46,6 +46,8 @@ public:
       }
    }
 
+   bool hasWorkspace() { return has_workspace;  }
+
    int rowCount(const QModelIndex & parent = QModelIndex()) const
    {
       return files.length();
