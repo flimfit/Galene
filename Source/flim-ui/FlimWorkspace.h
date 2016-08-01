@@ -151,6 +151,9 @@ public:
 
    QString getFileName(const QString& filename)
    {
+      if (!has_workspace)
+         throw std::runtime_error("No workspace selected. Please select a workspace from the file menu.");
+
       return workspace.absoluteFilePath(filename).append(file_extension);
    }
 

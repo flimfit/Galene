@@ -120,6 +120,8 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
          std::map<QString, QVariant>::iterator it;
          if ((it = metadata.find("Filename")) != metadata.end())
             filename = it->second.toString();
+         else
+            filename = "FLIM_";
 
          filename.remove(QRegExp("[/\\\\:\\.""\\*<>\\?|]")); // attempt to remove illegal characters - this isn't comprehensive
 
