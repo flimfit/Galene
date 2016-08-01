@@ -106,6 +106,7 @@ int main0()
    timetagger4_get_static_info(device, &staticinfo);
    printf("Board Serial        : %d.%d\n", staticinfo.board_serial >> 24, staticinfo.board_serial & 0xffffff);
    printf("Board Configuration : TimeTagger4-");
+/*
    switch (staticinfo.board_configuration&TIMETAGGER4_BOARDCONF_MASK)
    {
    case TIMETAGGER4_1G_BOARDCONF:
@@ -115,6 +116,7 @@ int main0()
    default:
       printf("unknown\n");
    }
+   */
    printf("Board Revision      : %d\n", staticinfo.board_revision);
    printf("Firmware Revision   : %d.%d\n", staticinfo.firmware_revision, staticinfo.subversion_revision);
    printf("Driver Revision     : %d.%d.%d.%d\n", ((staticinfo.driver_revision >> 24) & 255), ((staticinfo.driver_revision >> 16) & 255), ((staticinfo.driver_revision >> 8) & 255), (staticinfo.driver_revision & 255));
