@@ -129,7 +129,6 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
          for (auto&& m : metadata)
             file_writer->addMetadata(m.first, m.second);
 
-         tcspc->setFrameAccumulation(1000); // Kludge
          acquireSequenceImpl(filename, true); // use indeterminate acquisition
          status_timer->start(1000);
       }
@@ -284,7 +283,7 @@ void FlimDisplay::setLive(bool scanning)
       tcspc->setLive(scanning);
 }
 
-void FlimDisplay::acquisitionStatusChanged(bool acq_in_progress)
+void FlimDisplay::acquisitionStatusChanged(bool acq_in_progress, bool inderminate_acquisition)
 {
    acquire_sequence_button->setEnabled(!acq_in_progress);
    live_button->setEnabled(!acq_in_progress);
@@ -293,6 +292,11 @@ void FlimDisplay::acquisitionStatusChanged(bool acq_in_progress)
 
    if (!acq_in_progress)
       progress_bar->setValue(0);
+
+   if (inderminate_acquisition)
+      progress_bar->setMaximum(0);
+   else
+      progress_bar->setMaximum(100);
 }
 
 void FlimDisplay::acquireSequence()

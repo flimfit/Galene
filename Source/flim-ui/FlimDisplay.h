@@ -53,7 +53,7 @@ private:
    void acquireSequenceImpl(QString filename = "", bool indeterminate = false);
    void stopSequence();
 
-   void acquisitionStatusChanged(bool acq_in_progress);
+   void acquisitionStatusChanged(bool acq_in_progress, bool indeterminate);
 
    void displayErrorMessage(const QString error);
 
