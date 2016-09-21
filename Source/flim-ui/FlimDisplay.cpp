@@ -10,6 +10,7 @@
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
 #include "FlimFileReader.h"
+#include "RealignmentStudio.h"
 #include <functional>
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
@@ -42,6 +43,8 @@ ControlBinder(this, "FLIMDisplay")
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
    connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
 
+   auto m = new RealignmentStudio();
+   m->showMaximized();
 
    setupTCSPC();
   
@@ -60,6 +63,11 @@ ControlBinder(this, "FLIMDisplay")
    file_list_view->installEventFilter(new WorkspaceEventFilter(workspace));
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
 
+   connect(realignment_action, &QAction::triggered, [&]() {
+      auto m = new RealignmentStudio(); 
+      m->showMaximized();
+   });
+
    connect(workspace, &FlimWorkspace::openRequest, [&](const QString& filename) {
       try
       {
@@ -71,7 +79,7 @@ ControlBinder(this, "FLIMDisplay")
          sub->setWidget(widget);
          sub->setAttribute(Qt::WA_DeleteOnClose);
          mdi_area->addSubWindow(sub);
-         widget->setFLIMage(reader->getFLIMage());
+         widget->setFlimDataSource(reader->getFLIMage());
          widget->show();
          widget->setWindowTitle(QFileInfo(filename).baseName());
       }
@@ -168,7 +176,7 @@ void FlimDisplay::sendStatusUpdate()
    auto add = [&](QString a, QVariant b) { data.push_back(std::make_pair(a, b)); };
 
    add("cps1", (uint32_t)0); // counts per sec on FCS channel 1
-   add("cps1", (uint32_t)0); // counts per sec on FCS channel 2
+   add("cps2", (uint32_t)0); // counts per sec on FCS channel 2
    add("maxcpp", maxcps); // max counts per pixel
 
    for (int i = 0; i < rates.size(); i++)
@@ -182,12 +190,12 @@ void FlimDisplay::sendStatusUpdate()
 
 void FlimDisplay::setupTCSPC()
 {
-   bool use_simulated = false;
+   bool use_simulated = true;
    try
    {
       if (use_simulated)
       {
-         tcspc = new SimTcspc(this); //Cronologic(this);
+         tcspc = new SimTcspc(this);
          tcspc_control = new QWidget();
       }
       else
@@ -225,7 +233,7 @@ void FlimDisplay::setupTCSPC()
    sub->setAttribute(Qt::WA_DeleteOnClose);
    mdi_area->addSubWindow(sub);
 
-   preview_widget->setFLIMage(tcspc->getPreviewFLIMage());
+   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage());
 }
 
 void FlimDisplay::showTcspcSettings()
@@ -241,31 +249,8 @@ void FlimDisplay::showTcspcSettings()
    }
 }
 
-void EmptyLayout(QLayout* layout)
-{
-   if (layout->isEmpty())
-      return;
-
-   QLayoutItem *child;
-   while ((child = layout->takeAt(0)) != 0)
-   {
-      if (child->widget())
-         delete child->widget();
-      if (child->layout())
-      {
-         EmptyLayout(child->layout());
-         delete child->layout();
-      }
-   }
-   delete child;
-
-}
-
-
 void FlimDisplay::shutdown()
 {
-//   if (tcspc)
-//      tcspc->setScanning(false);
 }
 
 
