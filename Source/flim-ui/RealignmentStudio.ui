@@ -83,6 +83,44 @@
           <string>Realignment Parameters</string>
          </property>
          <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Spatial Binning</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="spatial_binning_combo">
+            <item>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>8</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_28">
             <property name="text">
@@ -120,39 +158,13 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="spatial_binning_combo">
-            <item>
-             <property name="text">
-              <string>1</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>2</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>4</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>8</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Spatial Binning</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="mode_combo">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
             <item>
              <property name="text">
               <string>Translation</string>
@@ -170,18 +182,11 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Mode</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="live_button">
+        <widget class="QPushButton" name="reload_button">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -192,7 +197,7 @@
           <string>Reload</string>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -223,7 +228,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="acquire_sequence_button">
+        <widget class="QPushButton" name="save_button">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -360,8 +365,8 @@
   <tabstop>file_list_view</tabstop>
   <tabstop>frame_binning_combo</tabstop>
   <tabstop>realignment_points_spin</tabstop>
-  <tabstop>live_button</tabstop>
-  <tabstop>acquire_sequence_button</tabstop>
+  <tabstop>reload_button</tabstop>
+  <tabstop>save_button</tabstop>
  </tabstops>
  <resources>
   <include location="Resources.qrc"/>

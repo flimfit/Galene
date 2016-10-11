@@ -12,6 +12,7 @@
 
 #include "ui_RealignmentStudio.h"
 #include <map>
+#include <list>
 
 class RealignmentStudio : public QMainWindow, private ControlBinder, private Ui::RealignmentStudio
 {
@@ -28,7 +29,10 @@ protected:
 
    void sendStatusUpdate();
    void openFile(const QString& filename);
+   std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
+   void save();
+   RealignmentParameters getRealignmentParameters();
 
 private:
 
@@ -40,4 +44,6 @@ private:
    QTimer* status_timer;
 
    std::map<QMdiSubWindow*, std::weak_ptr<FlimReaderDataSource>> window_map;
+
+   std::list<std::thread> save_thread;
 };

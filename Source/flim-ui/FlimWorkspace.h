@@ -38,10 +38,10 @@ public:
       if (has_workspace)
       {
          beginResetModel();
-         auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension) }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+         auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension), QString("*.ffh") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
          files.clear();
          for (auto& info : file_info)
-            files.append(info.baseName());
+            files.append(info.fileName());
          endResetModel();
       }
    }
@@ -86,7 +86,7 @@ public:
       }
 
       for (auto& idx : indexes)
-         workspace.remove(idx.data().toString().append(file_extension));
+         workspace.remove(idx.data().toString());
    }
 
    void requestOpenFiles(const QModelIndexList& indexes)
@@ -97,7 +97,7 @@ public:
 
    void requestOpenFile(const QModelIndex index)
    {
-      QString full_file = workspace.absoluteFilePath(QString("%1%2").arg(index.data().toString()).arg(file_extension));
+      QString full_file = workspace.absoluteFilePath(index.data().toString());
       emit openRequest(full_file);
    }
 
@@ -149,12 +149,16 @@ public:
       return next_file;
    }
 
-   QString getFileName(const QString& filename)
+   QString getFileName(const QString& filename, const QString& ext = "")
    {
       if (!has_workspace)
          throw std::runtime_error("No workspace selected. Please select a workspace from the file menu.");
 
-      return workspace.absoluteFilePath(filename).append(file_extension);
+      if (ext.isEmpty())
+         return workspace.absoluteFilePath(filename).append(file_extension);
+      else
+         return workspace.absoluteFilePath(filename).append(ext);
+
    }
 
 

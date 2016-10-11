@@ -16,21 +16,22 @@ set(CMAKE_AUTOMOC ON)
 add_definitions(${QT_DEFINITIONS}) 
 
 qt5_wrap_ui(UI_HEADERS 
-			FlimDisplay.ui
-			BHRatesWidget.ui
+         FlimDisplay.ui
+         BHRatesWidget.ui
          LifetimeDisplayWidget.ui
          RealignmentStudio.ui)
 
 qt5_add_resources(UI_RESOURCES Resources.qrc)
 
 set(SOURCE
-	FlimDisplay.cpp
+   FlimDisplay.cpp
    FlimServer.cpp
-	Main.cpp
-	qcustomplot.cpp
+   Main.cpp
+   qcustomplot.cpp
    CronologicControlDisplay.cpp
    RealignmentStudio.cpp
    LifetimeDisplayWidget.cpp
+   FlimReaderDataSource.cpp
 )
 
 set(HEADERS
@@ -48,12 +49,12 @@ set(HEADERS
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
-					${InstrumentControl_INCLUDE_DIR}
-               ${InstrumentControlUI_INCLUDE_DIR}
-               ${FLIMreader_INCLUDE_DIR}
-               ${QT_USE_FILE}
-               ${CMAKE_CURRENT_SOURCE_DIR}
-					${CMAKE_CURRENT_BINARY_DIR})
+                    ${InstrumentControl_INCLUDE_DIR}
+                    ${InstrumentControlUI_INCLUDE_DIR}
+                    ${FLIMreader_INCLUDE_DIR}
+                    ${QT_USE_FILE}
+                    ${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(flim-ui ${SOURCE} ${HEADERS} 
                                  ${UI_HEADERS} ${UI_RESOURCES} 
