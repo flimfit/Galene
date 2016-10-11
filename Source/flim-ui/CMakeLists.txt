@@ -19,7 +19,8 @@ qt5_wrap_ui(UI_HEADERS
          FlimDisplay.ui
          BHRatesWidget.ui
          LifetimeDisplayWidget.ui
-         RealignmentStudio.ui)
+         RealignmentStudio.ui
+         RealignmentDisplayWidget.ui)
 
 qt5_add_resources(UI_RESOURCES Resources.qrc)
 
@@ -46,6 +47,8 @@ set(HEADERS
    FlimServer.h
    FlimReaderDataSource.h
    RealignmentStudio.h
+   RealignmentDisplayWidget.h
+   RealignmentImageSource.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}

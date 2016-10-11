@@ -1,5 +1,5 @@
 #include "FlimReaderDataSource.h"
-#include <memory>;
+#include <memory>
 
 void FlimReaderDataSourceWorker::update()
 {
@@ -21,8 +21,6 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
 
    int n_chan = reader->getNumChannels();
    count_rates_dummy.resize(n_chan);
-
-   readData();
 }
 
 FlimReaderDataSource::~FlimReaderDataSource()
@@ -68,6 +66,7 @@ void FlimReaderDataSource::readData()
 void FlimReaderDataSource::update()
 {
    if (!currently_reading) return;
+   if (!data->isReady()) return;
 
    int n_px = reader->numX() * reader->numY();
    int n_chan = reader->getNumChannels();
@@ -97,9 +96,6 @@ void FlimReaderDataSource::update()
 // Use readData to call 
 void FlimReaderDataSource::readDataThread()
 {
-   read_again_when_finished = false;
-   currently_reading = true;
-
    int n_px = reader->dataSizePerChannel();
    int n_chan = reader->getNumChannels();
    int n_x = reader->numX();
@@ -113,9 +109,15 @@ void FlimReaderDataSource::readDataThread()
 
    data = std::make_shared<FlimCube<uint16_t>>();
 
+   read_again_when_finished = false;
+   currently_reading = true;
+
    try
    {
+      reader->alignFrames();
+      emit alignmentComplete();
       reader->readData(data);
+      emit readComplete();
    }
    catch (std::runtime_error e)
    {

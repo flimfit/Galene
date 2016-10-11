@@ -72,7 +72,7 @@ public:
    bool setData(const QModelIndex &index, const QVariant &value, int role)
    {
       if (role == Qt::EditRole)
-         return workspace.rename(index.data().toString().append(file_extension), value.toString().append(file_extension));
+         return workspace.rename(index.data().toString(), value.toString());
       return false;
    }
 

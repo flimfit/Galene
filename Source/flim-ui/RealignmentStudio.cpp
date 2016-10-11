@@ -10,6 +10,8 @@
 #include "ConstrainedMdiSubWindow.h"
 #include "FlimFileReader.h"
 #include "FlimCubeWriter.h"
+#include "ImageRenderWindow.h"
+#include "RealignmentImageSource.h"
 #include <functional>
 #include <thread>
 
@@ -49,16 +51,32 @@ void RealignmentStudio::openFile(const QString& filename)
       connect(reader.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
       reader->getReader()->setRealignmentParameters(getRealignmentParameters());
 
-      LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
-      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
-      sub->setWidget(widget);
-      sub->setAttribute(Qt::WA_DeleteOnClose);
-      mdi_area->addSubWindow(sub);
-      widget->setFlimDataSource(reader);
-      widget->show();
-      widget->setWindowTitle(QFileInfo(filename).baseName());
+      {
+         LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
+         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+         sub->setWidget(widget);
+         sub->setAttribute(Qt::WA_DeleteOnClose);
+         mdi_area->addSubWindow(sub);
+         widget->setFlimDataSource(reader);
+         widget->show();
+         widget->setWindowTitle(QFileInfo(filename).baseName());
+         window_map[sub] = reader;
+      }
+      {
 
-      window_map[sub] = reader;
+         ImageRenderWindow* widget = new ImageRenderWindow;
+         RealignmentImageSource* src = new RealignmentImageSource(reader, widget, this);
+         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+         sub->setWidget(widget);
+         sub->setAttribute(Qt::WA_DeleteOnClose);
+         mdi_area->addSubWindow(sub);
+         //widget->setFlimDataSource(reader);
+         widget->show();
+         widget->setWindowTitle(QFileInfo(filename).baseName());
+         window_map[sub] = reader;
+      }
+
+      reader->readData();
    }
    catch (std::runtime_error e)
    {
