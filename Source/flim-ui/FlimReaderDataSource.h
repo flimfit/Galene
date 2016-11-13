@@ -28,16 +28,14 @@ public:
 
    void stop()
    {
-      QMetaObject::invokeMethod(timer, "stop", Qt::QueuedConnection);
-
-      // wait to finish executing
-      while (executing) {};
+      bool executing = false;
    }
-   
+
    void init() 
    {
-      timer = new QTimer(this);
+      timer = new QTimer();
       connect(timer, &QTimer::timeout, this, &FlimReaderDataSourceWorker::update);
+      connect(this, &QObject::destroyed, timer, &QObject::deleteLater);
 
       timer->setInterval(1000);
       timer->start();
@@ -107,6 +105,7 @@ protected:
 
    std::thread reader_thread;
    std::mutex image_mutex;
+   std::mutex read_mutex;
 
    FlimReaderDataSourceWorker* worker;
 

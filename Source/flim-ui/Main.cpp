@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
    QApplication a(argc, argv);
        
    FlimDisplay display;
-   display.showMaximized();
+   display.showMinimized();
 
    a.exec();
 

@@ -18,6 +18,7 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
 
    worker = new FlimReaderDataSourceWorker(nullptr, this);
    connect(worker, &FlimReaderDataSourceWorker::updateComplete, [&]() { emit decayUpdated(); });
+   connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
    int n_chan = reader->getNumChannels();
    count_rates_dummy.resize(n_chan);
@@ -25,11 +26,11 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
 
 FlimReaderDataSource::~FlimReaderDataSource()
 {
+   std::lock_guard<std::mutex> lk(read_mutex);
    currently_reading = false;
    reader->stopReading();
 
    worker->stop();
-   delete worker;
 
    if (reader_thread.joinable())
       reader_thread.join();
@@ -65,6 +66,8 @@ void FlimReaderDataSource::readData()
 
 void FlimReaderDataSource::update()
 {
+   std::lock_guard<std::mutex> lk(read_mutex);
+
    if (!currently_reading) return;
    if (!data->isReady()) return;
 

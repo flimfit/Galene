@@ -12,6 +12,7 @@
 #include "FlimCubeWriter.h"
 #include "ImageRenderWindow.h"
 #include "RealignmentImageSource.h"
+#include "RealignmentDisplayWidget.h"
 #include <functional>
 #include <thread>
 
@@ -26,20 +27,19 @@ RealignmentStudio::RealignmentStudio() :
 
    workspace = new FlimWorkspace(this);
 
-   connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
+   connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
+   connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::save);
 
-   // Setup menu actions
-   //============================================================
    file_list_view->setModel(workspace);
    file_list_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
    file_list_view->setEditTriggers(QAbstractItemView::EditKeyPressed);
    file_list_view->installEventFilter(new WorkspaceEventFilter(workspace));
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
-
-   connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
+   
+   Bind(close_after_save_check, this, &RealignmentStudio::setCloseAfterSave, &RealignmentStudio::getCloseAfterSave);
 
 }
 
@@ -50,31 +50,33 @@ void RealignmentStudio::openFile(const QString& filename)
       auto reader = std::make_shared<FlimReaderDataSource>(filename);
       connect(reader.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
       reader->getReader()->setRealignmentParameters(getRealignmentParameters());
+      std::list<QMdiSubWindow*> windows;
 
+      auto createSubWindow = [&](QWidget* widget) -> QMdiSubWindow*
       {
-         LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
-         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+         auto sub = new ConstrainedMdiSubWindow();
          sub->setWidget(widget);
          sub->setAttribute(Qt::WA_DeleteOnClose);
          mdi_area->addSubWindow(sub);
-         widget->setFlimDataSource(reader);
+         
          widget->show();
          widget->setWindowTitle(QFileInfo(filename).baseName());
          window_map[sub] = reader;
-      }
-      {
 
-         ImageRenderWindow* widget = new ImageRenderWindow;
-         RealignmentImageSource* src = new RealignmentImageSource(reader, widget, this);
-         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
-         sub->setWidget(widget);
-         sub->setAttribute(Qt::WA_DeleteOnClose);
-         mdi_area->addSubWindow(sub);
-         //widget->setFlimDataSource(reader);
-         widget->show();
-         widget->setWindowTitle(QFileInfo(filename).baseName());
-         window_map[sub] = reader;
-      }
+         return sub;
+      };
+
+      auto widget = new LifetimeDisplayWidget;
+      widget->setFlimDataSource(reader);
+      auto w1 = createSubWindow(widget);
+      
+      auto realignment_widget = new RealignmentDisplayWidget(reader);
+      auto w2 = createSubWindow(realignment_widget);
+
+      // Make windows close each other
+      connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
+      connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
+
 
       reader->readData();
    }
@@ -104,17 +106,30 @@ void RealignmentStudio::reload()
    source->readData();
 }
 
+void RealignmentStudio::exportMovie()
+{
+   auto active_window = mdi_area->activeSubWindow();
+   auto main_w = active_window->widget();
+   if (main_w->inherits("RealignmentDisplayWidget"))
+   {
+      auto w = reinterpret_cast<RealignmentDisplayWidget*>(main_w);
+      w->exportMovie();
+   }
+
+}
+
 void RealignmentStudio::save()
 {
    // clean out threads that are finished
    save_thread.remove_if([](std::thread& t) { return !t.joinable(); });
 
    auto source = getCurrentSource();
+   auto window = mdi_area->activeSubWindow();
    QFileInfo fi = QString::fromStdString(source->getReader()->getFilename());
    QString name = fi.baseName() + suffix_edit->text();
    std::string filename = workspace->getFileName(name, ".ffh").toStdString();
 
-   save_thread.push_back(std::thread([this, source, filename]()
+   save_thread.push_back(std::thread([this, source, filename, window]()
    {
       auto reader = source->getReader();
       auto data = source->getData();
@@ -129,6 +144,10 @@ void RealignmentStudio::save()
       {
          displayErrorMessage(e.what());
       }
+
+      if (close_after_save)
+         QMetaObject::invokeMethod(window, "close");
+
    }));
    
 

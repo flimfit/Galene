@@ -1,4 +1,6 @@
-cmake_minimum_required (VERSION 3.3) 
+cmake_minimum_required (VERSION 3.5) 
+
+set(CMAKE_CXX_STANDARD 14)
 
 include("cmake/HunterGate.cmake")
 HunterGate(
@@ -13,6 +15,8 @@ hunter_add_package(OpenCV)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
+
+set(USE_CRONOLOGIC ON)
 
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)

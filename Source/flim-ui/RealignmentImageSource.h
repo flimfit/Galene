@@ -12,7 +12,7 @@ public:
    RealignmentImageSource(std::shared_ptr<FlimReaderDataSource> reader, ImageRenderWindow* window, QObject* parent = 0) :
       QObject(parent), reader(reader), window(window)
    {
-      connect(reader.get(), &FlimReaderDataSource::alignmentComplete, this, &RealignmentImageSource::update);
+
    }
 
 protected:
@@ -26,7 +26,7 @@ protected:
       auto results = r->getRealignmentResults();
 
       QVector<double> corr;
-      corr.reserve(results.size());
+      corr.reserve((int) results.size());
       for (auto& r : results)
       {
          cv::Mat H;

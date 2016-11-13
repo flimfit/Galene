@@ -2,10 +2,10 @@ project(flim-ui)
 
 cmake_minimum_required(VERSION 3.3)
 
-find_package(Qt5Widgets 5.6)
-find_package(Qt5PrintSupport 5.6)
-find_package(Qt5OpenGL 5.6)
-find_package(Qt5Network 5.6)
+find_package(Qt5Widgets 5.7)
+find_package(Qt5PrintSupport 5.7)
+find_package(Qt5OpenGL 5.7)
+find_package(Qt5Network 5.7)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)
 
@@ -72,4 +72,4 @@ target_link_libraries(flim-ui
    ${InstrumentControl_LIBRARIES}
    ${FLIMreader_LIBRARIES})
 
-qt5_use_modules(flim-ui Widgets PrintSupport SerialPort Network)
+qt5_use_modules(flim-ui Widgets PrintSupport SerialPort Network Charts)

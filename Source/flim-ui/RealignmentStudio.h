@@ -25,6 +25,9 @@ public:
    void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
    void updateProgress(double progress);
 
+   void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
+   bool getCloseAfterSave() { return close_after_save; }
+
 protected:
 
    void sendStatusUpdate();
@@ -32,10 +35,12 @@ protected:
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
    void save();
+   void exportMovie();
    RealignmentParameters getRealignmentParameters();
 
 private:
 
+   bool close_after_save = false;
    void displayErrorMessage(const QString error);
 
    LifetimeDisplayWidget* preview_widget;
