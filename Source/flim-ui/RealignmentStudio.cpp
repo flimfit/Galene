@@ -1,5 +1,6 @@
 
 #include "RealignmentStudio.h"
+#include "RealignmentStudioBatchProcessor.h"
 #include <QFileDialog>
 #include <QVector>
 #include <QDateTime>

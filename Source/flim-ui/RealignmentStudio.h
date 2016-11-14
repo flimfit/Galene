@@ -23,8 +23,8 @@ public:
    explicit RealignmentStudio();
    ~RealignmentStudio();
 
-   void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
-   void updateProgress(double progress);
+   //void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
+   //void updateProgress(double progress);
 
    void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
    bool getCloseAfterSave() { return close_after_save; }
@@ -37,7 +37,7 @@ signals:
 
 protected:
 
-   void sendStatusUpdate();
+   //void sendStatusUpdate();
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
 
@@ -66,52 +66,4 @@ private:
    std::list<std::thread> save_thread;
 
    friend class RealignmentStudioBatchProcessor;
-};
-
-
-class RealignmentStudioBatchProcessor : public ThreadedObject
-{
-   Q_OBJECT
-
-public:
-   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_) : 
-      ThreadedObject(studio_)
-   {
-      studio = studio_;
-      files = files_;
-
-      startThread();
-   }
-
-   void init()
-   {
-      processNext();
-   }
-
-   void processNext()
-   {
-      if (source)
-      {
-         studio->save(source, true);
-         disconnect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
-      }
-
-      if (files.empty())
-      {
-         deleteLater();
-         return;
-      }
-      
-      QString file = files.front();
-      files.pop_front();
-
-      source = studio->openFile(file);
-      connect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
-   }
-
-private:
-
-   std::shared_ptr<FlimReaderDataSource> source;
-   RealignmentStudio* studio;
-   QStringList files;
 };

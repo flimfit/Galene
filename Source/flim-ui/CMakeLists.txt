@@ -51,6 +51,7 @@ set(HEADERS
    RealignmentStudio.h
    RealignmentDisplayWidget.h
    RealignmentImageSource.h
+   RealignmentStudioBatchProcessor.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
