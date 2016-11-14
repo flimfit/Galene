@@ -33,6 +33,8 @@ set(SOURCE
    RealignmentStudio.cpp
    LifetimeDisplayWidget.cpp
    FlimReaderDataSource.cpp
+   FlimWorkspace.cpp
+   FlimDataSource.cpp
 )
 
 set(HEADERS

@@ -20,6 +20,7 @@
 
 using namespace std;
 
+
 RealignmentStudio::RealignmentStudio() :
    ControlBinder(this, "RealignmentStudio")
 {
@@ -31,59 +32,79 @@ RealignmentStudio::RealignmentStudio() :
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
-   connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::save);
+   connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
+   connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
+   
+   connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows);
 
    file_list_view->setModel(workspace);
    file_list_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
    file_list_view->setEditTriggers(QAbstractItemView::EditKeyPressed);
-   file_list_view->installEventFilter(new WorkspaceEventFilter(workspace));
+
+   auto event_filter = new WorkspaceEventFilter(workspace, true);
+   connect(event_filter, &WorkspaceEventFilter::requestProcessSelected, this, &RealignmentStudio::processSelected);
+
+   file_list_view->installEventFilter(event_filter);
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
    
+   workspace_selection = file_list_view->selectionModel();
+
    Bind(close_after_save_check, this, &RealignmentStudio::setCloseAfterSave, &RealignmentStudio::getCloseAfterSave);
 
 }
 
-void RealignmentStudio::openFile(const QString& filename) 
+std::shared_ptr<FlimReaderDataSource> RealignmentStudio::openFile(const QString& filename)
 {
+   std::shared_ptr<FlimReaderDataSource> source;
+
    try
    {
-      auto reader = std::make_shared<FlimReaderDataSource>(filename);
-      connect(reader.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
-      reader->getReader()->setRealignmentParameters(getRealignmentParameters());
+      source = std::make_shared<FlimReaderDataSource>(filename);
+      connect(source.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+      source->getReader()->setRealignmentParameters(getRealignmentParameters());
       std::list<QMdiSubWindow*> windows;
 
-      auto createSubWindow = [&](QWidget* widget) -> QMdiSubWindow*
-      {
-         auto sub = new ConstrainedMdiSubWindow();
-         sub->setWidget(widget);
-         sub->setAttribute(Qt::WA_DeleteOnClose);
-         mdi_area->addSubWindow(sub);
-         
-         widget->show();
-         widget->setWindowTitle(QFileInfo(filename).baseName());
-         window_map[sub] = reader;
-
-         return sub;
-      };
-
-      auto widget = new LifetimeDisplayWidget;
-      widget->setFlimDataSource(reader);
-      auto w1 = createSubWindow(widget);
-      
-      auto realignment_widget = new RealignmentDisplayWidget(reader);
-      auto w2 = createSubWindow(realignment_widget);
-
-      // Make windows close each other
-      connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
-      connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
-
-
-      reader->readData();
+      emit newDataSource(source);
    }
    catch (std::runtime_error e)
    {
       QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1'").arg(filename));
    }
+
+   return source;
+}
+
+void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> reader)
+{
+   auto createSubWindow = [&](QWidget* widget) -> QMdiSubWindow*
+   {
+      auto sub = new ConstrainedMdiSubWindow();
+      sub->setWidget(widget);
+      sub->setAttribute(Qt::WA_DeleteOnClose);
+      mdi_area->addSubWindow(sub);
+         
+      widget->show();
+      //widget->setWindowTitle(QFileInfo(filename).baseName());
+      window_map[sub] = reader;
+
+      connect(widget, &QObject::destroyed, sub, &QObject::deleteLater);
+
+      return sub;
+   };
+
+   auto widget = new LifetimeDisplayWidget;
+   widget->setFlimDataSource(reader);
+   auto w1 = createSubWindow(widget);
+      
+   auto realignment_widget = new RealignmentDisplayWidget(reader);
+   auto w2 = createSubWindow(realignment_widget);
+
+   // Make windows close each other
+   connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
+   connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
+
+
+   reader->readData();
 }
 
 std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
@@ -118,18 +139,24 @@ void RealignmentStudio::exportMovie()
 
 }
 
-void RealignmentStudio::save()
+void RealignmentStudio::saveCurrent()
 {
+   save(getCurrentSource());
+}
+
+void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool force_close)
+{
+   if (source == nullptr)
+      return;
+
    // clean out threads that are finished
    save_thread.remove_if([](std::thread& t) { return !t.joinable(); });
 
-   auto source = getCurrentSource();
-   auto window = mdi_area->activeSubWindow();
    QFileInfo fi = QString::fromStdString(source->getReader()->getFilename());
    QString name = fi.baseName() + suffix_edit->text();
    std::string filename = workspace->getFileName(name, ".ffh").toStdString();
 
-   save_thread.push_back(std::thread([this, source, filename, window]()
+   save_thread.push_back(std::thread([this, source, filename, force_close]()
    {
       auto reader = source->getReader();
       auto data = source->getData();
@@ -145,12 +172,18 @@ void RealignmentStudio::save()
          displayErrorMessage(e.what());
       }
 
-      if (close_after_save)
-         QMetaObject::invokeMethod(window, "close");
+      if (close_after_save || force_close)
+         source->requestDelete();
 
    }));
    
 
+}
+
+void RealignmentStudio::processSelected()
+{
+   QStringList files = workspace->getSelectedFiles(workspace_selection->selectedRows());
+   new RealignmentStudioBatchProcessor(this, files); // deletes itself
 }
 
 RealignmentParameters RealignmentStudio::getRealignmentParameters()

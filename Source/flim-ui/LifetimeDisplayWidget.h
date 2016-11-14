@@ -8,7 +8,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, public ControlBinder
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, public ControlBinder, public FlimDataSourceWatcher
 {
    Q_OBJECT
 
@@ -30,6 +30,8 @@ signals:
    void displayIntensityMaxChanged(int);
 
 protected:
+
+   void sourceDeleteRequested() { deleteLater(); };
 
    void setAutoscaleIntensity(bool autoscale_intensity_);
    void setAutoscaleTau(bool autoscale_tau_);

@@ -62,7 +62,6 @@ signals:
 
    void error(const QString& message);
    void alignmentComplete();
-   void readComplete();
 
 public:
 

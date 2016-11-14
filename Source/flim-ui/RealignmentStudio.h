@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "qcustomplot.h"
 
+#include "ThreadedObject.h"
 #include "ControlBinder.h"
 #include "LifetimeDisplayWidget.h"
 #include "FlimWorkspace.h"
@@ -28,13 +29,24 @@ public:
    void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
    bool getCloseAfterSave() { return close_after_save; }
 
+   std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
+
+signals:
+
+   void newDataSource(std::shared_ptr<FlimReaderDataSource> source);
+
 protected:
 
    void sendStatusUpdate();
-   void openFile(const QString& filename);
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
-   void save();
+
+   void openWindows(std::shared_ptr<FlimReaderDataSource> source);
+
+   void saveCurrent();
+   void save(std::shared_ptr<FlimReaderDataSource> source, bool force_close = false);
+   
+   void processSelected();
    void exportMovie();
    RealignmentParameters getRealignmentParameters();
 
@@ -46,9 +58,60 @@ private:
    LifetimeDisplayWidget* preview_widget;
    FlimWorkspace* workspace;
 
+   QItemSelectionModel *workspace_selection;
+
    QTimer* status_timer;
 
    std::map<QMdiSubWindow*, std::weak_ptr<FlimReaderDataSource>> window_map;
-
    std::list<std::thread> save_thread;
+
+   friend class RealignmentStudioBatchProcessor;
+};
+
+
+class RealignmentStudioBatchProcessor : public ThreadedObject
+{
+   Q_OBJECT
+
+public:
+   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_) : 
+      ThreadedObject(studio_)
+   {
+      studio = studio_;
+      files = files_;
+
+      startThread();
+   }
+
+   void init()
+   {
+      processNext();
+   }
+
+   void processNext()
+   {
+      if (source)
+      {
+         studio->save(source, true);
+         disconnect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
+      }
+
+      if (files.empty())
+      {
+         deleteLater();
+         return;
+      }
+      
+      QString file = files.front();
+      files.pop_front();
+
+      source = studio->openFile(file);
+      connect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
+   }
+
+private:
+
+   std::shared_ptr<FlimReaderDataSource> source;
+   RealignmentStudio* studio;
+   QStringList files;
 };
