@@ -84,7 +84,8 @@ void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> reader
       mdi_area->addSubWindow(sub);
          
       widget->show();
-      //widget->setWindowTitle(QFileInfo(filename).baseName());
+      QString filename = QString::fromStdString(reader->getReader()->getFilename());
+      widget->setWindowTitle(QFileInfo(filename).baseName());
       window_map[sub] = reader;
 
       connect(widget, &QObject::destroyed, sub, &QObject::deleteLater);
