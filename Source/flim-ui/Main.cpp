@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include "FlimDisplay.h"
+#include "RealignmentStudio.h"
 #include "BHRatesWidget.h"
 #include "FlimReaderDataSource.h"
 #include <memory>
@@ -59,8 +60,9 @@ int main(int argc, char *argv[])
 
    QApplication a(argc, argv);
        
-   FlimDisplay display;
-   display.showMinimized();
+   //FlimDisplay display;
+   RealignmentStudio display;
+   display.showMaximized();
 
    a.exec();
 

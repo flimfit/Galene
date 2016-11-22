@@ -29,6 +29,7 @@ RealignmentStudio::RealignmentStudio() :
 
    workspace = new FlimWorkspace(this);
 
+   connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 

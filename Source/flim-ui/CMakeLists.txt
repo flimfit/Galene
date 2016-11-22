@@ -1,4 +1,4 @@
-project(flim-ui) 
+project(flim_ui) 
 
 cmake_minimum_required(VERSION 3.3)
 
@@ -62,17 +62,46 @@ include_directories(${fifo_flim_INCLUDE_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(flim-ui ${SOURCE} ${HEADERS} 
+if(WIN32)
+   set(WIN_RESOURCE_FILE icon.rc)
+endif()
+
+add_executable(flim_ui ${SOURCE} ${HEADERS} 
                                  ${UI_HEADERS} ${UI_RESOURCES} 
                                  $<TARGET_OBJECTS:InstrumentControl> 
                                  $<TARGET_OBJECTS:InstrumentControlUI> 
                                  $<TARGET_OBJECTS:fifo_flim>
-                                 $<TARGET_OBJECTS:FLIMreader>)
+                                 $<TARGET_OBJECTS:FLIMreader> ${WIN_RESOURCE_FILE})
 
-target_link_libraries(flim-ui
+target_link_libraries(flim_ui
    ${OpenCV_LIBS} 
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES}
    ${FLIMreader_LIBRARIES})
 
-qt5_use_modules(flim-ui Widgets PrintSupport SerialPort Network Charts)
+qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network Charts)
+
+DeployQt(TARGET flim_ui INCLUDE_MODULES ${QTLIBS})
+
+set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
+include(InstallRequiredSystemLibraries)
+
+install(TARGETS flim_ui RUNTIME DESTINATION bin)
+install(DIRECTORY $<TARGET_FILE_DIR:flim_ui>/ DESTINATION bin)
+
+
+# Create installer
+
+set(CPACK_PACKAGE_NAME "flim_ui")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "FLIM UI Installer")
+set(CPACK_PACKAGE_VERSION ${VERSION}) # Version of installer
+set(CPACK_PACKAGE_EXECUTABLES flim_ui "flim-ui ${VERSION}" PARENT_SCOPE)
+
+if (WIN32)
+   set(CPACK_GENERATOR NSIS)
+   set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.ico" PARENT_SCOPE)
+   set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.ico" PARENT_SCOPE)
+   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON" PARENT_SCOPE)
+elseif (APPLE)
+   set(CPACK_GENERATOR BUNDLE)
+endif()
