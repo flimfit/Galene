@@ -17,6 +17,13 @@ if(GIT_FOUND)
             OUTPUT_VARIABLE VERSION
             OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "VERSION: ${VERSION}")
+	string(REGEX MATCH "([0-9]+)\.([0-9]+)\.([0-9]+)" MATCHED ${VERSION})
+	
+	set(VERSION_MAJOR ${CMAKE_MATCH_1})
+	set(VERSION_MINOR ${CMAKE_MATCH_2})
+	set(VERSION_PATCH ${CMAKE_MATCH_3})
+	
+	message(STATUS "VERSION: ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH}")
 endif()
 
 project (flim-ui) 
@@ -34,5 +41,9 @@ add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FLIMreader/Source/FLIMreader)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
+
+set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 
 include(CPack)
