@@ -22,8 +22,7 @@ if(GIT_FOUND)
 	set(VERSION_MAJOR ${CMAKE_MATCH_1})
 	set(VERSION_MINOR ${CMAKE_MATCH_2})
 	set(VERSION_PATCH ${CMAKE_MATCH_3})
-	
-	message(STATUS "VERSION: ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH}")
+	add_definitions(-DVERSION="${VERSION}")
 endif()
 
 project (flim-ui) 
@@ -36,6 +35,7 @@ set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
 
 set(USE_CRONOLOGIC ON)
 
+add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FLIMreader/Source/FLIMreader)

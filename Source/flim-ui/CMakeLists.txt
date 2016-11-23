@@ -58,6 +58,7 @@ include_directories(${fifo_flim_INCLUDE_DIR}
                     ${InstrumentControl_INCLUDE_DIR}
                     ${InstrumentControlUI_INCLUDE_DIR}
                     ${FLIMreader_INCLUDE_DIR}
+                    ${QSimpleUpdater_INCLUDE_DIR}
                     ${QT_USE_FILE}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR})
@@ -71,7 +72,9 @@ add_executable(flim_ui ${SOURCE} ${HEADERS}
                                  $<TARGET_OBJECTS:InstrumentControl> 
                                  $<TARGET_OBJECTS:InstrumentControlUI> 
                                  $<TARGET_OBJECTS:fifo_flim>
-                                 $<TARGET_OBJECTS:FLIMreader> ${WIN_RESOURCE_FILE})
+                                 $<TARGET_OBJECTS:FLIMreader>
+                                 $<TARGET_OBJECTS:QSimpleUpdater>
+                                 ${WIN_RESOURCE_FILE})
 
 target_link_libraries(flim_ui
    ${OpenCV_LIBS} 
@@ -79,7 +82,7 @@ target_link_libraries(flim_ui
    ${InstrumentControl_LIBRARIES}
    ${FLIMreader_LIBRARIES})
 
-qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network Charts)
+qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
 
 DeployQt(TARGET flim_ui INCLUDE_MODULES ${QTLIBS})
 

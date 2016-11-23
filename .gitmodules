@@ -8,3 +8,6 @@
 	path = Source/FLIMreader
 	url = https://github.com/flimfit/FLIMreader
 	branch = flim-realignment
+[submodule "source/QSimpleUpdater"]
+	path = source/QSimpleUpdater
+	url = https://github.com/seanwarren/QSimpleUpdater.git

@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QCoreApplication>
+#include "QSimpleUpdater.h"
 #include "FlimDisplay.h"
 #include "RealignmentStudio.h"
 #include "BHRatesWidget.h"
@@ -7,6 +8,10 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+
+const QString update_url = "https://raw.githubusercontent.com/"
+                           "alex-spataru/QSimpleUpdater/master/tutorial/"
+                           "definitions/updates.json";
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 
@@ -59,7 +64,14 @@ int main(int argc, char *argv[])
    qInstallMessageHandler(myMessageOutput);
 
    QApplication a(argc, argv);
-       
+
+   /*
+   auto updater = QSimpleUpdater::getInstance();
+   updater->setModuleVersion(update_url, VERSION); // from CMake
+   updater->setModuleName(update_url, "flim-ui");
+   updater->checkForUpdates(update_url);
+   */
+
    //FlimDisplay display;
    RealignmentStudio display;
    display.showMaximized();
