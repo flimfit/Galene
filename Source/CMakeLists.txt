@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.5) 
 
 set(CMAKE_CXX_STANDARD 14)
+set(HUNTER_CONFIGURATION_TYPES Release;Debug;RelWithDebInfo)
 
 include("cmake/HunterGate.cmake")
 HunterGate(

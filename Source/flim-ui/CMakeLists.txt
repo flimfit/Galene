@@ -77,10 +77,10 @@ add_executable(flim_ui ${SOURCE} ${HEADERS}
                                  ${WIN_RESOURCE_FILE})
 
 target_link_libraries(flim_ui
-   ${OpenCV_LIBS} 
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES}
-   ${FLIMreader_LIBRARIES})
+   ${FLIMreader_LIBRARIES}
+   PRIVATE ${OpenCV_LIBS})
 
 qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
 
