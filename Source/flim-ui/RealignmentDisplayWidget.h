@@ -29,6 +29,7 @@ public:
 
    void exportMovie()
    {
+#ifndef SUPPRESS_OPENCV_HIGHGUI
       if (results.empty())
       {
          QMessageBox::warning(this, "Could not export", "No results to export from this window");
@@ -57,6 +58,7 @@ public:
             r.frame.convertTo(buf, CV_8U, scale);
          writer.write(buf);
       }
+#endif
    }
 
 

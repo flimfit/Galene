@@ -34,6 +34,7 @@ void LifetimeDisplayWidget::setFlimDataSource(std::shared_ptr<FlimDataSource> fl
    FlimDataSourceWatcher::setFlimDataSource(flimage_);
 
    flimage = flimage_;
+   connect(flimage.get(), &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
    connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    connect(flimage.get(), &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);

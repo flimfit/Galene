@@ -7,7 +7,9 @@ find_package(Qt5PrintSupport 5.7)
 find_package(Qt5OpenGL 5.7)
 find_package(Qt5Network 5.7)
 
+
 find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)
+set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -77,10 +79,11 @@ add_executable(flim_ui ${SOURCE} ${HEADERS}
                                  ${WIN_RESOURCE_FILE})
 
 target_link_libraries(flim_ui
+   ${OpenCV_LIBS}
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES}
    ${FLIMreader_LIBRARIES}
-   PRIVATE ${OpenCV_LIBS})
+   )
 
 qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
 
