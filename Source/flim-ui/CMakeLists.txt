@@ -1,6 +1,6 @@
 project(flim_ui) 
 
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.7)
 
 find_package(Qt5Widgets 5.7)
 find_package(Qt5PrintSupport 5.7)
