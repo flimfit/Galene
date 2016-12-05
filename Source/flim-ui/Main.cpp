@@ -9,9 +9,7 @@
 #include <vector>
 #include <iostream>
 
-const QString update_url = "https://raw.githubusercontent.com/"
-                           "alex-spataru/QSimpleUpdater/master/tutorial/"
-                           "definitions/updates.json";
+const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 
@@ -65,12 +63,12 @@ int main(int argc, char *argv[])
 
    QApplication a(argc, argv);
 
-   /*
+   
    auto updater = QSimpleUpdater::getInstance();
    updater->setModuleVersion(update_url, VERSION); // from CMake
    updater->setModuleName(update_url, "flim-ui");
    updater->checkForUpdates(update_url);
-   */
+   
 
    //FlimDisplay display;
    RealignmentStudio display;
