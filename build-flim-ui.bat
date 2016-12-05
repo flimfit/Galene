@@ -12,7 +12,7 @@ cd %PROJECT_DIR%
 set GENERATOR="Visual Studio %MSVC_VER% %MSVC_YEAR% Win64"
 echo Generating CMake Project in: %PROJECT_DIR%
 echo Using Generator: %GENERATOR%
-cmake -G %GENERATOR% ..\Source\
+cmake -G %GENERATOR% ..\..\Source\
 
 echo Building 64bit Project in Release mode
 cmake --build . --config Release --target PACKAGE
