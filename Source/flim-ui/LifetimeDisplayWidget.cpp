@@ -58,6 +58,9 @@ void LifetimeDisplayWidget::setFlimDataSource(std::shared_ptr<FlimDataSource> fl
 
       rate_labels.push_back(w);
    }
+
+   updateLifetimeImage();
+   updateDecay();
 }
 
 void LifetimeDisplayWidget::updateCountRates()

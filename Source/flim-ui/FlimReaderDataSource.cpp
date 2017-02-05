@@ -120,6 +120,7 @@ void FlimReaderDataSource::readDataThread()
       reader->alignFrames();
       emit alignmentComplete();
       reader->readData(data);
+      update();
       emit readComplete();
    }
    catch (std::runtime_error e)
