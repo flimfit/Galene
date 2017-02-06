@@ -267,11 +267,25 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="close_after_save_check">
-            <property name="text">
-             <string>Close after save</string>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="topMargin">
+             <number>0</number>
             </property>
-           </widget>
+            <item>
+             <widget class="QCheckBox" name="close_after_save_check">
+              <property name="text">
+               <string>Close after save</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="save_preview_check">
+              <property name="text">
+               <string>Save preview</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="Line" name="line">

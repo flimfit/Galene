@@ -26,8 +26,12 @@ public:
    //void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
    //void updateProgress(double progress);
 
+
    void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
    bool getCloseAfterSave() { return close_after_save; }
+
+   void setSavePreview(bool save_preview_) { save_preview = save_preview_; };
+   bool getSavePreview() { return save_preview; }
 
    std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
 
@@ -53,6 +57,8 @@ protected:
 private:
 
    bool close_after_save = false;
+   bool save_preview = false;
+
    void displayErrorMessage(const QString error);
 
    LifetimeDisplayWidget* preview_widget;

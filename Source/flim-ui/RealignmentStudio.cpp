@@ -52,6 +52,7 @@ RealignmentStudio::RealignmentStudio() :
    workspace_selection = file_list_view->selectionModel();
 
    Bind(close_after_save_check, this, &RealignmentStudio::setCloseAfterSave, &RealignmentStudio::getCloseAfterSave);
+   Bind(save_preview_check, this, &RealignmentStudio::setSavePreview, &RealignmentStudio::getSavePreview);
 
 }
 
@@ -158,8 +159,9 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
    QFileInfo fi = QString::fromStdString(source->getReader()->getFilename());
    QString name = fi.baseName() + suffix_edit->text();
    std::string filename = workspace->getFileName(name, ".ffh").toStdString();
+   std::string preview_filename = workspace->getFileName(name, ".png").toStdString();
 
-   save_thread.push_back(std::thread([this, source, filename, force_close]()
+   save_thread.push_back(std::thread([this, source, filename, preview_filename, force_close]()
    {
       auto reader = source->getReader();
       auto data = source->getData();
@@ -173,6 +175,19 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
       catch (std::runtime_error e)
       {
          displayErrorMessage(e.what());
+      }
+
+      if (save_preview)
+      {
+         cv::Mat& intensity = source->getIntensity();
+
+         double mn, mx;
+         cv::minMaxLoc(intensity, &mn, &mx);
+
+         cv::Mat output;
+         intensity.convertTo(output, CV_8U, 255.0 / mx);
+
+         cv::imwrite(preview_filename, output);
       }
 
       if (close_after_save || force_close)
