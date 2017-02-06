@@ -36,7 +36,6 @@ set(SOURCE
    LifetimeDisplayWidget.cpp
    FlimReaderDataSource.cpp
    FlimWorkspace.cpp
-   FlimDataSource.cpp
 )
 
 set(HEADERS

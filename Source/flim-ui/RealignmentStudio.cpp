@@ -187,7 +187,9 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
          cv::Mat output;
          intensity.convertTo(output, CV_8U, 255.0 / mx);
 
+#ifndef SUPPRESS_OPENCV_HIGHGUI
          cv::imwrite(preview_filename, output);
+#endif
       }
 
       if (close_after_save || force_close)
