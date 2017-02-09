@@ -54,6 +54,7 @@ signals:
 protected:
 
    void setWorkspace(const QString& dir);
+   const QString getNewPath();
 
    bool has_workspace = false;
    QDir workspace;

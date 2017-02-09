@@ -95,20 +95,28 @@ void FlimWorkspace::requestOpenFile(const QModelIndex index)
 }
 
 
+const QString FlimWorkspace::getNewPath()
+{
+   if (has_workspace)
+      return workspace.canonicalPath();
+   else
+      return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+}
+
 void FlimWorkspace::makeNew()
 {
-   QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-   QString new_dir = QFileDialog::getSaveFileName(nullptr, "Choose a workspace", folder, "");
+   QString new_dir = QFileDialog::getSaveFileName(nullptr, "Choose a workspace", getNewPath(), "");
 
-   makeNewFromFolder(new_dir);
+   if (!new_dir.isEmpty())
+     makeNewFromFolder(new_dir);
 }
 
 void FlimWorkspace::open()
 {
-   QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-   QString open_dir = QFileDialog::getExistingDirectory(nullptr, "Choose a workspace", folder);
+   QString open_dir = QFileDialog::getExistingDirectory(nullptr, "Choose a workspace", getNewPath());
 
-   openFromFolder(open_dir);
+   if (!open_dir.isEmpty())
+      openFromFolder(open_dir);
 }
 
 void FlimWorkspace::makeNewFromFolder(const QString& dir)
