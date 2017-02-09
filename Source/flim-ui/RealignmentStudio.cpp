@@ -184,8 +184,12 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
          double mn, mx;
          cv::minMaxLoc(intensity, &mn, &mx);
 
+         cv::Scalar mean, std;
+         cv::meanStdDev(intensity, mean, std);
+         double i_max = mean[0] + 1.96 * std[0]; // 97.5% 
+
          cv::Mat output;
-         intensity.convertTo(output, CV_8U, 255.0 / mx);
+         intensity.convertTo(output, CV_8U, 255.0 / i_max);
 
 #ifndef SUPPRESS_OPENCV_HIGHGUI
          cv::imwrite(preview_filename, output);
