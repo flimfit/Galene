@@ -1,21 +1,19 @@
 #pragma once
 
-/*
-#include "Cronologic.h"
+#include "FifoTcspc.h"
 #include "CronologicControlDisplay.h"
 #include "SimTcspc.h"
 
 class FifoTcspcControlDisplayFactory 
 {
 public:
-   static QWidget* createControlDisplay(Cronologic* tcspc)
+   static QWidget* create(FifoTcspc* tcspc)
    {
-      return new CronologicControlDisplay(tcspc);
-   }
+#ifdef USE_CRONOLOGIC
+      if (Cronologic* c = dynamic_cast<Cronologic*>(tcspc))
+         return new CronologicControlDisplay(c);
+#endif
 
-   static QWidget* createControlDisplay(SimTcspc* tcspc)
-   {
       return new QWidget();
    }
 };
-*/

@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <fstream>
-//#include "Cronologic.h"
+#include "FifoTcspcFactory.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
 #include "FlimFileReader.h"
@@ -190,23 +190,13 @@ void FlimDisplay::sendStatusUpdate()
 
 void FlimDisplay::setupTCSPC()
 {
-   bool use_simulated = true;
-   try
-   {
-      if (use_simulated)
-      {
-         tcspc = new SimTcspc(this);
-         tcspc_control = new QWidget();
-      }
-      else
-      {
-            // TODO: abstract this
-         //Cronologic* c = new Cronologic(this);
-         //tcspc_control = new CronologicControlDisplay(c);
-         //tcspc = c;
-      }
+   QString type = "cronologic";
 
-   }
+   try 
+   {
+      tcspc = FifoTcspcFactory::create(type, this);
+      tcspc_control = FifoTcspcControlDisplayFactory::create(tcspc);
+   }   
    catch (std::runtime_error e)
    {
       QMessageBox msg(QMessageBox::Critical, "Critial Error", QString("Could not connect to TCSPC card: %1").arg(e.what()));

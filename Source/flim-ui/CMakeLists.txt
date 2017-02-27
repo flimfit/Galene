@@ -17,10 +17,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 set(CMAKE_AUTOMOC ON)
 
-if(USE_CRONOLOGIC)
-    set(CRONOLOGIC_FILES "CronologicControlDisplay.cpp CronologicControlDisplay.h")
-endif()
-
 # QT stuff
 #====================================
 add_definitions(${QT_DEFINITIONS}) 
@@ -39,11 +35,11 @@ set(SOURCE
    FlimServer.cpp
    Main.cpp
    qcustomplot.cpp
-   
    RealignmentStudio.cpp
    LifetimeDisplayWidget.cpp
    FlimReaderDataSource.cpp
-   FlimWorkspace.cpp
+   FlimWorkspace.cpp   
+   CronologicControlDisplay.cpp
 )
 
 set(HEADERS
@@ -60,6 +56,7 @@ set(HEADERS
    RealignmentDisplayWidget.h
    RealignmentImageSource.h
    RealignmentStudioBatchProcessor.h
+   CronologicControlDisplay.cpp
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
@@ -79,8 +76,10 @@ elseif(APPLE)
     set(RESOURCE_FILES ${ICON_FILE})
 endif()
 
+add_definitions(${fifo_flim_DEFINITIONS})
+
 add_executable(flim_ui MACOSX_BUNDLE 
-                    ${SOURCE} ${HEADERS} ${CRONOLOGIC_FILES}
+                    ${SOURCE} ${HEADERS}
                     ${UI_HEADERS} ${UI_RESOURCES} 
                     $<TARGET_OBJECTS:InstrumentControl> 
                     $<TARGET_OBJECTS:InstrumentControlUI> 

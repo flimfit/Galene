@@ -1,4 +1,5 @@
 #pragma once
+#ifdef USE_CRONOLOGIC
 
 #include "cronologic.h"
 #include "ParameterWidget.h"
@@ -41,3 +42,5 @@ private:
    QList<ParameterWidget*> widgets;
 
 };
+
+#endif

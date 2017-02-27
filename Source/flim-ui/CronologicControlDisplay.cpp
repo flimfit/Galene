@@ -1,3 +1,4 @@
+#ifdef USE_CRONOLOGIC
 #include "CronologicControlDisplay.h"
 
 #include <QApplication>
@@ -6,7 +7,6 @@
 #include <QGroupBox>
 
 #include <iostream>
-
 
 
 CronologicControlDisplay::CronologicControlDisplay(Cronologic* tcspc, QWidget* parent) :
@@ -53,3 +53,4 @@ CronologicControlDisplay::CronologicControlDisplay(Cronologic* tcspc, QWidget* p
    setLayout(side_layout);
 }
 
+#endif
