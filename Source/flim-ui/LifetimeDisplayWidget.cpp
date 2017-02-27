@@ -1,5 +1,3 @@
-#pragma once
-
 #include "LifetimeDisplayWidget.h"
 
 #include <opencv2/imgproc.hpp>
@@ -234,7 +232,7 @@ void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
    intensity.convertTo(alpha, CV_8U, 255.0 / (i_max - i_min), -255.0 * i_min / (i_max - i_min));
 
    display = cv::Mat(mapped_mar.rows, mapped_mar.cols, CV_8UC4);
-   cv::mixChannels({ { mapped_mar, alpha } }, { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
+   cv::mixChannels(std::vector<cv::Mat>({ mapped_mar, alpha }), { { display } }, { 0, 0, 1, 1, 2, 2, 3, 3 }); // to ARGB1
 
    lifetime_image_widget->SetImage(display);
 }

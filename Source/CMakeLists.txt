@@ -4,11 +4,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 include("cmake/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.14.29.tar.gz"
-    SHA1 "9c29c30fff99b7c1479b2e9d4926dcc3f8d364e0"
+    URL "https://github.com/ruslo/hunter/archive/v0.18.3.tar.gz"
+    SHA1 "3e29b599966d2acc7ddcb10cc50522d794d24d93"
+    LOCAL
 )
-
-include("cmake/DeployQt.cmake")
 
 find_package(Git)
 if(GIT_FOUND)
@@ -26,15 +25,30 @@ if(GIT_FOUND)
 endif()
 
 project (flim-ui) 
-hunter_add_package(Boost COMPONENTS filesystem system)
-hunter_add_package(OpenCV)
+
+find_package(Boost REQUIRED COMPONENTS system filesystem)
+if(NOT Boost_FOUND)
+    hunter_add_package(Boost COMPONENTS filesystem system)
+endif()
+
+find_package(OpenCV)
+if(NOT OpenCV_FOUND)
+    hunter_add_package(OpenCV)
+endif()
+
+find_package(Qt5SerialPort)
+if(NOT Qt5SerialPort_FOUND)
+    hunter_add_package(Qt COMPONENTS qtbase qtserialport)
+endif()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
-set(USE_CRONOLOGIC ON CACHE BOOL "Support for Cronologic")
+if(WIN32)
+    set(USE_CRONOLOGIC ON CACHE BOOL)
+endif()
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
@@ -43,8 +57,22 @@ add_subdirectory(FLIMreader/Source/FLIMreader)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 
+# Create installer
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 
-include(CPack)
+set(CPACK_PACKAGE_NAME "flim_ui")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "FLIM UI Installer")
+set(CPACK_PACKAGE_VERSION ${VERSION}) # Version of installer
+set(CPACK_PACKAGE_VENDOR "Sean Warren")
+set(CPACK_PACKAGE_EXECUTABLES flim_ui "flim-ui ${VERSION}")
+
+if (WIN32)
+   set(CPACK_GENERATOR NSIS)
+   set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui/flim-ui.ico")
+   set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui/flim-ui.ico")
+   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL "ON")
+    include(CPack)
+endif()
+

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "FlimWorkspace.h"
 
 #include <QMessageBox>

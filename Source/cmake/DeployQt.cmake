@@ -1,64 +1,76 @@
+# The MIT License (MIT)
 #
-# CMake wrapper to call windeployqt in Windows
+# Copyright (c) 2016 Nathan Osman
 #
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-function(DeployQt)
-	cmake_parse_arguments(_deploy
-		"COMPILER_RUNTIME;FORCE"
-		"TARGET"
-		"INCLUDE_MODULES;EXCLUDE_MODULES"
-		${ARGN}
-		)
+find_package(Qt5Core REQUIRED)
 
-	if(NOT _deploy_TARGET)
-		message(FATAL_ERROR "A TARGET must be specified")
-	endif()
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		list(APPEND _ARGS --debug)
-	elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-		list(APPEND _ARGS --release-with-debug-info)
-	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-		list(APPEND _ARGS --release)
-	endif()
-	if(_deploy_COMPILER_RUNTIME)
-		list(APPEND _ARGS --compiler-runtime)
-	endif()
-	if(_deploy_FORCE)
-		list(APPEND _ARGS --force)
-	endif()
+# Retrieve the absolute path to qmake and then use that path to find
+# the windeployqt and macdeployqt binaries
+get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
 
-	foreach(mod ${_deploy_INCLUDE_MODULES})
-		string(TOLOWER ${mod} mod)
-		string(REPLACE "qt5::" "" mod ${mod})
-		list(APPEND _ARGS "--${mod}")
-	endforeach()
-	foreach(mod ${_deploy_EXCLUDE_MODULES})
-		string(TOLOWER ${mod} mod)
-		string(REPLACE "qt5::" "" mod ${mod})
-		list(APPEND _ARGS "--no-${mod}")
-	endforeach()
+# Add commands that copy the required Qt files to the same directory as the
+# target after being built, including the system libraries
+function(windeployqt target)
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E
+            env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+                --verbose 0
+                --no-compiler-runtime
+                "$<TARGET_FILE:${target}>"
+        COMMENT "Deploying Qt..."
+    )
 
-	if(APPLE)
-		set(PROGRAM_NAME macdeployqt)
-	elseif(WIN32)
-		set(PROGRAM_NAME windeployqt)
-	else()
-		message(FATAL_ERROR "Unsupported platform")
-	endif()
-		
-	find_program(_deploy_PROGRAM ${PROGRAM_NAME}
-		PATHS $ENV{QTDIR}/bin/)
-	if(_deploy_PROGRAM)
-		message(STATUS "Found ${_deploy_PROGRAM}")
-	else()
-		message(FATAL_ERROR "Unable to find ${PROGRAM_NAME}")
-	endif()
+    # windeployqt doesn't work correctly with the system runtime libraries,
+    # so we fall back to one of CMake's own modules for copying them over
 
-	if(COMPILER_RUNTIME AND NOT $ENV{VVVV})
-		message(STATUS "not set, the VC++ redistributable installer will NOT be bundled")
-	endif()
-      
-	add_custom_command(TARGET ${_deploy_TARGET} POST_BUILD 
-      COMMAND ${_deploy_PROGRAM} ${_ARGS}
-		$<TARGET_FILE:${_deploy_TARGET}>)
+    # Doing this with MSVC 2015 requires CMake 3.6+
+    if((MSVC_VERSION VERSION_EQUAL 1900 OR MSVC_VERSION VERSION_GREATER 1900)
+            AND CMAKE_VERSION VERSION_LESS "3.6")
+        message(WARNING "Deploying with MSVC 2015+ requires CMake 3.6+")
+    endif()
+
+    set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    include(InstallRequiredSystemLibraries)
+    foreach(lib ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
+        get_filename_component(filename "${lib}" NAME)
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E
+                copy_if_different "${lib}" "$<TARGET_FILE_DIR:${target}>"
+            COMMENT "Copying ${filename}..."
+        )
+    endforeach()
 endfunction()
+
+# Add commands that copy the required Qt files to the application bundle
+# represented by the target.
+function(macdeployqt target)
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+            "$<TARGET_FILE_DIR:${target}>/../.."
+            -always-overwrite
+        COMMENT "Deploying Qt..."
+    )
+endfunction()
+
+mark_as_advanced(WINDEPLOYQT_EXECUTABLE MACDEPLOYQT_EXECUTABLE)

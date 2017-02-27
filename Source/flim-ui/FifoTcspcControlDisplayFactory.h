@@ -1,5 +1,6 @@
 #pragma once
 
+/*
 #include "Cronologic.h"
 #include "CronologicControlDisplay.h"
 #include "SimTcspc.h"
@@ -17,3 +18,4 @@ public:
       return new QWidget();
    }
 };
+*/

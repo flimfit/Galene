@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <fstream>
-#include "Cronologic.h"
+//#include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
 #include "FlimFileReader.h"
@@ -200,9 +200,10 @@ void FlimDisplay::setupTCSPC()
       }
       else
       {
-         Cronologic* c = new Cronologic(this);
-         tcspc_control = new CronologicControlDisplay(c);
-         tcspc = c;
+            // TODO: abstract this
+         //Cronologic* c = new Cronologic(this);
+         //tcspc_control = new CronologicControlDisplay(c);
+         //tcspc = c;
       }
 
    }

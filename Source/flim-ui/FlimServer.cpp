@@ -2,6 +2,7 @@
 #include <QThread>
 #include <cassert>
 #include <iostream>
+#include <cstring>
 #include <QMetaType>
 
 FlimServer::FlimServer(QObject* parent) :

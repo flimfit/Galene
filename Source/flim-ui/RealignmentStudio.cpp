@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <fstream>
-#include "Cronologic.h"
+//#include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FlimFileReader.h"
 #include "FlimCubeWriter.h"
@@ -179,7 +179,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
 
       if (save_preview)
       {
-         cv::Mat& intensity = source->getIntensity();
+         const cv::Mat& intensity = source->getIntensity();
 
          double mn, mx;
          cv::minMaxLoc(intensity, &mn, &mx);
