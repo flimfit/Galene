@@ -48,7 +48,7 @@ cv::Mat FlimReaderDataSource::getMeanArrivalTime()
    return mean_arrival_time;
 };
 
-void FlimReaderDataSource::readData()
+void FlimReaderDataSource::readData(bool realign)
 {
    if (currently_reading)
    {
@@ -59,7 +59,7 @@ void FlimReaderDataSource::readData()
       if (reader_thread.joinable())
          reader_thread.join();
 
-      reader_thread = std::thread(&FlimReaderDataSource::readDataThread, this);
+      reader_thread = std::thread(&FlimReaderDataSource::readDataThread, this, realign);
    }
 }
 
@@ -97,7 +97,7 @@ void FlimReaderDataSource::update()
 }
 
 // Use readData to call 
-void FlimReaderDataSource::readDataThread()
+void FlimReaderDataSource::readDataThread(bool realign)
 {
    int n_px = reader->dataSizePerChannel();
    int n_chan = reader->getNumChannels();
@@ -117,8 +117,12 @@ void FlimReaderDataSource::readDataThread()
 
    try
    {
-      reader->alignFrames();
-      emit alignmentComplete();
+      if (realign)
+      {
+         reader->alignFrames();
+         emit alignmentComplete();
+      }
+
       reader->readData(data);
       update();
       emit readComplete();

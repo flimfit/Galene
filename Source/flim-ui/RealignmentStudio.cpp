@@ -34,6 +34,7 @@ RealignmentStudio::RealignmentStudio() :
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
+   connect(reprocess_button, &QPushButton::pressed, this, &RealignmentStudio::reprocess);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
    connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
    
@@ -131,6 +132,16 @@ void RealignmentStudio::reload()
    source->readData();
 }
 
+void RealignmentStudio::reprocess()
+{
+   auto source = getCurrentSource();
+   auto reader = source->getReader();
+
+   reader->setRealignmentParameters(getRealignmentParameters());
+   source->readData(false);
+}
+
+
 void RealignmentStudio::exportMovie()
 {
    auto active_window = mdi_area->activeSubWindow();
@@ -218,6 +229,8 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.n_resampling_points = realignment_points_spin->value();
    params.frame_binning = frame_binning_combo->value();
    params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
+   params.threshold = threshold_spin->value();
+   params.smoothing = smoothing_spin->value();
 
    return params;
 }

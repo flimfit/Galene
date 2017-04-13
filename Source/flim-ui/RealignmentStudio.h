@@ -44,6 +44,7 @@ protected:
    //void sendStatusUpdate();
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
+   void reprocess();
 
    void openWindows(std::shared_ptr<FlimReaderDataSource> source);
 

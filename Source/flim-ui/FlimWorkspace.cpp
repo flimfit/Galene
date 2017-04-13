@@ -30,7 +30,7 @@ void FlimWorkspace::update()
    if (has_workspace)
    {
       beginResetModel();
-      auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension), QString("*.ffh") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+      auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension), QString("*.pt3"), QString("*.ffh") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)
          files.append(info.fileName());

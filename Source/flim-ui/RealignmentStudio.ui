@@ -138,6 +138,33 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="mode_combo">
+               <property name="currentText">
+                <string>Warp</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>None</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Translation</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Rigid Body</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Warp</string>
+                </property>
+               </item>
+              </widget>
+             </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_28">
                <property name="text">
@@ -175,31 +202,61 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="mode_combo">
-               <property name="currentText">
-                <string>None</string>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Threshold</string>
                </property>
-               <item>
-                <property name="text">
-                 <string>None</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Translation</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Rigid Body</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Warp</string>
-                </property>
-               </item>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="threshold_spin">
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <double>1000000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="smoothing_spin">
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.250000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Smoothing</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QDoubleSpinBox" name="coverage_threshold_spin">
+               <property name="suffix">
+                <string> %</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="singleStep">
+                <double>5.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Coverage Threshold</string>
+               </property>
               </widget>
              </item>
             </layout>
@@ -221,6 +278,13 @@
             </property>
             <property name="flat">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reprocess_button">
+            <property name="text">
+             <string>Reprocess</string>
             </property>
            </widget>
           </item>

@@ -77,7 +77,7 @@ public:
    cv::Mat getIntensity();
    cv::Mat getMeanArrivalTime();
 
-   void readData();
+   void readData(bool realign = true);
 
    //   virtual std::list<std::vector<quint16>>& getHistogramData() = 0;
    std::vector<uint>& getCurrentDecay(int channel) { return current_decay_dummy; };
@@ -89,7 +89,7 @@ protected:
    void update();
    
    // Use readData to call 
-   void readDataThread();
+   void readDataThread(bool realign = true);
 
    std::shared_ptr<FLIMReader> reader;
    QString filename;
