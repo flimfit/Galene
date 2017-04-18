@@ -31,6 +31,7 @@ RealignmentStudio::RealignmentStudio() :
 
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
+   connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfo);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
@@ -154,6 +155,23 @@ void RealignmentStudio::exportMovie()
 
 }
 
+void RealignmentStudio::writeAlignmentInfo()
+{
+   auto source = getCurrentSource();
+   auto reader = source->getReader();
+   auto& aligner = reader->getFrameAligner();
+
+   if (aligner == nullptr)
+      return;
+
+   QFileInfo file(QString::fromStdString(reader->getFilename()));
+   QString new_file = file.dir().absoluteFilePath(file.baseName().append("_realignment.csv"));
+   std::string s = new_file.toStdString();
+
+   aligner->writeRealignmentInfo(new_file.toStdString());
+}
+
+
 void RealignmentStudio::saveCurrent()
 {
    save(getCurrentSource());
@@ -229,7 +247,8 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.n_resampling_points = realignment_points_spin->value();
    params.frame_binning = frame_binning_combo->value();
    params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
-   params.threshold = threshold_spin->value();
+   params.correlation_threshold = threshold_spin->value();
+   params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
 
    return params;

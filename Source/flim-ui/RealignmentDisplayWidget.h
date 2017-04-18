@@ -58,6 +58,8 @@ public:
             r.frame.convertTo(buf, CV_8U, scale);
          writer.write(buf);
       }
+#else
+      QMessageBox::warning(this, "Could not export", "Cannot export when compiled in debug mode");
 #endif
    }
 

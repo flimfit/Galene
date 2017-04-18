@@ -53,6 +53,7 @@ protected:
    
    void processSelected();
    void exportMovie();
+   void writeAlignmentInfo();
    RealignmentParameters getRealignmentParameters();
 
 private:

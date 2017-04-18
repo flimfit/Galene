@@ -141,7 +141,7 @@
              <item row="1" column="1">
               <widget class="QComboBox" name="mode_combo">
                <property name="currentText">
-                <string>Warp</string>
+                <string>None</string>
                </property>
                <item>
                 <property name="text">
@@ -411,6 +411,7 @@
     <addaction name="open_workspace_action"/>
     <addaction name="separator"/>
     <addaction name="export_movie_action"/>
+    <addaction name="export_alignment_info_action"/>
     <addaction name="separator"/>
     <addaction name="quit_action"/>
    </widget>
@@ -494,6 +495,11 @@
   <action name="export_movie_action">
    <property name="text">
     <string>Export Alignment Movie...</string>
+   </property>
+  </action>
+  <action name="export_alignment_info_action">
+   <property name="text">
+    <string>Export Alignment Information...</string>
    </property>
   </action>
  </widget>
