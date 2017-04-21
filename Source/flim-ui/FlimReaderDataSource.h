@@ -28,6 +28,7 @@ public:
 
    void stop()
    {
+      timer->stop();
       bool executing = false;
    }
 
@@ -39,6 +40,7 @@ public:
 
       timer->setInterval(1000);
       timer->start();
+      executing = true;
    }
 
    void update();
@@ -110,6 +112,9 @@ protected:
 
    bool currently_reading = false;
    bool read_again_when_finished = false;
+   bool terminate = false;
+
+   std::unique_ptr<QMetaObject::Connection> conn;
 
    friend class FlimReaderDataSourceWorker;
 };

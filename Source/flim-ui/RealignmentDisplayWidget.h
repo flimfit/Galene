@@ -27,6 +27,12 @@ public:
       connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
    }
 
+   ~RealignmentDisplayWidget()
+   {
+      disconnect(reader.get(), &FlimReaderDataSource::alignmentComplete, this, &RealignmentDisplayWidget::update);
+   }
+
+
    void exportMovie()
    {
 #ifndef SUPPRESS_OPENCV_HIGHGUI

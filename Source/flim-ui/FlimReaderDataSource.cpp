@@ -3,10 +3,11 @@
 
 void FlimReaderDataSourceWorker::update()
 {
-   executing = true;
-   source->update();
-   emit updateComplete();
-   executing = false;
+   if (executing)
+   {
+      source->update();
+      emit updateComplete();
+   }
 }
 
 
@@ -16,8 +17,12 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
    filename = filename_;
    reader = std::shared_ptr<FLIMReader>(FLIMReader::createReader(filename.toStdString()));
 
+   reader->setTemporalResolution(8); // TODO
+
    worker = new FlimReaderDataSourceWorker(nullptr, this);
-   connect(worker, &FlimReaderDataSourceWorker::updateComplete, [&]() { emit decayUpdated(); });
+   //auto& c = connect(worker, &FlimReaderDataSourceWorker::updateComplete, [&]() { emit decayUpdated(); });
+   //conn = std::unique_ptr<QMetaObject::Connection>(&c);
+
    connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
    int n_chan = reader->getNumChannels();
@@ -26,11 +31,15 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
 
 FlimReaderDataSource::~FlimReaderDataSource()
 {
-   std::lock_guard<std::mutex> lk(read_mutex);
+   terminate = true;
    currently_reading = false;
    reader->stopReading();
 
+   //disconnect(*conn);
+
    worker->stop();
+
+   std::lock_guard<std::mutex> lk(read_mutex);
 
    if (reader_thread.joinable())
       reader_thread.join();
@@ -52,7 +61,7 @@ void FlimReaderDataSource::readData(bool realign)
 {
    if (currently_reading)
    {
-      read_again_when_finished = true;
+      //read_again_when_finished = true;
    }
    else
    {
@@ -66,34 +75,43 @@ void FlimReaderDataSource::readData(bool realign)
 
 void FlimReaderDataSource::update()
 {
-   std::lock_guard<std::mutex> lk(read_mutex);
+   if (terminate)
+      return;
 
-   if (!currently_reading) return;
-   if (!data->isReady()) return;
-
-   int n_px = reader->numX() * reader->numY();
-   int n_chan = reader->getNumChannels();
-   int n_t = (int) data->timepoints.size();
-
-   if (intensity.size().area() < n_px) return;
-
-   uint16_t* data_ptr = data->getDataPtr();
-   for (int p = 0; p < n_px; p++)
    {
-      uint16_t I = 0;
-      float It = 0;
-      for (int c = 0; c < n_chan; c++)
-         for (int t = 0; t < n_t; t++)
-         {
-            I += *data_ptr;
-            It += (*data_ptr) * data->timepoints[t];
+      std::lock_guard<std::mutex> lk(read_mutex);
 
-            data_ptr++;
-         }
-      intensity.at<uint16_t>(p) = I;
-      mean_arrival_time.at<float>(p) = It / I;
+      if (!currently_reading) return;
+      if (!data->isReady()) return;
 
+      std::lock_guard<std::mutex> lk_im(image_mutex);
+
+      int n_px = reader->numX() * reader->numY();
+      int n_chan = reader->getNumChannels();
+      int n_t = (int)data->timepoints.size();
+
+      if (intensity.size().area() < n_px) return;
+
+      uint16_t* data_ptr = data->getDataPtr();
+      for (int p = 0; p < n_px; p++)
+      {
+         uint16_t I = 0;
+         float It = 0;
+         for (int c = 0; c < n_chan; c++)
+            for (int t = 0; t < n_t; t++)
+            {
+               I += *data_ptr;
+               It += (*data_ptr) * data->timepoints[t];
+
+               data_ptr++;
+            }
+         intensity.at<uint16_t>(p) = I;
+         mean_arrival_time.at<float>(p) = It / I;
+
+      }
    }
+
+   QMetaObject::invokeMethod(this, "decayUpdated");
 }
 
 // Use readData to call 
@@ -132,7 +150,7 @@ void FlimReaderDataSource::readDataThread(bool realign)
       emit error(e.what());
    }
 
-   if (read_again_when_finished)
+   if (read_again_when_finished && !terminate)
       readDataThread();
    else
       currently_reading = false;
