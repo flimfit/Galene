@@ -41,6 +41,8 @@ if(NOT Qt5SerialPort_FOUND)
     hunter_add_package(Qt COMPONENTS qtbase qtserialport)
 endif()
 
+hunter_add_package(dlib)
+
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
