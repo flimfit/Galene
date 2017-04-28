@@ -94,6 +94,12 @@ target_link_libraries(flim_ui
    ${InstrumentControl_LIBRARIES}
    ${FLIMreader_LIBRARIES})
 
+add_custom_command(
+        TARGET flim_ui POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
+                ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
+
 set_target_properties(flim_ui PROPERTIES MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
 qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
