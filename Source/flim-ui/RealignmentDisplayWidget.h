@@ -100,6 +100,7 @@ protected:
       }
       correlation_plot->graph(0)->setData(x, y);
       correlation_plot->graph(0)->rescaleAxes();
+      correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->update();
       
       slider->setMaximum(n-1);
@@ -119,6 +120,7 @@ protected:
             image_widget->SetImage(results[image].frame);
 
          correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
+         correlation_plot->yAxis->setRange(0, 1.2);
          correlation_plot->update();
       }
    }

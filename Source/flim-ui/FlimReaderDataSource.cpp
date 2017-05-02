@@ -105,9 +105,20 @@ void FlimReaderDataSource::update()
 
                data_ptr++;
             }
-         intensity.at<uint16_t>(p) = I;
+         intensity.at<float>(p) = I;
          mean_arrival_time.at<float>(p) = It / I;
 
+      }
+
+      // Apply intensity normalisation
+      cv::Mat intensity_normalisation = reader->getIntensityNormalisation();
+      if (!intensity_normalisation.empty())
+      {
+         cv::Mat norm;
+         double mn, mx;
+         cv::minMaxIdx(intensity_normalisation, &mn, &mx);
+         intensity_normalisation.convertTo(norm, CV_32F, 1/mx);
+         //cv::divide(intensity, norm, intensity);
       }
    }
 
@@ -124,7 +135,7 @@ void FlimReaderDataSource::readDataThread(bool realign)
 
    {
       std::lock_guard<std::mutex> lk(image_mutex);
-      intensity = cv::Mat(n_y, n_x, CV_16U, cv::Scalar(0));
+      intensity = cv::Mat(n_y, n_x, CV_32F, cv::Scalar(0));
       mean_arrival_time = cv::Mat(n_y, n_x, CV_32F, cv::Scalar(0));
    }
 

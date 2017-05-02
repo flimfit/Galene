@@ -43,9 +43,6 @@ ControlBinder(this, "FLIMDisplay")
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
    connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
 
-   auto m = new RealignmentStudio();
-   m->showMaximized();
-
    setupTCSPC();
   
    // Setup menu actions
@@ -71,7 +68,6 @@ ControlBinder(this, "FLIMDisplay")
    connect(workspace, &FlimWorkspace::openRequest, [&](const QString& filename) {
       try
       {
-
          FlimFileReader* reader = new FlimFileReader(filename);
 
          LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
@@ -190,7 +186,7 @@ void FlimDisplay::sendStatusUpdate()
 
 void FlimDisplay::setupTCSPC()
 {
-   QString type = "cronologic";
+   QString type = "sim";
 
    try 
    {
