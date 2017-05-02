@@ -10,7 +10,8 @@ REM SET PROJECT_DIR=Build\
 REM rmdir %PROJECT_DIR% /s /q
 REM mkdir %PROJECT_DIR%
 
-set GENERATOR="Visual Studio %MSVC_VER% %MSVC_YEAR% Win64"
+if %MSVC_VER%==15 (set GENERATOR="Visual Studio %MSVC_VER% Win64"
+) else set GENERATOR="Visual Studio %MSVC_VER% %MSVC_YEAR% Win64"
 echo Generating CMake Project in: %PROJECT_DIR%
 echo Using Generator: %GENERATOR%
 cmake -G %GENERATOR% -HSource -BBuild
