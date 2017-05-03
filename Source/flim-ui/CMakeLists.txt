@@ -40,6 +40,8 @@ set(SOURCE
    FlimReaderDataSource.cpp
    FlimWorkspace.cpp   
    CronologicControlDisplay.cpp
+   RealignmentDisplayWidget.cpp
+   RealignmentResultsWriter.cpp
 )
 
 set(HEADERS
@@ -56,7 +58,8 @@ set(HEADERS
    RealignmentDisplayWidget.h
    RealignmentImageSource.h
    RealignmentStudioBatchProcessor.h
-   CronologicControlDisplay.cpp
+   CronologicControlDisplay.h
+   RealignmentResultsWriter.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}

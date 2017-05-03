@@ -7,13 +7,13 @@
 #include <QMessageBox>
 #include <iostream>
 #include <fstream>
-//#include "Cronologic.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FlimFileReader.h"
 #include "FlimCubeWriter.h"
 #include "ImageRenderWindow.h"
 #include "RealignmentImageSource.h"
 #include "RealignmentDisplayWidget.h"
+#include "RealignmentResultsWriter.h"
 #include <functional>
 #include <thread>
 
@@ -31,7 +31,7 @@ RealignmentStudio::RealignmentStudio() :
 
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
-   connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfo);
+   connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
@@ -155,9 +155,13 @@ void RealignmentStudio::exportMovie()
 
 }
 
-void RealignmentStudio::writeAlignmentInfo()
+void RealignmentStudio::writeAlignmentInfoCurrent()
 {
-   auto source = getCurrentSource();
+	writeAlignmentInfo(getCurrentSource());
+}
+
+void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source)
+{
    auto reader = source->getReader();
    auto& aligner = reader->getFrameAligner();
 
@@ -174,7 +178,7 @@ void RealignmentStudio::writeAlignmentInfo()
 
 void RealignmentStudio::saveCurrent()
 {
-   save(getCurrentSource());
+	save(getCurrentSource());
 }
 
 void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool force_close)
@@ -189,22 +193,16 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
    QString name = fi.baseName() + suffix_edit->text();
    std::string filename = workspace->getFileName(name, ".ffh").toStdString();
    std::string preview_filename = workspace->getFileName(name, ".png").toStdString();
+   QString aligned_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-stack.tif");
+   QString unaligned_movie_filename = workspace->getFileName(fi.baseName(), "-unaligned-stack.tif");
 
-   save_thread.push_back(std::thread([this, source, filename, preview_filename, force_close]()
+   save_thread.push_back(std::thread([=]()
    {
       auto reader = source->getReader();
       auto data = source->getData();
       auto tags = reader->getTags();
       auto reader_tags = reader->getReaderTags();
-
-      try
-      {
-         FlimCubeWriter<uint16_t> writer(filename, data, tags, reader_tags);
-      }
-      catch (std::runtime_error e)
-      {
-         displayErrorMessage(e.what());
-      }
+      auto images = reader->getImageMap();
 
       if (save_preview)
       {
@@ -224,6 +222,23 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
          cv::imwrite(preview_filename, output);
 #endif
       }
+
+	  writeAlignmentInfo(source);
+
+     auto& results = reader->getRealignmentResults();
+     RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
+     RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
+
+
+	  try
+	  {
+		  FlimCubeWriter<uint16_t> writer(filename, data, tags, reader_tags, images);
+	  }
+	  catch (std::runtime_error e)
+	  {
+		  displayErrorMessage(e.what());
+	  }
+
 
       if (close_after_save || force_close)
          source->requestDelete();

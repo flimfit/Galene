@@ -50,10 +50,14 @@ protected:
 
    void saveCurrent();
    void save(std::shared_ptr<FlimReaderDataSource> source, bool force_close = false);
-   
+
+   void writeAlignmentInfoCurrent();
+   void writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source);
+
+
    void processSelected();
    void exportMovie();
-   void writeAlignmentInfo();
+
    RealignmentParameters getRealignmentParameters();
 
 private:

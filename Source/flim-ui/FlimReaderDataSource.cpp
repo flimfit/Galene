@@ -118,7 +118,7 @@ void FlimReaderDataSource::update()
          double mn, mx;
          cv::minMaxIdx(intensity_normalisation, &mn, &mx);
          intensity_normalisation.convertTo(norm, CV_32F, 1/mx);
-         //cv::divide(intensity, norm, intensity);
+         cv::divide(intensity, norm, intensity);
       }
    }
 
