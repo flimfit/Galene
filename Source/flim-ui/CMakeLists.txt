@@ -40,6 +40,7 @@ set(SOURCE
    FlimReaderDataSource.cpp
    FlimWorkspace.cpp   
    CronologicControlDisplay.cpp
+   SimTcspcControlDisplay.cpp
    RealignmentDisplayWidget.cpp
    RealignmentResultsWriter.cpp
 )
@@ -59,6 +60,7 @@ set(HEADERS
    RealignmentImageSource.h
    RealignmentStudioBatchProcessor.h
    CronologicControlDisplay.h
+   SimTcspcControlDisplay.h
    RealignmentResultsWriter.h
 )
 

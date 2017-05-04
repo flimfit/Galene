@@ -29,6 +29,7 @@ ControlBinder(this, "FLIMDisplay")
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
+   connect(generate_simulated_dataset_action, &QAction::triggered, this, &FlimDisplay::generateSimulatedDataset);
 
    file_writer = std::make_shared<FlimFileWriter>();
    connect(file_writer.get(), &FlimFileWriter::error, this, &FlimDisplay::displayErrorMessage);
@@ -42,6 +43,7 @@ ControlBinder(this, "FLIMDisplay")
    connect(status_timer, &QTimer::timeout, this, &FlimDisplay::sendStatusUpdate);
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
    connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
+
 
    setupTCSPC();
   
@@ -331,4 +333,45 @@ void FlimDisplay::frameIncremented()
 FlimDisplay::~FlimDisplay()
 {
    shutdown();
+}
+
+
+void FlimDisplay::generateSimulatedDataset()
+{
+   std::thread t([&]() {
+      
+      double frequency = 0.01;
+
+      double min_amplitude = 0;
+      double max_amplitude = 200;
+      int n_step = 10;
+
+      double amplitude_step = (max_amplitude - min_amplitude) / (n_step - 1);
+
+      int frame_accumulation = 25;
+
+      tcspc->setFrameAccumulation(frame_accumulation);
+      tcspc->setParameter("DisplacementFrequency", Float, frequency);
+      
+      
+      for (int i = 0; i < n_step; i++)
+      {
+         while (tcspc->acquisitionInProgress())
+            QThread::msleep(200);
+
+         double amplitude = min_amplitude + i * amplitude_step;
+         tcspc->setParameter("DisplacementAmplitude", Float, amplitude);
+
+         QString filename = QString("Simulated Data Amplitude=%1 Frequency=%2 Frames=%3 ").arg(amplitude).arg(frequency).arg(frame_accumulation);
+         filename.replace("\.", "_");
+         workspace->setFilePrefix(filename);
+            
+         file_writer->addMetadata("DisplacementFrequency", frequency);
+         file_writer->addMetadata("DisplacementAmplitude", amplitude);
+         acquireSequence();
+      }
+
+
+   });
+   t.detach();
 }

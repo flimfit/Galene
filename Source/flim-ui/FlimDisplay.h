@@ -34,6 +34,8 @@ public:
    void updateProgress(double progress);
    void showTcspcSettings();
 
+   void generateSimulatedDataset();
+
 signals:
    void statusUpdate(E_PQ_MEAS_TYPE measurement_type, std::vector<std::pair<QString, QVariant>> optional_data);
    void measurementRequestResponse(E_ERROR_CODES code);

@@ -287,9 +287,16 @@
     </property>
     <addaction name="realignment_action"/>
    </widget>
+   <widget class="QMenu" name="menuSimulations">
+    <property name="title">
+     <string>Simulations</string>
+    </property>
+    <addaction name="generate_simulated_dataset_action"/>
+   </widget>
    <addaction name="menuFiles"/>
    <addaction name="menuSettings"/>
    <addaction name="menuRealignment"/>
+   <addaction name="menuSimulations"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -337,6 +344,14 @@
   <action name="realignment_action">
    <property name="text">
     <string>Open Realignment Manager...</string>
+   </property>
+  </action>
+  <action name="generate_simulated_dataset_action">
+   <property name="text">
+    <string>Generate Dataset...</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
    </property>
   </action>
  </widget>

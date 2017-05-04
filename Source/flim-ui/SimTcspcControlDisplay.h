@@ -1,16 +1,15 @@
 #pragma once
-#ifdef USE_CRONOLOGIC
 
-#include "cronologic.h"
+#include "SimTcspc.h"
 #include "ParameterWidget.h"
 
 
-class CronologicControlDisplay : public QWidget
+class SimTcspcControlDisplay : public QWidget
 {
    Q_OBJECT
 
 public:
-   explicit CronologicControlDisplay(Cronologic* tcspc, QWidget* parent = 0);
+   explicit SimTcspcControlDisplay(SimTcspc* tcspc, QWidget* parent = 0);
 
 private:
 
@@ -26,7 +25,7 @@ private:
       ParameterWidget* w = new ParameterWidget(tcspc, args...);
       widgets.push_back(w);
 
-      connect(w, &ParameterWidget::valueChanged, this, &CronologicControlDisplay::updateWidgets);
+      connect(w, &ParameterWidget::valueChanged, this, &SimTcspcControlDisplay::updateWidgets);
    }
 
    void updateWidgets()
@@ -35,9 +34,7 @@ private:
          w->setWidgetValue();
    }
 
-   Cronologic* tcspc;
+   SimTcspc* tcspc;
    QList<ParameterWidget*> widgets;
 
 };
-
-#endif
