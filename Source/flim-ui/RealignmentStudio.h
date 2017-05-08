@@ -33,6 +33,12 @@ public:
    void setSavePreview(bool save_preview_) { save_preview = save_preview_; };
    bool getSavePreview() { return save_preview; }
 
+   void setSaveMovie(bool save_movie_) { save_movie = save_movie_; };
+   bool getSaveMovie() { return save_movie; }
+
+   void setSaveRealignmentInfo(bool save_realignment_info_) { save_realignment_info = save_realignment_info_; };
+   bool getSaveRealignmentInfo() { return save_realignment_info; }
+
    std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
 
 signals:
@@ -45,6 +51,8 @@ protected:
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
    void reprocess();
+
+   void updateParameterGroupBox(int index);
 
    void openWindows(std::shared_ptr<FlimReaderDataSource> source);
 
@@ -64,6 +72,8 @@ private:
 
    bool close_after_save = false;
    bool save_preview = false;
+   bool save_movie = false;
+   bool save_realignment_info = false;
 
    void displayErrorMessage(const QString error);
 

@@ -1,5 +1,6 @@
 #include "RealignmentResultsWriter.h"
 #include <QFileInfo>
+#include <QMessageBox>
 #include "WriteMultipageTiff.h"
 
 void RealignmentResultsWriter::exportAlignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
@@ -50,7 +51,7 @@ void RealignmentResultsWriter::writeMovie(const QString& filename, const std::ve
          writer.write(buf);
       }
 #else
-      QMessageBox::warning(this, "Could not export", "Cannot export when compiled in debug mode");
+      QMessageBox::warning(nullptr, "Could not export", "Cannot export when compiled in debug mode");
 #endif
    }
    else if (extension == "tif")

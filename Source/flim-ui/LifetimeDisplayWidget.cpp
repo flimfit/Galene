@@ -245,12 +245,10 @@ void LifetimeDisplayWidget::setupPlots()
 
    decay_plot->replot();
 
-
-
+	/*
    lifetime_histogram_plot->addGraph();
-
    lifetime_histogram_plot->xAxis->setLabel(QString("Lifetime (%1)").arg(unit));
    lifetime_histogram_plot->yAxis->setLabel("Frequency");
    lifetime_histogram_plot->replot();
-
+   */
 }

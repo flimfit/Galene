@@ -65,7 +65,7 @@ void RealignmentDisplayWidget::update()
    correlation_plot->graph(0)->setData(x, y);
    correlation_plot->graph(0)->rescaleAxes();
    correlation_plot->yAxis->setRange(0, 1.2);
-   correlation_plot->replot();
+   //correlation_plot->replot();
 
    slider->setMaximum(n - 1);
    slider->setValue(0);
@@ -85,7 +85,7 @@ void RealignmentDisplayWidget::displayImage(int image)
 
       correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
-      correlation_plot->replot();
+      //correlation_plot->replot();
    }
 }
 

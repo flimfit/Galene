@@ -26,7 +26,7 @@ public:
       startThread();
    }
 
-   void stop()
+   Q_INVOKABLE void stop()
    {
       timer->stop();
       bool executing = false;

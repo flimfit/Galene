@@ -37,7 +37,7 @@ FlimReaderDataSource::~FlimReaderDataSource()
 
    //disconnect(*conn);
 
-   worker->stop();
+   QMetaObject::invokeMethod(worker, "stop");
 
    std::lock_guard<std::mutex> lk(read_mutex);
 
