@@ -31,10 +31,7 @@ if(NOT Boost_FOUND)
     hunter_add_package(Boost COMPONENTS filesystem system)
 endif()
 
-#find_package(OpenCV)
-#if(NOT OpenCV_FOUND)
 hunter_add_package(OpenCV)
-#endif()
 
 find_package(Qt5SerialPort)
 if(NOT Qt5SerialPort_FOUND)

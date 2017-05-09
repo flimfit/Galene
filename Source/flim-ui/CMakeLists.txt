@@ -111,7 +111,8 @@ add_custom_command(
                 ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
                 ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
 
-set_target_properties(flim_ui PROPERTIES MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
+set_target_properties(flim_ui PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
 qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
 
@@ -120,7 +121,6 @@ if (WIN32)
 elseif(APPLE)
     macdeployqt(flim_ui INCLUDE_MODULES ${QTLIBS})
 endif()
-
 
 set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)
