@@ -26,22 +26,25 @@ endif()
 
 project (flim-ui) 
 
-find_package(Boost REQUIRED COMPONENTS system filesystem)
+find_package(Boost COMPONENTS system filesystem)
 if(NOT Boost_FOUND)
     hunter_add_package(Boost COMPONENTS filesystem system)
 endif()
 
-find_package(OpenCV)
-if(NOT OpenCV_FOUND)
-    hunter_add_package(OpenCV)
-endif()
+#find_package(OpenCV)
+#if(NOT OpenCV_FOUND)
+hunter_add_package(OpenCV)
+#endif()
 
 find_package(Qt5SerialPort)
 if(NOT Qt5SerialPort_FOUND)
     hunter_add_package(Qt COMPONENTS qtbase qtserialport)
 endif()
 
-hunter_add_package(dlib)
+find_package(dlib)
+if(NOT dlib_FOUND)
+   hunter_add_package(dlib)
+endif()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
