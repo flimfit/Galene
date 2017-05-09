@@ -67,7 +67,7 @@ set(HEADERS
 include_directories(${fifo_flim_INCLUDE_DIR}
                     ${InstrumentControl_INCLUDE_DIR}
                     ${InstrumentControlUI_INCLUDE_DIR}
-                    ${FLIMreader_INCLUDE_DIR}
+                    ${FlimReader_INCLUDE_DIR}
                     ${QSimpleUpdater_INCLUDE_DIR}
                     ${QT_USE_FILE}
                     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -89,7 +89,7 @@ add_executable(flim_ui MACOSX_BUNDLE
                     $<TARGET_OBJECTS:InstrumentControl> 
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
-                    $<TARGET_OBJECTS:FLIMreader>
+                    $<TARGET_OBJECTS:FlimReader>
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
@@ -97,7 +97,7 @@ target_link_libraries(flim_ui
    ${OpenCV_LIBS}
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES}
-   ${FLIMreader_LIBRARIES})
+   ${FlimReader_LIBRARIES})
 
 add_custom_command(
         TARGET flim_ui POST_BUILD

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "FlimDataSource.h"
-#include "FLIMReader.h"
+#include "FlimReader.h"
 #include "FlimCube.h"
+#include "TaskProgress.h"
 
 #include <QString>
 #include <QThread>
@@ -70,7 +71,7 @@ public:
    FlimReaderDataSource(const QString& filename_, QObject* parent = 0);
    ~FlimReaderDataSource();
 
-   std::shared_ptr<FLIMReader> getReader() { return reader; }
+   std::shared_ptr<FlimReader> getReader() { return reader; }
    std::shared_ptr<FlimCube<uint16_t>> getData() { return data; }
 
    int getNumChannels() { return reader->getNumChannels(); }
@@ -93,7 +94,7 @@ protected:
    // Use readData to call 
    void readDataThread(bool realign = true);
 
-   std::shared_ptr<FLIMReader> reader;
+   std::shared_ptr<FlimReader> reader;
    QString filename;
 
    std::vector<uint> current_decay_dummy;
@@ -114,7 +115,7 @@ protected:
    bool read_again_when_finished = false;
    bool terminate = false;
 
-   std::unique_ptr<QMetaObject::Connection> conn;
+   std::shared_ptr<TaskProgress> task;
 
    friend class FlimReaderDataSourceWorker;
 };

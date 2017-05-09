@@ -340,10 +340,10 @@ void FlimDisplay::generateSimulatedDataset()
 {
    std::thread t([&]() {
       
-      double frequency = 0.01;
+      double frequency = 0.7;
 
       double min_amplitude = 0;
-      double max_amplitude = 200;
+      double max_amplitude = 20;
       int n_step = 10;
 
       double amplitude_step = (max_amplitude - min_amplitude) / (n_step - 1);

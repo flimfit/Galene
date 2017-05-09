@@ -15,14 +15,11 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
    FlimDataSource(parent)
 {
    filename = filename_;
-   reader = std::shared_ptr<FLIMReader>(FLIMReader::createReader(filename.toStdString()));
+   reader = std::shared_ptr<FlimReader>(FlimReader::createReader(filename.toStdString()));
 
    reader->setTemporalResolution(8); // TODO
 
    worker = new FlimReaderDataSourceWorker(nullptr, this);
-   //auto& c = connect(worker, &FlimReaderDataSourceWorker::updateComplete, [&]() { emit decayUpdated(); });
-   //conn = std::unique_ptr<QMetaObject::Connection>(&c);
-
    connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
    int n_chan = reader->getNumChannels();
@@ -77,6 +74,12 @@ void FlimReaderDataSource::update()
 {
    if (terminate)
       return;
+
+   if (task)
+   {
+      float progress = reader->getProgress();
+      task->setProgress(progress);
+   }
 
    {
       std::lock_guard<std::mutex> lk(read_mutex);
@@ -144,14 +147,19 @@ void FlimReaderDataSource::readDataThread(bool realign)
    read_again_when_finished = false;
    currently_reading = true;
 
+   task = std::make_shared<TaskProgress>("Loading data...");
+   TaskRegister::addTask(task);
+
    try
    {
       if (realign)
       {
+         task->setTaskName("Realigning data...");
          reader->alignFrames();
          emit alignmentComplete();
       }
 
+      task->setTaskName("Reading data...");
       reader->readData(data);
       update();
       emit readComplete();
@@ -160,6 +168,8 @@ void FlimReaderDataSource::readDataThread(bool realign)
    {
       emit error(e.what());
    }
+
+   task->setFinished();
 
    if (read_again_when_finished && !terminate)
       readDataThread();
