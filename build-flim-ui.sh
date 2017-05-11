@@ -16,3 +16,6 @@ cmake --build Build
 # fix up the half-ass job done by macdeployqt
 # see: https://github.com/iltommi/macdeployqtfix/blob/master/macdeployqtfix.py
 python macdeployqtfix.py Build/flim-ui/flim_ui.app/Contents/MacOS/flim_ui /usr/local/opt/qt5
+
+# sign code (requires that signature is installed in keychain)
+codesign -s P6MM899VL9 Build/flim-ui/flim_ui.app/
