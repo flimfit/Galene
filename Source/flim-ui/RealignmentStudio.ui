@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1245</width>
-    <height>734</height>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,20 +37,47 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListView" name="file_list_view">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
          </property>
-         <property name="spacing">
-          <number>5</number>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QSplitter" name="splitter">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QListView" name="file_list_view">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="spacing">
+              <number>5</number>
+             </property>
+            </widget>
+            <widget class="QMdiArea" name="mdi_area"/>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <widget class="QMdiArea" name="mdi_area"/>
        </item>
        <item>
         <widget class="QFrame" name="frame">
@@ -492,9 +519,7 @@
      </widget>
     </item>
     <item>
-     <widget class="ProgressCentre" name="widget" native="true">
-      <zorder>frame_2</zorder>
-     </widget>
+     <widget class="ProgressCentre" name="widget" native="true"/>
     </item>
    </layout>
   </widget>
