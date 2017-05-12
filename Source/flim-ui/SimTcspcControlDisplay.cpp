@@ -18,6 +18,8 @@ SimTcspcControlDisplay::SimTcspcControlDisplay(SimTcspc* tcspc, QWidget* parent)
    QFormLayout* motion_layout = new QFormLayout();
    addWidget(motion_layout, "DisplacementAmplitude", Float);
    addWidget(motion_layout, "DisplacementFrequency", Float);
+   addWidget(motion_layout, "DisplacementAngle", Float);
+
 
    QGroupBox* thresh_group = new QGroupBox("Motion");
    thresh_group->setLayout(motion_layout);
