@@ -1,6 +1,7 @@
 
 #include "RealignmentStudio.h"
 #include "RealignmentStudioBatchProcessor.h"
+#include "MetaDataDialog.h"
 #include <QFileDialog>
 #include <QVector>
 #include <QDateTime>
@@ -33,6 +34,7 @@ RealignmentStudio::RealignmentStudio() :
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
+   connect(workspace, &FlimWorkspace::infoRequest, this, &RealignmentStudio::showFileInfo);
 
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
    connect(reprocess_button, &QPushButton::pressed, this, &RealignmentStudio::reprocess);
@@ -89,7 +91,6 @@ std::shared_ptr<FlimReaderDataSource> RealignmentStudio::openFile(const QString&
       source = std::make_shared<FlimReaderDataSource>(filename);
       connect(source.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
       source->getReader()->setRealignmentParameters(getRealignmentParameters());
-      std::list<QMdiSubWindow*> windows;
 
       emit newDataSource(source);
    }
@@ -101,31 +102,49 @@ std::shared_ptr<FlimReaderDataSource> RealignmentStudio::openFile(const QString&
    return source;
 }
 
+void RealignmentStudio::showFileInfo(const QString& filename)
+{
+   try
+   {
+      auto reader = FlimReader::createReader(filename.toStdString());
+      auto widget = new MetaDataDialog(reader->getTags());
+      createSubWindow(widget, filename);
+   }
+   catch (std::runtime_error e)
+   {
+      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
+   }
+}
+
+QMdiSubWindow* RealignmentStudio::createSubWindow(QWidget* widget, const QString& title)
+{
+   auto sub = new ConstrainedMdiSubWindow();
+   sub->setWidget(widget);
+   sub->setAttribute(Qt::WA_DeleteOnClose);
+   mdi_area->addSubWindow(sub);
+
+   widget->show();
+   widget->setWindowTitle(title);
+
+   connect(widget, &QObject::destroyed, sub, &QObject::deleteLater);
+
+   return sub;
+}
+
 void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source)
 {
-   auto createSubWindow = [&](QWidget* widget) -> QMdiSubWindow*
-   {
-      auto sub = new ConstrainedMdiSubWindow();
-      sub->setWidget(widget);
-      sub->setAttribute(Qt::WA_DeleteOnClose);
-      mdi_area->addSubWindow(sub);
-         
-      widget->show();
-      QString filename = QString::fromStdString(source->getReader()->getFilename());
-      widget->setWindowTitle(QFileInfo(filename).baseName());
-      window_map[sub] = source;
-
-      connect(widget, &QObject::destroyed, sub, &QObject::deleteLater);
-
-      return sub;
-   };
-
    auto widget = new LifetimeDisplayWidget;
    widget->setFlimDataSource(source);
-   auto w1 = createSubWindow(widget);
-      
+
+   QString filename = QString::fromStdString(source->getReader()->getFilename());
+   QString title = QFileInfo(filename).baseName();
+
+   auto w1 = createSubWindow(widget, title);
+   window_map[w1] = source;
+
    auto realignment_widget = new RealignmentDisplayWidget(source);
-   auto w2 = createSubWindow(realignment_widget);
+   auto w2 = createSubWindow(realignment_widget, title);
+   window_map[w2] = source;
 
    // Make windows close each other
    connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
@@ -215,6 +234,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
    std::string filename = workspace->getFileName(name, ".ffh").toStdString();
    std::string preview_filename = workspace->getFileName(name, ".png").toStdString();
    QString aligned_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-stack.tif");
+   QString aligned_preserving_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-int-presv-stack.tif");
    QString unaligned_movie_filename = workspace->getFileName(fi.baseName(), "-unaligned-stack.tif");
 
    auto task = std::make_shared<TaskProgress>("Saving...");
@@ -254,6 +274,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
       {
          auto& results = reader->getRealignmentResults();
          RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
+         RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(results, aligned_preserving_movie_filename);
          RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
       }
 

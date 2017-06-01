@@ -77,7 +77,7 @@ void FlimReaderDataSource::update()
 
    if (task)
    {
-      float progress = reader->getProgress();
+      double progress = reader->getProgress();
       task->setProgress(progress);
    }
 
@@ -154,12 +154,10 @@ void FlimReaderDataSource::readDataThread(bool realign)
    {
       if (realign)
       {
-         task->setTaskName("Realigning data...");
          reader->alignFrames();
          emit alignmentComplete();
       }
 
-      task->setTaskName("Reading data...");
       reader->readData(data);
       update();
       emit readComplete();

@@ -16,6 +16,19 @@ void RealignmentResultsWriter::exportAlignedMovie(const std::vector<RealignmentR
    writeMovie(filename, images);
 }
 
+void RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+{
+   std::vector<cv::Mat> images;
+   for (const auto& r : results)
+   {
+      cv::Mat b;
+      r.realigned_preserving.convertTo(b, CV_16U);
+      images.push_back(b);
+   }
+
+   writeMovie(filename, images);
+}
+ 
 void RealignmentResultsWriter::exportUnalignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
 {
    std::vector<cv::Mat> images;

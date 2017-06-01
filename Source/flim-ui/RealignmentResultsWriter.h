@@ -8,6 +8,7 @@ class RealignmentResultsWriter
 public:
 
    static void exportAlignedMovie(const std::vector<RealignmentResult>& results, const QString& filename);
+   static void exportAlignedIntensityPreservingMovie(const std::vector<RealignmentResult>& results, const QString& filename);
    static void exportUnalignedMovie(const std::vector<RealignmentResult>& results, const QString& filename);
 
 protected:

@@ -30,6 +30,11 @@ public:
    void deleteFiles(const QModelIndexList& indexes, bool request_confirmation = true);
    void requestOpenFiles(const QModelIndexList& indexes);
    void requestOpenFile(const QModelIndex index);
+   
+   void requestInfoFiles(const QModelIndexList& indexes);
+   void requestInfoFile(const QModelIndex index);
+
+
    void makeNew();
 
    void open();
@@ -50,6 +55,7 @@ public:
 signals:
    void sequenceNumberChanged(int sequence_number);
    void openRequest(const QString& file);
+   void infoRequest(const QString& file);
 
 protected:
 
@@ -112,6 +118,8 @@ protected:
          
          menu.addAction("Open", [this, obj]() { requestOpenSelected(obj); });
 
+         menu.addAction("Info", [this, obj]() { requestInfoSelected(obj); });
+
          if (can_process)
             menu.addAction("Process", [this, obj]() { emit requestProcessSelected(); });
 
@@ -145,6 +153,11 @@ protected:
    void requestOpenSelected(QObject* obj)
    {
       workspace->requestOpenFiles(selected(obj));
+   }
+
+   void requestInfoSelected(QObject* obj)
+   {
+      workspace->requestInfoFiles(selected(obj));
    }
 
    FlimWorkspace* workspace;

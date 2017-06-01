@@ -30,7 +30,7 @@ void FlimWorkspace::update()
    if (has_workspace)
    {
       beginResetModel();
-      auto file_info = workspace.entryInfoList({ QString("*%1").arg(file_extension), QString("*.pt3"), QString("*.ffh") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+      auto file_info = workspace.entryInfoList({ QString("*.ffd"), QString("*.pt3"), QString("*.ffh"), QString("*.ptu"), QString("*.spc") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)
          files.append(info.fileName());
@@ -91,6 +91,19 @@ void FlimWorkspace::requestOpenFile(const QModelIndex index)
    QString full_file = workspace.absoluteFilePath(index.data().toString());
    emit openRequest(full_file);
 }
+
+void FlimWorkspace::requestInfoFiles(const QModelIndexList& indexes)
+{
+   for (auto& idx : indexes)
+      requestInfoFile(idx);
+}
+
+void FlimWorkspace::requestInfoFile(const QModelIndex index)
+{
+   QString full_file = workspace.absoluteFilePath(index.data().toString());
+   emit infoRequest(full_file);
+}
+
 
 
 const QString FlimWorkspace::getNewPath()

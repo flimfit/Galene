@@ -27,7 +27,8 @@ qt5_wrap_ui(UI_HEADERS
          BHRatesWidget.ui
          LifetimeDisplayWidget.ui
          RealignmentStudio.ui
-         RealignmentDisplayWidget.ui)
+         RealignmentDisplayWidget.ui
+         MetaDataDialog.ui)
 
 qt5_add_resources(UI_RESOURCES Resources.qrc)
 
@@ -63,6 +64,7 @@ set(HEADERS
    CronologicControlDisplay.h
    SimTcspcControlDisplay.h
    RealignmentResultsWriter.h
+   MetadataDialog.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}

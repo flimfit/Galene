@@ -9,13 +9,13 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDat
    updateGeometry();
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
-   connect(reader.get(), &FlimReaderDataSource::alignmentComplete, this, &RealignmentDisplayWidget::update);
+   connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
 }
 
 RealignmentDisplayWidget::~RealignmentDisplayWidget()
 {
-   disconnect(reader.get(), &FlimReaderDataSource::alignmentComplete, this, &RealignmentDisplayWidget::update);
+   disconnect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
 }
 
 

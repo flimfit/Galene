@@ -40,6 +40,7 @@ public:
    bool getSaveRealignmentInfo() { return save_realignment_info; }
 
    std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
+   void showFileInfo(const QString& filename);
 
 signals:
 
@@ -47,7 +48,6 @@ signals:
 
 protected:
 
-   //void sendStatusUpdate();
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
    void reload();
    void reprocess();
@@ -62,6 +62,7 @@ protected:
    void writeAlignmentInfoCurrent();
    void writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source);
 
+   QMdiSubWindow* createSubWindow(QWidget* widget, const QString& title);
 
    void processSelected();
    void exportMovie();
