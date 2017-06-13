@@ -154,10 +154,11 @@ void FlimReaderDataSource::readDataThread(bool realign)
    {
       if (realign)
       {
+         task->setTaskName("Preloading frames...");
          reader->alignFrames();
          emit alignmentComplete();
       }
-
+      task->setTaskName("Reading data...");
       reader->readData(data);
       update();
       emit readComplete();

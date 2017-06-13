@@ -49,8 +49,8 @@ signals:
 protected:
 
    std::shared_ptr<FlimReaderDataSource> getCurrentSource();
+   void realign();
    void reload();
-   void reprocess();
 
    void updateParameterGroupBox(int index);
 
@@ -66,6 +66,7 @@ protected:
 
    void processSelected();
    void exportMovie();
+   void saveMergedImage();
 
    RealignmentParameters getRealignmentParameters();
 

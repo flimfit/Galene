@@ -32,12 +32,13 @@ RealignmentStudio::RealignmentStudio() :
 
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
+   connect(save_merged_action, &QAction::triggered, this, &RealignmentStudio::saveMergedImage);
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
    connect(workspace, &FlimWorkspace::infoRequest, this, &RealignmentStudio::showFileInfo);
 
+   connect(realign_button, &QPushButton::pressed, this, &RealignmentStudio::realign);
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
-   connect(reprocess_button, &QPushButton::pressed, this, &RealignmentStudio::reprocess);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
    connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
    
@@ -146,7 +147,22 @@ void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source
    auto w2 = createSubWindow(realignment_widget, title);
    window_map[w2] = source;
 
+   FlimReader* reader = source->getReader().get();
+   connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [reader](int index) { reader->setReferenceIndex(index); }); // reader isn't a QObject
+
    // Make windows close each other
+   connect(w2, &QObject::destroyed, [&]() {
+      auto it = window_map.find(w1);
+      if (it != window_map.end())
+         window_map.erase(w1);
+   });
+
+   connect(w1, &QObject::destroyed, [&]() {
+      auto it = window_map.find(w2);
+      if (it != window_map.end())
+         window_map.erase(w2); 
+   });
+
    connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
    connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
 
@@ -164,7 +180,7 @@ std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
    return weak_source.lock();
 }
 
-void RealignmentStudio::reload()
+void RealignmentStudio::realign()
 {
    auto source = getCurrentSource();
    auto reader = source->getReader();
@@ -173,7 +189,7 @@ void RealignmentStudio::reload()
    source->readData();
 }
 
-void RealignmentStudio::reprocess()
+void RealignmentStudio::reload()
 {
    auto source = getCurrentSource();
    auto reader = source->getReader();
@@ -194,6 +210,19 @@ void RealignmentStudio::exportMovie()
    }
 
 }
+
+void RealignmentStudio::saveMergedImage()
+{
+   auto active_window = mdi_area->activeSubWindow();
+   auto main_w = active_window->widget();
+   if (main_w->inherits("LifetimeDisplayWidget"))
+   {
+      auto w = reinterpret_cast<LifetimeDisplayWidget*>(main_w);
+      w->saveMergedImage();
+   }
+
+}
+
 
 void RealignmentStudio::writeAlignmentInfoCurrent()
 {

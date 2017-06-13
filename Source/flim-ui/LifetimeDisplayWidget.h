@@ -20,6 +20,8 @@ public:
    void updateCountRates();
    void setClosable(bool closable_) { closable = closable_; }
 
+   void saveMergedImage();
+
    void closeEvent(QCloseEvent *event);
 
 signals:

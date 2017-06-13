@@ -23,12 +23,17 @@ public:
 
    void axisClicked(QCPAxis *  axis, QCPAxis::SelectablePart  part, QMouseEvent *  event);
 
+signals:
+
+   void referenceIndexUpdated(int reference_index);
+
 protected:
 
    void update();
    void displayImage(int image);
    void axisClick(const QPointF& point);
    void setupPlots();
+   void referenceButtonPressed();
 
    std::shared_ptr<FlimReaderDataSource> reader;
 

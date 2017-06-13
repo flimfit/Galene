@@ -18,10 +18,13 @@
     <item>
      <widget class="QFrame" name="frame_2">
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="leftMargin">
@@ -39,7 +42,7 @@
        <item>
         <widget class="QFrame" name="frame_3">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
@@ -129,6 +132,9 @@
              </property>
              <item>
               <widget class="QComboBox" name="mode_combo">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Realignment algorithm to use&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="currentText">
                 <string>None</string>
                </property>
@@ -340,33 +346,39 @@
                </widget>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="realign_button">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reload the currently highlighted image using new realignment settings &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Realign + Reload</string>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reload_button">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reload the currently highlighted image using new realignment threshold values, but don't perform realignment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Reload</string>
+               </property>
+              </widget>
+             </item>
             </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="reload_button">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Reload</string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="reprocess_button">
-            <property name="text">
-             <string>Reprocess</string>
-            </property>
            </widget>
           </item>
           <item>
@@ -374,116 +386,147 @@
             <property name="title">
              <string>Output</string>
             </property>
-            <layout class="QFormLayout" name="formLayout">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Suffix</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLineEdit" name="suffix_edit">
-               <property name="text">
-                <string>-aligned</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Export:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QCheckBox" name="save_preview_check">
-               <property name="text">
-                <string>Intensity preview</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QCheckBox" name="save_movie_check">
-               <property name="text">
-                <string>Frames as movie</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QFrame" name="frame_4">
+               <property name="minimumSize">
                 <size>
-                 <width>40</width>
-                 <height>15</height>
+                 <width>0</width>
+                 <height>0</height>
                 </size>
                </property>
-              </spacer>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <layout class="QFormLayout" name="formLayout_4">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Suffix</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="suffix_edit">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Suffix to add to saved aligned file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>-aligned</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Export:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QCheckBox" name="save_preview_check">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save aligned intensity as png for quick preview of alignment results&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Intensity preview</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="save_movie_check">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save tif stack of aligned and unaligned frames&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Frames as movie</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="save_realignment_info_check">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save spreadsheet of x,y displacement coordinates and correlations for each frame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Realignment information</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QCheckBox" name="save_realignment_info_check">
+             <item>
+              <widget class="QPushButton" name="save_button">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>Realignment information</string>
+                <string>Save</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+             <item>
+              <widget class="QCheckBox" name="close_after_save_check">
+               <property name="text">
+                <string>Close after save</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
+              </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="save_button">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Save</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="close_after_save_check">
-              <property name="text">
-               <string>Close after save</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
            </widget>
           </item>
           <item>
@@ -495,7 +538,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Process Selected</string>
+             <string>Process all selected</string>
             </property>
            </widget>
           </item>
@@ -538,23 +581,13 @@
     </property>
     <addaction name="open_workspace_action"/>
     <addaction name="separator"/>
+    <addaction name="save_merged_action"/>
     <addaction name="export_movie_action"/>
     <addaction name="export_alignment_info_action"/>
     <addaction name="separator"/>
     <addaction name="quit_action"/>
    </widget>
    <addaction name="menuFiles"/>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <action name="quit_action">
    <property name="text">
@@ -622,6 +655,11 @@
   <action name="export_alignment_info_action">
    <property name="text">
     <string>Export Alignment Information...</string>
+   </property>
+  </action>
+  <action name="save_merged_action">
+   <property name="text">
+    <string>Save Merged Image...</string>
    </property>
   </action>
  </widget>

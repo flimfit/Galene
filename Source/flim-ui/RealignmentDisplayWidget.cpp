@@ -6,16 +6,22 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDat
 {
    setupUi(this);
    setupPlots();
-   updateGeometry();
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
    connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
+
+   connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
 
 RealignmentDisplayWidget::~RealignmentDisplayWidget()
 {
    disconnect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
+}
+
+void RealignmentDisplayWidget::referenceButtonPressed()
+{
+   emit referenceIndexUpdated(slider->value());
 }
 
 
@@ -37,7 +43,6 @@ void RealignmentDisplayWidget::exportMovie()
       RealignmentResultsWriter::exportUnalignedMovie(results, file);
 
 }
-
 
 
 void RealignmentDisplayWidget::update()
@@ -85,7 +90,7 @@ void RealignmentDisplayWidget::displayImage(int image)
 
       correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
-      //correlation_plot->replot();
+      correlation_plot->replot();
    }
 }
 

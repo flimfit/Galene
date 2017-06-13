@@ -2,6 +2,7 @@
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui.hpp>
 
 
 LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
@@ -83,6 +84,21 @@ void LifetimeDisplayWidget::updateCountRates()
       QString text = QString("%1 %2cps").arg(rate, 0, 'f', dp).arg(label[idx]);
       rate_labels[i]->setText(text);
    }
+}
+
+void LifetimeDisplayWidget::saveMergedImage()
+{
+   QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Tiff (*.tif)");
+   if (file.isEmpty()) return;
+
+   // Intensity merge
+   cv::Mat merged, alpha3;
+   cv::Mat in[] = { alpha, alpha, alpha };
+   cv::merge(in, 3, alpha3);
+   cv::multiply(mapped_mar, alpha3, merged, 1.0/255);
+#ifndef SUPPRESS_OPENCV_HIGHGUI
+   cv::imwrite(file.toStdString(), merged);
+#endif
 }
 
 void LifetimeDisplayWidget::closeEvent(QCloseEvent *event)
