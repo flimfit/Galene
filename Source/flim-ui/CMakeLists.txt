@@ -82,7 +82,6 @@ elseif(APPLE)
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.icns")
     set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(RESOURCE_FILES ${ICON_FILE})
-
     set(EXTRA_LIBRARIES "-framework Accelerate") # for dlib
 endif()
 

@@ -48,10 +48,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
+set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../)
+
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FLIMreader/Source/FLIMreader)
+add_subdirectory(FLIMreader/Source/FLIMreaderMex)
+add_subdirectory(FLIMreader/Source/FLIMreaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 
