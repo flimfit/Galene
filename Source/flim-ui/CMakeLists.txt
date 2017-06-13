@@ -64,7 +64,7 @@ set(HEADERS
    CronologicControlDisplay.h
    SimTcspcControlDisplay.h
    RealignmentResultsWriter.h
-   MetadataDialog.h
+   MetaDataDialog.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui_MetaDataDialog.h"
-#include "FLIMreader.h"
+#include "FlimReader.h"
 
 class MetaDataDialog : public QWidget, public Ui::MetaDataDialog
 {
