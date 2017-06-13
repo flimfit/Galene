@@ -341,25 +341,28 @@ void FlimDisplay::generateSimulatedDataset()
    std::thread t([&]() {
       
       double min_amplitude = 0;
-      double max_amplitude = 20;
+      double max_amplitude = 40;
       int n_step = 10;
 
       double min_frequency = 0;
-      double max_frequency = 5;
+      double max_frequency = 2;
 
       double amplitude_step = (max_amplitude - min_amplitude) / (n_step - 1);
       double frequency_step = (max_frequency - min_frequency) / (n_step - 1);
 
-      int frame_accumulation = 25; 
+      int frame_accumulation = 50; 
 
       tcspc->setFrameAccumulation(frame_accumulation);
       
-      auto generate = [&](double frequency, double amplitude)
+      std::vector<double> angle = { 90 };
+
+      auto generate = [&](double frequency, double amplitude, double angle)
       {
          tcspc->setParameter("DisplacementFrequency", Float, frequency);
          tcspc->setParameter("DisplacementAmplitude", Float, amplitude);
+         tcspc->setParameter("DisplacementAngle", Float, angle);
 
-         QString filename = QString("Simulated Data Displacement=x Amplitude=%1 Frequency=%2 Frames=%3 ").arg(amplitude).arg(frequency).arg(frame_accumulation);
+         QString filename = QString("Sim Amplitude=%1 Frequency=%2 Angle=%3 Frames=%4 ").arg(amplitude).arg(frequency).arg(angle).arg(frame_accumulation);
          filename.replace('.', '_');
          workspace->setFilePrefix(filename);
 
@@ -371,16 +374,17 @@ void FlimDisplay::generateSimulatedDataset()
             QThread::msleep(200);
       };
 
-      generate(0, 0);
+      generate(0, 0, 0);
       
-      for (int j = 1; j<n_step; j++)
-         for (int i = 1; i < n_step; i++)
-         {
-            double frequency = min_frequency + j * frequency_step;
-            double amplitude = min_amplitude + i * amplitude_step;
+      for (double a : angle)
+         for (int j = 1; j<n_step; j++)
+            for (int i = 1; i < n_step; i++)
+            {
+               double frequency = min_frequency + j * frequency_step;
+               double amplitude = min_amplitude + i * amplitude_step;
 
-            generate(frequency, amplitude);
-         }
+               generate(frequency, amplitude, a);
+            }
 
 
    });
