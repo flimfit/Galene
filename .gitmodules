@@ -6,7 +6,7 @@
 	url = https://github.com/seanwarren/fifo-flim
 [submodule "Source/FlimReader"]
 	path = Source/FlimReader
-	url = https://github.com/flimfit/FLIMreader
+	url = https://github.com/flimfit/FlimReader
 	branch = flim-realignment
 [submodule "Source/QSimpleUpdater"]
 	path = Source/QSimpleUpdater
