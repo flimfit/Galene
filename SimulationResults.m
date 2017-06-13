@@ -1,4 +1,4 @@
-root = 'X:\Sean Warren\Motion correction paper\Simulated Data\45deg\';
+root = 'X:\Sean Warren\Motion correction paper\Simulated Data 4\';
 
 files = dir([root '*.csv']);
 files = {files.name};
@@ -6,12 +6,13 @@ files = {files.name};
 zoom = 1;
 scan_speed = 1000;
 
-meta = regexp(files,'Amplitude=(?<Amplitude>[0-9_]+) Frequency=(?<Frequency>[0-9_]+)','names','once');
+meta = regexp(files,'Amplitude=(?<Amplitude>[0-9_]+) Frequency=(?<Frequency>[0-9_]+) Angle=(?<Angle>[0-9_]+)','names','once');
 
 %%
 clear data;
 for i=1:length(files)
     d = ReadPointFile([root files{i}],zoom,scan_speed);
+
     
     fields = fieldnames(meta{i});
     for j=1:length(fields)
@@ -23,29 +24,52 @@ end
 %%
 amplitudes = unique([data.Amplitude]);
 frequencies = unique([data.Frequency]);
+angles = unique([data.Angle]);
 
-corr = nan(length(amplitudes),length(frequencies));
+corr = nan*ones(length(amplitudes),length(frequencies),length(angles));
+f70 = nan*ones(length(amplitudes),length(frequencies),length(angles));
 
-for i=1:length(amplitudes)
-    for j=1:length(frequencies)
+for k=1:length(angles)
+    for i=1:length(amplitudes)
+        for j=1:length(frequencies)
 
-        sel = [data.Frequency] == frequencies(j) & [data.Amplitude] == amplitudes(i);
-        d = data(sel);
-        
-        if ~isempty(d)
-            corr(i,j) = mean(d.correlation);
-            f70(i,j) = mean(d.correlation > 0.7);
+            sel = [data.Frequency] == frequencies(j) ...
+                & [data.Amplitude] == amplitudes(i) ...
+                & [data.Angle] == angles(k);
+            d = data(sel);
+
+            if ~isempty(d)
+                corr(i,j,k) = mean(d.correlation);
+                f70(i,j,k) = mean(d.correlation > 0.7);
+            end
         end
     end
 end
+corr(1,:,:) = corr(1,1,1);
+corr(:,1,:) = corr(1,1,1);
+f70(1,:,:) = f70(1,1,1);
+f70(:,1,:) = f70(1,1,1);
 
-%corr(amplitudes==0,:) = corr(1,1);
-subplot(1,2,1)
-imagesc(frequencies,amplitudes,corr);
-caxis([0.5 1])
-colorbar
+amplitudes_scaled = amplitudes / 256 * 100; % Convert to percentage of FOV
+frequencies_scaled = frequencies * scan_speed / 256; % Convert from relative -> Hz
 
-subplot(1,2,2)
-imagesc(frequencies,amplitudes,f70);
-caxis([0.5 1])
-colorbar
+set(0,'defaultAxesFontSize',8)
+
+for i=1:length(angles)
+    subplot(1,length(angles),i)
+    imagesc(frequencies_scaled,amplitudes_scaled,corr(:,:,i));
+    caxis([0 1])
+    set(gca,'TickDir','out','Box','off','YDir','normal')
+%    colorbar
+end
+%{
+for i=1:length(angles)
+    subplot(2,length(angles),i+length(angles))
+    imagesc(frequencies,amplitudes_scaled,f70(:,:,i));
+    caxis([0 1])
+    colorbar
+end
+%}
+
+set(gcf,'Units','centimeters','PaperPosition',[0,0,14,4]);
+print(gcf,'Correlation-2D.pdf','-dpdf');

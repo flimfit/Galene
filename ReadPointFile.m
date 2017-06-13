@@ -1,4 +1,4 @@
-function data = ReadPointFile(points_file,zoom,scan_speed)
+function data = ReadPointFile(points_file,n_px,zoom,scan_speed)
 
     filedata = fileread(points_file);
     filedata = strrep(filedata,'-nan(ind)','0');
@@ -7,8 +7,12 @@ function data = ReadPointFile(points_file,zoom,scan_speed)
     fprintf(f,filedata);
     fclose(f);
 
-    um_per_px = 2.29 * 0.397 / zoom;
-
+    if isfinite(zoom)
+        um_per_px = 1.2442e+03 / (n_px * zoom);
+    else
+        um_per_px = 1;
+    end
+    
     d = csvread(points_file,0,1,[0 1 4 1]);
 
     data.line_duration = d(1);
@@ -18,18 +22,21 @@ function data = ReadPointFile(points_file,zoom,scan_speed)
     data.lines = d(5);
     
     points = csvread(points_file,6,0);
-    data.correlation = points(:,2);
-    data.coverage = points(:,3);
-    points = points(:,4:end);
+    data.unaligned_correlation = points(:,2);
+    data.correlation = points(:,3);
+    data.coverage = points(:,4);
+    points = points(:,5:end);
+    
+    data.points_unscaled = points';
     data.points = points' * um_per_px;
 
     tc = (0:size(data.points,2)-1) * data.interframe_duration;
     tr = (0:size(data.points,1)-1)' * data.frame_duration / (size(data.points,1)-1);
-    data.t = tc + tr;
+    data.t_unscaled = (tc + tr) / data.frame_duration;
 
     
     frame_time = data.lines / scan_speed;
     
-    t = data.t / data.frame_duration * frame_time;
-    data.t_frame = t(1:size(data.points,1):end);
+    data.t = data.t_unscaled * frame_time;
+    data.t_frame = data.t(1,:);
 
