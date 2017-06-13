@@ -4,10 +4,10 @@
 [submodule "Source/fifo-flim"]
 	path = Source/fifo-flim
 	url = https://github.com/seanwarren/fifo-flim
-[submodule "Source/FlimReader"]
-	path = Source/FlimReader
-	url = https://github.com/flimfit/FlimReader
-	branch = flim-realignment
 [submodule "Source/QSimpleUpdater"]
 	path = Source/QSimpleUpdater
 	url = https://github.com/seanwarren/QSimpleUpdater.git
+[submodule "Source/FlimReader"]
+	path = Source/FlimReader
+	url = https://github.com/flimfit/FlimReader.git
+	branch = flim-realignment
