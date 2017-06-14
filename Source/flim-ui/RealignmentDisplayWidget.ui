@@ -62,6 +62,9 @@
           <height>24</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose whether to display aligned or unaligned frame intensities&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>A</string>
         </property>
@@ -72,6 +75,9 @@
       </item>
       <item>
        <widget class="QSlider" name="slider">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Frame to display&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="maximum">
          <number>0</number>
         </property>
@@ -85,6 +91,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="set_reference_button">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the selected frame as the reference to align other frames. &lt;/p&gt;&lt;p&gt;Realign the dataset after changing the reference frame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Use as reference</string>
         </property>
@@ -106,6 +115,9 @@
        <width>0</width>
        <height>100</height>
       </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Correlation of aligned frames with reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <layout class="QVBoxLayout" name="chart_layout">
       <property name="spacing">
