@@ -78,14 +78,15 @@ elseif(APPLE)
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.icns")
     set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(RESOURCE_FILES ${ICON_FILE})
-    set(EXTRA_LIBRARIES "-framework Accelerate") # for dlib
 endif()
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
-add_executable(flim_ui MACOSX_BUNDLE 
-                    ${SOURCE} ${HEADERS}
-                    ${UI_HEADERS} ${UI_RESOURCES} 
+add_executable(Galene MACOSX_BUNDLE 
+                    ${SOURCE} 
+                    ${HEADERS}
+                    ${UI_HEADERS} 
+                    ${UI_RESOURCES} 
                     $<TARGET_OBJECTS:InstrumentControl> 
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
@@ -93,38 +94,37 @@ add_executable(flim_ui MACOSX_BUNDLE
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
-target_link_libraries(flim_ui
+target_link_libraries(Galene
    ${OpenCV_LIBS}
    ${fifo_flim_LIBS} 
    ${InstrumentControl_LIBRARIES}
    ${FlimReader_LIBRARIES}
    ${dlib_LIBRARIES}
-   ${libtiff_LIBRARIES}
-   ${EXTRA_LIBRARIES})
+   ${libtiff_LIBRARIES})
 
 add_custom_command(
-        TARGET flim_ui POST_BUILD
+        TARGET Galene POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
                 ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
 
-set_target_properties(flim_ui PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                          MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-qt5_use_modules(flim_ui Widgets PrintSupport SerialPort Network)
+qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
 if (WIN32)
-    windeployqt(flim_ui INCLUDE_MODULES ${QTLIBS})
+    windeployqt(Galene INCLUDE_MODULES ${QTLIBS})
 elseif(APPLE)
-    macdeployqt(flim_ui INCLUDE_MODULES ${QTLIBS})
+    macdeployqt(Galene INCLUDE_MODULES ${QTLIBS})
 endif()
 
 set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)
 
-install(TARGETS flim_ui RUNTIME DESTINATION bin 
+install(TARGETS Galene RUNTIME DESTINATION bin 
                         BUNDLE DESTINATION bundle)
 
 if (WIN32)
-    install(DIRECTORY $<TARGET_FILE_DIR:flim_ui>/ DESTINATION bin)
+    install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)
 endif()
