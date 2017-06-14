@@ -40,4 +40,14 @@ private:
 
 };
 
+#else
+
+#include <QWidget>
+
+class CronologicControlDisplay : public QWidget
+{
+   Q_OBJECT
+};
+
+
 #endif
