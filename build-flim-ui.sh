@@ -22,7 +22,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.12
 
 # Generate make files and build 
 cmake -G"Unix Makefiles" -HSource -BBuild
-cmake --build Build -- -j
+cmake --build Build --config Release
 
 # sign code (requires that signature is installed in keychain)
-codesign -s P6MM899VL9 Build/flim-ui/flim_ui.app/
+codesign --verbose --deep -s P6MM899VL9 Build/flim-ui/Galene.app/
