@@ -71,6 +71,16 @@ function(macdeployqt target)
             -always-overwrite
         COMMENT "Deploying Qt..."
     )
+    # fix up the half-ass job done by macdeployqt
+    # see: https://github.com/iltommi/macdeployqtfix/blob/master/macdeployqtfix.py
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND "python"
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/macdeployqtfix.py"
+            "-v"
+            "$<TARGET_FILE:${target}>"
+            /usr/local/opt/qt5
+        COMMENT "Fixing Qt Deployment..."
+    )
 endfunction()
 
 mark_as_advanced(WINDEPLOYQT_EXECUTABLE MACDEPLOYQT_EXECUTABLE)
