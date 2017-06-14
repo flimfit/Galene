@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.7) 
-
 set(CMAKE_CXX_STANDARD 14)
 
+# Use hunter to acquire dependencies where we can 
 include("cmake/HunterGate.cmake")
 HunterGate(
         URL "https://github.com/ruslo/hunter/archive/v0.18.43.tar.gz"
@@ -9,6 +9,7 @@ HunterGate(
     LOCAL
 )
 
+# Get current version from git
 find_package(Git)
 if(GIT_FOUND)
     execute_process(
@@ -24,7 +25,7 @@ if(GIT_FOUND)
 	add_definitions(-DVERSION="${VERSION}")
 endif()
 
-project (flim-ui) 
+project (Galene) 
 
 find_package(Boost COMPONENTS system filesystem)
 if(NOT Boost_FOUND)
@@ -33,11 +34,6 @@ endif()
 
 hunter_add_package(OpenCV)
 
-find_package(Qt5SerialPort)
-if(NOT Qt5SerialPort_FOUND)
-    hunter_add_package(Qt COMPONENTS qtbase qtserialport)
-endif()
-
 find_package(dlib)
 if(NOT dlib_FOUND)
    hunter_add_package(dlib)
@@ -45,17 +41,20 @@ endif()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Common)
+
+# Work around bug with OpenCV highgui components when compiled with ReleaseWithDebugInfo
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
+# Set output directory for FlimReaderMex file
+# This will be used for generating the figures
 set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/Matlab/../)
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FlimReader/Source/FlimReader)
-#add_subdirectory(FlimReader/Source/FlimReaderMex)
-#add_subdirectory(FlimReader/Source/FlimReaderTest)
+add_subdirectory(FlimReader/Source/FlimReaderMex)
+add_subdirectory(FlimReader/Source/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 
@@ -64,11 +63,11 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 
-set(CPACK_PACKAGE_NAME "flim_ui")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "FLIM UI Installer")
+set(CPACK_PACKAGE_NAME "Galene")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Galene Installer")
 set(CPACK_PACKAGE_VERSION ${VERSION}) # Version of installer
 set(CPACK_PACKAGE_VENDOR "Sean Warren")
-set(CPACK_PACKAGE_EXECUTABLES flim_ui "flim-ui ${VERSION}")
+set(CPACK_PACKAGE_EXECUTABLES flim_ui "Galene ${VERSION}")
 
 if (WIN32)
    set(CPACK_GENERATOR NSIS)

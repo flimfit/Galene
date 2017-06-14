@@ -3,6 +3,7 @@
 # Build script for Galene on Mac. 
 # Requires: 
 #    - MacOS >=10.12
+#    - CMake >= 3.7
 #    - Qt >=5.7
 #    - Up-to-date LLVM (i.e. not supplied by Apple)
 # Currently assumes these are installed by brew, i.e. using 

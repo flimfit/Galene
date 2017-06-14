@@ -1,5 +1,4 @@
-project(flim_ui) 
-
+project(flim-ui) 
 cmake_minimum_required(VERSION 3.7)
 
 find_package(Qt5Widgets)
@@ -17,9 +16,6 @@ include("cmake/DeployQt.cmake")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 set(CMAKE_AUTOMOC ON)
-
-# QT stuff
-#====================================
 add_definitions(${QT_DEFINITIONS}) 
 
 qt5_wrap_ui(UI_HEADERS 
