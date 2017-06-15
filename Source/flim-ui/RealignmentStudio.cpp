@@ -30,6 +30,8 @@ RealignmentStudio::RealignmentStudio() :
 
    workspace = new FlimWorkspace(this);
 
+   connect(help_action, &QAction::triggered, []() {  QDesktopServices::openUrl(QUrl("http://galene.readthedocs.io")); });
+
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
    connect(save_merged_action, &QAction::triggered, this, &RealignmentStudio::saveMergedImage);
