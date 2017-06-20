@@ -17,8 +17,8 @@ export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
 export PATH="/usr/local/opt/qt5/bin:$PATH"
 
 # Set deployment target
-export OSX_SDK_VERSION=10.12
-export MACOSX_DEPLOYMENT_TARGET=10.12
+export OSX_SDK_VERSION=10.10
+export MACOSX_DEPLOYMENT_TARGET=10.10
 
 # Generate make files and build 
 cmake -G"Unix Makefiles" -HSource -BBuild
