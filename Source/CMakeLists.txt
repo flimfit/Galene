@@ -56,15 +56,22 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 # Work around bug with OpenCV highgui components when compiled with ReleaseWithDebugInfo
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
-# Set output directory for FlimReaderMex file
-# This will be used for generating the figures
-set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/Matlab/../)
+
+find_package(MATLAB)
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FlimReader/Source/FlimReader)
-add_subdirectory(FlimReader/Source/FlimReaderMex)
+
+if(MATLAB_FOUND)
+    # Set output directory for FlimReaderMex file.
+    # This will be used for generating the figures,
+    # Matlab is not required for the main application
+    set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/Matlab/../)
+    add_subdirectory(FlimReader/Source/FlimReaderMex)
+endif()
+
 add_subdirectory(FlimReader/Source/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
