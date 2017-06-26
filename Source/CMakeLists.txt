@@ -67,7 +67,7 @@ if(MATLAB_FOUND)
     # Set output directory for FlimReaderMex file.
     # This will be used for generating the figures,
     # Matlab is not required for the main application
-    set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/Matlab/../)
+    set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
     add_subdirectory(FlimReader/Source/FlimReaderMex)
 endif()
 
