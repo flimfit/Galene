@@ -78,7 +78,7 @@ void RealignmentStudio::updateParameterGroupBox(int index)
 		page = 1;
 		break;
 	case 3:
-		page = 2;
+		page = 2; 
 		break;
 	}
 	parameter_stackedwidget->setCurrentIndex(page);
@@ -267,6 +267,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
    QString aligned_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-stack.tif");
    QString aligned_preserving_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-int-presv-stack.tif");
    QString unaligned_movie_filename = workspace->getFileName(fi.baseName(), "-unaligned-stack.tif");
+   QString coverage_movie_filename = workspace->getFileName(fi.baseName(), "-coverage-stack.tif");
 
    auto task = std::make_shared<TaskProgress>("Saving...");
    TaskRegister::addTask(task);
@@ -307,6 +308,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
          RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
          RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(results, aligned_preserving_movie_filename);
          RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
+         RealignmentResultsWriter::exportCoverageMovie(results, coverage_movie_filename);
       }
 
 

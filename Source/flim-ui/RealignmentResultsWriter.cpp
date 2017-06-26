@@ -43,6 +43,20 @@ void RealignmentResultsWriter::exportUnalignedMovie(const std::vector<Realignmen
 }
 
 
+void RealignmentResultsWriter::exportCoverageMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+{
+   std::vector<cv::Mat> images;
+   for (const auto& r : results)
+   {
+      cv::Mat b;
+      r.mask.convertTo(b, CV_16U);
+      images.push_back(b);
+   }
+
+   writeMovie(filename, images);
+}
+
+
 void RealignmentResultsWriter::writeMovie(const QString& filename, const std::vector<cv::Mat>& images)
 {
    QString extension = QFileInfo(filename).suffix();

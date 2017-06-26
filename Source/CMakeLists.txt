@@ -47,7 +47,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS
 
 # Set output directory for FlimReaderMex file
 # This will be used for generating the figures
-set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/Matlab/../)
+set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab/)
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
