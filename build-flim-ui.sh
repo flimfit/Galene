@@ -15,6 +15,7 @@ export CC=/usr/local/opt/llvm/bin/clang
 export CXX=/usr/local/opt/llvm/bin/clang++
 export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
 export PATH="/usr/local/opt/qt5/bin:$PATH"
+export MACOSX_DEPLOYMENT_TARGET=10.10
 
 # Generate make files and build 
 cmake -G"Unix Makefiles" -HSource -BBuild

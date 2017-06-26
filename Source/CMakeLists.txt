@@ -3,10 +3,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
 
-# check to see if SDK exists
+# check to see if SDK exists and use it if so
 if(EXISTS ${TARGET_SDKROOT})
-    # Set build target to 10.10
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
     set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
 else()
     message(WARNING "Could not find macOS 10.10 SDK, falling back on default")
