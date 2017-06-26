@@ -1,6 +1,17 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
+set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
+
+# check to see if SDK exists
+if(EXISTS ${TARGET_SDKROOT})
+    # Set build target to 10.10
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+    set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
+else()
+    message(WARNING "Could not find macOS 10.10 SDK, falling back on default")
+endif()
+ 
 # Use hunter to acquire dependencies where we can 
 include("cmake/HunterGate.cmake")
 HunterGate(
