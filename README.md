@@ -26,7 +26,7 @@ Build steps
 Building on Mac
 -------------------
 Requirements
-- MacOS 10.12 or greater
+- MacOS 10.10 or greater
 - LLVM 4.0 or greater (install via brew, apple supplied version does not support OpenMP)
 - CMake 3.7 or greater (install via brew)
 - Qt 5.7 or greater (install via brew)

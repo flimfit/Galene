@@ -35,10 +35,11 @@ RealignmentStudio::RealignmentStudio() :
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
    connect(save_merged_action, &QAction::triggered, this, &RealignmentStudio::saveMergedImage);
+   connect(quit_action, &QAction::triggered, this, &RealignmentStudio::close);
+
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
    connect(workspace, &FlimWorkspace::infoRequest, this, &RealignmentStudio::showFileInfo);
-
    connect(realign_button, &QPushButton::pressed, this, &RealignmentStudio::realign);
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
