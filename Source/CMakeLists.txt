@@ -56,7 +56,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 # Work around bug with OpenCV highgui components when compiled with ReleaseWithDebugInfo
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
-
 find_package(MATLAB)
 
 add_subdirectory(QSimpleUpdater)
