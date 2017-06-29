@@ -5,5 +5,10 @@
       "CC": "/usr/local/opt/llvm/bin/clang",
       "CXX": "/usr/local/opt/llvm/bin/clang++",
       "LDFLAGS": "-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+   },
+   "files.associations": {
+      "*.m": "matlab",
+      "algorithm": "cpp",
+      "random": "cpp"
    }
 }

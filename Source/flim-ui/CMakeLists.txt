@@ -82,6 +82,19 @@ endif()
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
+add_executable(GaleneTest 
+                    ${SOURCE} 
+                    ${HEADERS}
+                    ${UI_HEADERS} 
+                    ${UI_RESOURCES} 
+                    $<TARGET_OBJECTS:InstrumentControl> 
+                    $<TARGET_OBJECTS:InstrumentControlUI> 
+                    $<TARGET_OBJECTS:fifo_flim>
+                    $<TARGET_OBJECTS:FlimReader>
+                    $<TARGET_OBJECTS:QSimpleUpdater>
+                    ${RESOURCE_FILES})
+
+
 add_executable(Galene MACOSX_BUNDLE 
                     ${SOURCE} 
                     ${HEADERS}
@@ -102,6 +115,14 @@ target_link_libraries(Galene
    ${dlib_LIBRARIES}
    ${libtiff_LIBRARIES})
 
+target_link_libraries(GaleneTest
+   ${OpenCV_LIBS}
+   ${fifo_flim_LIBS} 
+   ${InstrumentControl_LIBRARIES}
+   ${FlimReader_LIBRARIES}
+   ${dlib_LIBRARIES}
+   ${libtiff_LIBRARIES})
+
 add_custom_command(
         TARGET Galene POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
@@ -112,6 +133,7 @@ set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURREN
                                          MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
 qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
+qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
 
 if (WIN32)
     windeployqt(Galene INCLUDE_MODULES ${QTLIBS})
