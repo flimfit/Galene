@@ -13,7 +13,7 @@ endif()
 # Use hunter to acquire dependencies where we can 
 include("cmake/HunterGate.cmake")
 HunterGate(
-        URL "https://github.com/ruslo/hunter/archive/v0.18.43.tar.gz"
+    URL "https://github.com/ruslo/hunter/archive/v0.18.43.tar.gz"
     SHA1 "d2c8c42cd07f7cefe18fd9a9b9c13114b1a15a27"
     LOCAL
 )
@@ -36,17 +36,9 @@ endif()
 
 project (Galene) 
 
-find_package(Boost COMPONENTS system filesystem)
-if(NOT Boost_FOUND)
-    hunter_add_package(Boost COMPONENTS filesystem system)
-endif()
-
+hunter_add_package(Boost COMPONENTS filesystem system)
 hunter_add_package(OpenCV)
-
-find_package(dlib)
-if(NOT dlib_FOUND)
-   hunter_add_package(dlib)
-endif()
+hunter_add_package(dlib)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})

@@ -18,8 +18,8 @@ export PATH="/usr/local/opt/qt5/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.10
 
 # Generate make files and build 
-cmake -G"Unix Makefiles" -HSource -BBuild
-cmake --build Build --config Release
+cmake -G"Unix Makefiles" -HSource -BBuild -DCMAKE_BUILD_TYPE=Release
+cmake --build Build
 
 # sign code (requires that signature is installed in keychain)
 codesign --verbose --deep -s P6MM899VL9 Build/flim-ui/Galene.app/
