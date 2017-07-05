@@ -10,8 +10,7 @@ class RealignmentStudioBatchProcessor : public ThreadedObject
    Q_OBJECT
 
 public:
-   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_) :
-      ThreadedObject(studio_)
+   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_)
    {
       studio = studio_;
       files = files_;
