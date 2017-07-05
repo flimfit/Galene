@@ -18,10 +18,7 @@ FlimWorkspace::FlimWorkspace(QObject* parent, const QString& dir) :
    }
    else
    {
-      QSettings settings;
-      QString last_workspace = settings.value("workspace/last_workspace", "").toString();
-      if (!last_workspace.isEmpty())
-         openFromFolder(last_workspace);
+      openFromFolder(getNewPath());
    }
 }
 
@@ -109,9 +106,18 @@ void FlimWorkspace::requestInfoFile(const QModelIndex index)
 const QString FlimWorkspace::getNewPath()
 {
    if (has_workspace)
+   {
       return workspace.canonicalPath();
+   }
    else
-      return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+   {
+      QSettings settings;
+      QString last_workspace = settings.value("workspace/last_workspace", "").toString();
+      if (!last_workspace.isEmpty())
+         return last_workspace;
+      else
+         return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+   }
 }
 
 void FlimWorkspace::makeNew()
