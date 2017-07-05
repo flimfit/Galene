@@ -24,9 +24,11 @@ public:
 
    void init()
    {
-      processNext();
+      QMetaObject::invokeMethod(this, "processNext", Qt::QueuedConnection);
+//      processNext();
    }
 
+   Q_INVOKABLE 
    void processNext()
    {
       if (source)
