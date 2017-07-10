@@ -36,3 +36,7 @@ Build steps
     - `brew install llvm qt5 cmake` 
 - Clone the Galene repository 
 - Run script `build-flim-ui.sh`
+
+Acknowledgements
+-------------------
+Galene dynamically links to Qt 5.9, [licenced under the LGPLv3](http://doc.qt.io/qt-5/lgpl.html). Please see [Qt Licencing](http://doc.qt.io/qt-5/licensing.html) for more details.
