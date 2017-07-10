@@ -39,4 +39,5 @@ Build steps
 
 Acknowledgements
 -------------------
-Galene dynamically links to Qt 5.9, [licenced under the LGPLv3](http://doc.qt.io/qt-5/lgpl.html). Please see [Qt Licencing](http://doc.qt.io/qt-5/licensing.html) for more details.
+Galene dynamically links to Qt 5.9, [licenced under the LGPLv3](http://doc.qt.io/qt-5/lgpl.html). 
+Qt is available from [Qt.io](http://qt.io), or you can download the source code used in Galene [here](http://downloads.flimfit.org/qt/qt59.tar.xz).
