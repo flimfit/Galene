@@ -1,4 +1,3 @@
-
 #include "FlimDisplay.h"
 #include <QFileDialog>
 #include <QVector>

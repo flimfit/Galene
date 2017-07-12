@@ -8,7 +8,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDat
    setupPlots();
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
-   connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
+   connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
 
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
