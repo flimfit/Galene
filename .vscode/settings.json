@@ -4,11 +4,16 @@
    "cmake.environment": {
       "CC": "/usr/local/opt/llvm/bin/clang",
       "CXX": "/usr/local/opt/llvm/bin/clang++",
-      "LDFLAGS": "-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+      "LDFLAGS": "-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib",
+      "PATH": "/usr/local/opt/qt5/bin:$PATH",
+      "MACOSX_DEPLOYMENT_TARGET": "10.10"
    },
+   "C_Cpp.intelliSenseEngine": "Tag Parser",
    "files.associations": {
       "*.m": "matlab",
       "algorithm": "cpp",
-      "random": "cpp"
+      "random": "cpp",
+      "fstream": "cpp",
+      "*.ipp": "cpp"
    }
 }

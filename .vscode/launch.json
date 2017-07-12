@@ -7,7 +7,7 @@
          "request": "launch",
          "program": "${workspaceRoot}/Build/flim-ui/GaleneTest",
          "MIMode": "lldb",
-         "cwd": "${workspaceRoot}/"
+         "cwd": "${workspaceRoot}/"         
       }
    ]
 }
