@@ -147,8 +147,11 @@ void FlimReaderDataSource::readDataThread(bool realign)
    read_again_when_finished = false;
    currently_reading = true;
 
-   task = std::make_shared<TaskProgress>("Loading data...");
+   task = std::make_shared<TaskProgress>("Loading data...", true);
    TaskRegister::addTask(task);
+   connect(task.get(), &TaskProgress::cancelRequested, [&]() { 
+      reader->stopReading(); 
+   });
 
    try
    {
