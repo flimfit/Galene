@@ -125,7 +125,8 @@ void FlimReaderDataSource::update()
       }
    }
 
-   QMetaObject::invokeMethod(this, "decayUpdated");
+   emit decayUpdated();
+   //QMetaObject::invokeMethod(this, "decayUpdated");
 }
 
 // Use readData to call 
@@ -143,14 +144,15 @@ void FlimReaderDataSource::readDataThread(bool realign)
    }
 
    data = std::make_shared<FlimCube<uint16_t>>();
-
    read_again_when_finished = false;
    currently_reading = true;
+   terminate = false;
 
    task = std::make_shared<TaskProgress>("Loading data...", true);
    TaskRegister::addTask(task);
    connect(task.get(), &TaskProgress::cancelRequested, [&]() { 
       reader->stopReading(); 
+      terminate = true;
    });
 
    try
@@ -158,6 +160,7 @@ void FlimReaderDataSource::readDataThread(bool realign)
       if (realign)
       {
          task->setTaskName("Preloading frames...");
+         reader->clearStopSignal();
          reader->alignFrames();
          emit alignmentComplete();
       }
