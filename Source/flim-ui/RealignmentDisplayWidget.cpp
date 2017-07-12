@@ -10,6 +10,8 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDat
 
    connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
+   connect(slider, &QSlider::sliderMoved, current_frame_spin, &QSpinBox::setValue);
+   connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
 
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
@@ -74,6 +76,7 @@ void RealignmentDisplayWidget::update()
 
    slider->setMaximum(n - 1);
    slider->setValue(0);
+   current_frame_spin->setValue(0);
 
    displayImage(0);
 }
