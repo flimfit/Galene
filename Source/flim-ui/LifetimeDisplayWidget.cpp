@@ -6,8 +6,7 @@
 
 
 LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
-   QWidget(parent),
-   ControlBinder(parent, "LifetimeDisplayWidget")
+  ControlBinder(this, "LifetimeDisplayWidget")
 {
    setupUi(this);
    setupPlots();
@@ -18,8 +17,8 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    line_colors.push_back(Qt::red);
    line_colors.push_back(Qt::magenta);
 
-   QueuedBind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau, true);
-   QueuedBind(intensity_auto_check, this, &LifetimeDisplayWidget::setAutoscaleIntensity, &LifetimeDisplayWidget::getAutoscaleIntensity, true);
+   Bind(tau_auto_check, this, &LifetimeDisplayWidget::setAutoscaleTau, &LifetimeDisplayWidget::getAutoscaleTau, &LifetimeDisplayWidget::autoscaleLifetimeChanged, true);
+   Bind(intensity_auto_check, this, &LifetimeDisplayWidget::setAutoscaleIntensity, &LifetimeDisplayWidget::getAutoscaleIntensity, &LifetimeDisplayWidget::autoscaleIntensityChanged, true);
    QueuedBind(tau_min_spin, this, &LifetimeDisplayWidget::setDisplayTauMin, &LifetimeDisplayWidget::getDisplayTauMin, &LifetimeDisplayWidget::displayTauMinChanged);
    QueuedBind(tau_max_spin, this, &LifetimeDisplayWidget::setDisplayTauMax, &LifetimeDisplayWidget::getDisplayTauMax, &LifetimeDisplayWidget::displayTauMaxChanged);
    QueuedBind(intensity_min_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMin, &LifetimeDisplayWidget::getDisplayIntensityMin, &LifetimeDisplayWidget::displayIntensityMinChanged);
@@ -35,7 +34,7 @@ void LifetimeDisplayWidget::setFlimDataSource(std::shared_ptr<FlimDataSource> fl
    flimage = flimage_;
    connect(flimage.get(), &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
    connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
+   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
    connect(flimage.get(), &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
 
    while (auto w = count_rate_layout->findChild<QWidget*>())

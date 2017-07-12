@@ -8,7 +8,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, public ControlBinder, public FlimDataSourceWatcher
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder, public FlimDataSourceWatcher
 {
    Q_OBJECT
 
@@ -30,6 +30,8 @@ signals:
    void displayTauMaxChanged(double);
    void displayIntensityMinChanged(int);
    void displayIntensityMaxChanged(int);
+   void autoscaleIntensityChanged(bool);
+   void autoscaleLifetimeChanged(bool);
 
 protected:
 
@@ -53,7 +55,7 @@ protected:
    void updateDecay();
 
    void updateLifetimeImage() { updateLifetimeImageImpl(false); }
-   void updateLifetimeScale() { updateLifetimeImageImpl(false); }
+   void updateLifetimeScale() { updateLifetimeImageImpl(true); }
 
    void updateLifetimeImageImpl(bool rescale);
    void setupPlots();
