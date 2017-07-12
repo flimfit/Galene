@@ -23,9 +23,7 @@ public:
    explicit RealignmentStudio();
    ~RealignmentStudio();
 
-   //void setStatusBarMessage(const QString& message) { statusbar->showMessage(message); }
-   //void updateProgress(double progress);
-
+   void closeEvent(QCloseEvent* event);
 
    void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
    bool getCloseAfterSave() { return close_after_save; }

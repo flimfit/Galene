@@ -135,6 +135,20 @@ QMdiSubWindow* RealignmentStudio::createSubWindow(QWidget* widget, const QString
    return sub;
 }
 
+void RealignmentStudio::closeEvent(QCloseEvent* event)
+{
+   // Close each subwindow before closing main window
+   while (!window_map.empty())
+   {
+      auto w = window_map.begin()->first;
+      window_map.erase(window_map.begin());
+      w->close();
+   }
+
+   QMainWindow::closeEvent(event);
+}
+
+
 void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source)
 {
    auto widget = new LifetimeDisplayWidget;
@@ -155,15 +169,15 @@ void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source
 
    // Make windows close each other
    connect(w2, &QObject::destroyed, [&]() {
-      auto it = window_map.find(w1);
+      auto it = window_map.find(w2);
       if (it != window_map.end())
-         window_map.erase(w1);
+         window_map.erase(w2);
    });
 
    connect(w1, &QObject::destroyed, [&]() {
-      auto it = window_map.find(w2);
+      auto it = window_map.find(w1);
       if (it != window_map.end())
-         window_map.erase(w2); 
+         window_map.erase(w1); 
    });
 
    connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
