@@ -200,8 +200,14 @@ std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
 void RealignmentStudio::realign()
 {
    auto source = getCurrentSource();
-   auto reader = source->getReader();
+   
+   if (!source)
+   {
+      QMessageBox::warning(this, "Warning", "Please open a file before reloading");
+      return;
+   }
 
+   auto reader = source->getReader();
    reader->setRealignmentParameters(getRealignmentParameters());
    source->readData();
 }
@@ -209,8 +215,14 @@ void RealignmentStudio::realign()
 void RealignmentStudio::reload()
 {
    auto source = getCurrentSource();
-   auto reader = source->getReader();
 
+   if (!source)
+   {
+      QMessageBox::warning(this, "Warning", "Please open a file before reloading");
+      return;
+   }
+
+   auto reader = source->getReader();
    reader->setRealignmentParameters(getRealignmentParameters());
    source->readData(false);
 }
