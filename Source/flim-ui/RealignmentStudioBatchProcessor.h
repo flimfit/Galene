@@ -15,7 +15,7 @@ public:
       studio = studio_;
       files = files_;
 
-      task = std::make_shared<TaskProgress>("Processing...", files.size());
+      task = std::make_shared<TaskProgress>("Processing...", true, files.size());
       TaskRegister::addTask(task);
 
       startThread();
@@ -24,7 +24,6 @@ public:
    void init()
    {
       QMetaObject::invokeMethod(this, "processNext", Qt::QueuedConnection);
-//      processNext();
    }
 
    Q_INVOKABLE 

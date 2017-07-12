@@ -137,6 +137,16 @@ QMdiSubWindow* RealignmentStudio::createSubWindow(QWidget* widget, const QString
 
 void RealignmentStudio::closeEvent(QCloseEvent* event)
 {
+   auto task_reg = TaskRegister::getRegister();
+   bool has_tasks = !task_reg->getTasks().empty();
+
+   if (has_tasks)
+   {
+      QMessageBox::warning(this, "Warning", "Please wait for tasks to complete");
+      event->ignore();
+      return;
+   }
+
    // Close each subwindow before closing main window
    while (!window_map.empty())
    {
@@ -144,8 +154,7 @@ void RealignmentStudio::closeEvent(QCloseEvent* event)
       window_map.erase(window_map.begin());
       w->close();
    }
-
-   QMainWindow::closeEvent(event);
+   event->accept();
 }
 
 
@@ -231,6 +240,13 @@ void RealignmentStudio::reload()
 void RealignmentStudio::exportMovie()
 {
    auto active_window = mdi_area->activeSubWindow();
+
+   if (!active_window)
+   {
+      QMessageBox::warning(this, "Warning", "No FLIM image open");
+      return;
+   }
+
    auto main_w = active_window->widget();
    if (main_w->inherits("RealignmentDisplayWidget"))
    {
@@ -243,6 +259,13 @@ void RealignmentStudio::exportMovie()
 void RealignmentStudio::saveMergedImage()
 {
    auto active_window = mdi_area->activeSubWindow();
+
+   if (!active_window)
+   {
+     QMessageBox::warning(this, "Warning", "No FLIM image open");
+     return;
+   }
+
    auto main_w = active_window->widget();
    if (main_w->inherits("LifetimeDisplayWidget"))
    {
@@ -260,6 +283,13 @@ void RealignmentStudio::writeAlignmentInfoCurrent()
 
 void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source)
 {
+   if (!source)
+   {
+      QMessageBox::warning(this, "Warning", "No FLIM image open");
+      return;
+   }
+
+
    auto reader = source->getReader();
    auto& aligner = reader->getFrameAligner();
 
