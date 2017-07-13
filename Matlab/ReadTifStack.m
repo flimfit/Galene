@@ -5,7 +5,14 @@ function FinalImage = ReadTifStack(FileTif)
     nImage=InfoImage(1).Height;
     NumberImages=length(InfoImage);
 
-    FinalImage=zeros(nImage,mImage,NumberImages,'uint16');
+    switch InfoImage(1).SampleFormat
+        case 'Unsigned integer'
+            format = 'uint16';
+        case 'IEEE floating point'
+            format = 'single';
+    end
+    
+    FinalImage=zeros(nImage,mImage,NumberImages,format);
     for i=1:NumberImages
        FinalImage(:,:,i)=imread(FileTif,'Index',i);
     end

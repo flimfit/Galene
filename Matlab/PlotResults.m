@@ -1,21 +1,7 @@
 output_folder = ['X:\Sean Warren\Motion correction paper\Paper\Figures\']
 
-%{
-% Set up file names
-file = 'X:\Sean Warren\Motion correction paper\2017-03-31 ANRN361 Rac1-on window pancreas gut\01 pancreas _1_1.pt3';
-file = 'X:\Sean Warren\Motion correction paper\SimulatedData\Simulated Data Amplitude=4_44444 Frequency=0_7 Frames=25 _001_001.ffd';
-file = 'X:\Sean Warren\Motion correction paper\Sim23\Simulated Data Amplitude=20 Frequency=0_7 Frames=25 _001_001.ffd';
-%file = 'X:\Sean Warren\Motion correction paper\Rac1 on crypts\2017-05-02 ANRN354 crypts\2017-05-02 ANRN354 Rac1-on crypts Intravital\01 control crypts 6x_2_1.pt3';
-%file = 'X:\Sean Warren\Motion correction paper\Rac1 on crypts\2017-04-13 ANRN351 Rac1on crypts\02 Rac1-on gut drug=PMA_11_1.pt3';
-%file = 'X:\Sean Warren\Motion correction paper\2017-04-05 ANRN361 Rac1-on optical windows\02b pancreas 1000hz zoom=6 _10_1.pt3';
-%file = 'X:\Sean Warren\Motion correction paper\PRex1 virgin mammary 16wk\160623 - PRex1-RacFRET no1\Mammary gland 1137_8_1_001.ffd'
-%file = 'X:\Sean Warren\Motion correction paper\2017-03-03 ANRN360 Rac1-on gut\02 Rac1-on gut bidirectional_14_1_001.ffd'
-
-file = 'X:\Sean Warren\Motion correction paper\Simulated Data 4\Sim Amplitude=17_7778 Frequency=1_33333 Angle=0 Frames=50 _001_001';
-%}
-
 SetupDatasets();
-data = dataset(1);
+data = dataset(7);
 
 [~,filename,ext] = fileparts(data.file); 
 

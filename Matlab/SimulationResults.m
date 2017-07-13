@@ -11,7 +11,7 @@ meta = regexp(files,'Amplitude=(?<Amplitude>[0-9_]+) Frequency=(?<Frequency>[0-9
 %%
 clear data;
 for i=1:length(files)
-    d = ReadPointFile([root files{i}],zoom,scan_speed);
+    d = ReadPointFile([root files{i}],256,zoom,scan_speed);
 
     
     fields = fieldnames(meta{i});
@@ -25,6 +25,8 @@ end
 amplitudes = unique([data.Amplitude]);
 frequencies = unique([data.Frequency]);
 angles = unique([data.Angle]);
+
+%%
 
 corr = nan*ones(length(amplitudes),length(frequencies),length(angles));
 f70 = nan*ones(length(amplitudes),length(frequencies),length(angles));

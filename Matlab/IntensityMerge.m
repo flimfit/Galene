@@ -1,5 +1,5 @@
 SetupDatasets();
-data = dataset(1);
+data = dataset(7);
 
 aligned_ffh = [data.file '-aligned.ffh'];
 intensity_file = [data.file '-aligned I raw.tif'];
@@ -13,7 +13,11 @@ FlimReaderMex(r,'Delete');
 clear FlimReaderMex
 
 intensity_normalisation = double(intensity_normalisation);
-intensity_normalisation = intensity_normalisation / mean(intensity_normalisation(:));
+intensity_normalisation(end-1:end,:) = 50;
+imagesc(intensity_normalisation)
+
+
+intensity_normalisation = intensity_normalisation / max(intensity_normalisation(:));
 
 intensity = imread(intensity_file);
 tau = imread(tau_file);
@@ -25,5 +29,6 @@ merged = ShowFLIM(tau',intensity',data.tau_lim,data.I_lim,false);
 
 figure(3)
 imagesc(merged)
+daspect([1 1 1])
 
 imwrite(merged,merged_file)

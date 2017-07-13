@@ -1,6 +1,6 @@
 function tc = ShowFLIM(tau, I, lim, Ilim, show_bar)
 
-    if nargin < 4
+    if nargin < 5
         show_bar = true;
     end
 
