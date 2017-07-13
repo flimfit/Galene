@@ -401,8 +401,18 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
 
    params.type = static_cast<RealignmentType>(mode_combo->currentIndex());
    params.n_resampling_points = realignment_points_spin->value();
-   params.frame_binning = frame_binning_combo->value();
-   params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
+   
+   switch (params.type)
+   {
+   case RealignmentType::Warp:
+      params.frame_binning = 1;
+      params.spatial_binning = 1;
+      break;
+   default:
+      params.frame_binning = frame_binning_combo->value();
+      params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
+   }
+
    params.correlation_threshold = threshold_spin->value();
    params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
