@@ -130,6 +130,7 @@ QMdiSubWindow* RealignmentStudio::createSubWindow(QWidget* widget, const QString
    widget->show();
    widget->setWindowTitle(title);
 
+   connect(sub, &QObject::destroyed, widget, &QObject::deleteLater);
    connect(widget, &QObject::destroyed, sub, &QObject::deleteLater);
 
    return sub;
@@ -177,23 +178,22 @@ void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source
    connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [reader](int index) { reader->setReferenceIndex(index); }); // reader isn't a QObject
 
    // Make windows close each other
-   connect(w2, &QObject::destroyed, [&]() {
-      auto it = window_map.find(w2);
-      if (it != window_map.end())
-         window_map.erase(w2);
-   });
-
-   connect(w1, &QObject::destroyed, [&]() {
-      auto it = window_map.find(w1);
-      if (it != window_map.end())
-         window_map.erase(w1); 
-   });
+   connect(w2, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
+   connect(w1, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
 
    connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
    connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
 
    source->readData();
 }
+
+void RealignmentStudio::removeWindow(QObject* obj)
+{
+   QMdiSubWindow* w = static_cast<QMdiSubWindow*>(obj);
+   auto it = window_map.find(w);
+   if (it != window_map.end())
+      window_map.erase(w);
+};
 
 std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
 {
@@ -381,6 +381,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
 
       if (close_after_save || force_close)
          source->requestDelete();
+
 
       task->setFinished();
 

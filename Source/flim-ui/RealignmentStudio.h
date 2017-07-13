@@ -53,6 +53,7 @@ protected:
    void updateParameterGroupBox(int index);
 
    void openWindows(std::shared_ptr<FlimReaderDataSource> source);
+   void removeWindow(QObject* obj);
 
    void saveCurrent();
    void save(std::shared_ptr<FlimReaderDataSource> source, bool force_close = false);
