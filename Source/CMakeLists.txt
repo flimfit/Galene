@@ -51,17 +51,18 @@ find_package(MATLAB)
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
-add_subdirectory(FlimReader/Source/FlimReader)
+add_subdirectory(FlimReader/frame-aligner/FrameAligner)
+add_subdirectory(FlimReader/FlimReader)
 
 if(MATLAB_FOUND)
     # Set output directory for FlimReaderMex file.
     # This will be used for generating the figures,
     # Matlab is not required for the main application
     set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
-    add_subdirectory(FlimReader/Source/FlimReaderMex)
+    add_subdirectory(FlimReader/FlimReaderMex)
 endif()
 
-add_subdirectory(FlimReader/Source/FlimReaderTest)
+add_subdirectory(FlimReader/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 

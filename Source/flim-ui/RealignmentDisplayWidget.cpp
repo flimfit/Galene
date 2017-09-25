@@ -1,14 +1,18 @@
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
 
-RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDataSource> reader, QWidget* parent) :
-   QWidget(parent), reader(reader)
+RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDataSource> source, QWidget* parent) :
+   QWidget(parent), source(source)
 {
    setupUi(this);
    setupPlots();
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
-   connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
+   timer = new QTimer(this);
+   connect(timer, &QTimer::timeout, this, &RealignmentDisplayWidget::update);
+   timer->start(2000);
+   
+   //connect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
    connect(slider, &QSlider::sliderMoved, current_frame_spin, &QSpinBox::setValue);
    connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
@@ -18,7 +22,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDat
 
 RealignmentDisplayWidget::~RealignmentDisplayWidget()
 {
-   disconnect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
+   //disconnect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
 }
 
 void RealignmentDisplayWidget::referenceButtonPressed()
@@ -49,8 +53,7 @@ void RealignmentDisplayWidget::exportMovie()
 
 void RealignmentDisplayWidget::update()
 {
-   auto r = reader->getReader();
-   results = r->getRealignmentResults();
+   results = source->getRealignmentResults();
 
    int n = (int)results.size();
 
@@ -78,7 +81,7 @@ void RealignmentDisplayWidget::update()
    slider->setValue(0);
    current_frame_spin->setValue(0);
 
-   displayImage(0);
+   displayImage(cur_image);
 }
 
 void RealignmentDisplayWidget::displayImage(int image)
@@ -94,6 +97,7 @@ void RealignmentDisplayWidget::displayImage(int image)
       correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();
+      cur_image = image;
    }
 }
 

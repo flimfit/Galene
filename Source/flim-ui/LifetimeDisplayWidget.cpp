@@ -27,15 +27,15 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    connect(rate_type_combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &LifetimeDisplayWidget::updateCountRates);
 }
 
-void LifetimeDisplayWidget::setFlimDataSource(std::shared_ptr<FlimDataSource> flimage_)
+void LifetimeDisplayWidget::setFlimDataSource(FlimDataSource* flimage_)
 {
-   FlimDataSourceWatcher::setFlimDataSource(flimage_);
+   //FlimDataSourceWatcher::setFlimDataSource(flimage_);
 
    flimage = flimage_;
-   connect(flimage.get(), &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
 
    while (auto w = count_rate_layout->findChild<QWidget*>())
       delete w;

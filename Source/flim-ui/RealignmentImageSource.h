@@ -23,7 +23,7 @@ protected:
       w->ClearImages();
 
       auto r = reader->getReader();
-      auto results = r->getRealignmentResults();
+      auto& results = r->getRealignmentResults();
 
       QVector<double> corr;
       corr.reserve((int) results.size());

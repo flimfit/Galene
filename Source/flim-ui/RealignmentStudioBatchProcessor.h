@@ -23,38 +23,27 @@ public:
 
    void init()
    {
-      QMetaObject::invokeMethod(this, "processNext", Qt::QueuedConnection);
+      QMetaObject::invokeMethod(this, "process", Qt::QueuedConnection);
    }
 
    Q_INVOKABLE 
-   void processNext()
+   void process()
    {
-      if (source)
+      for(auto file : files)
       {
+         auto source = studio->openFile(file);
+         source->waitForComplete();
          studio->save(source, true);
-         disconnect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
          task->incrementStep();
       }
 
-
-      if (files.empty() || task->wasCancelRequested())
-      {
-         task->setFinished();
-         deleteLater();
-         return;
-      }
-
-      QString file = files.front();
-      files.pop_front();
-
-      source = studio->openFile(file);
-      connect(source.get(), &FlimDataSource::readComplete, this, &RealignmentStudioBatchProcessor::processNext);
+      task->setFinished();
+      deleteLater();
    }
 
 private:
 
    std::shared_ptr<TaskProgress> task;
-   std::shared_ptr<FlimReaderDataSource> source;
    RealignmentStudio* studio;
    QStringList files;
 };

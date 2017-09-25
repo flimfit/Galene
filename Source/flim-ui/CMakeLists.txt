@@ -91,6 +91,7 @@ add_executable(GaleneTest
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
                     $<TARGET_OBJECTS:FlimReader>
+                    $<TARGET_OBJECTS:FrameAligner>
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
@@ -104,6 +105,7 @@ add_executable(Galene MACOSX_BUNDLE
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
                     $<TARGET_OBJECTS:FlimReader>
+                    $<TARGET_OBJECTS:FrameAligner>
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 

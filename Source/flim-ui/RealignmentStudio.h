@@ -37,29 +37,29 @@ public:
    void setSaveRealignmentInfo(bool save_realignment_info_) { save_realignment_info = save_realignment_info_; };
    bool getSaveRealignmentInfo() { return save_realignment_info; }
 
-   std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
+   std::shared_ptr<RealignableDataSource> openFile(const QString& filename);
    void showFileInfo(const QString& filename);
 
 signals:
 
-   void newDataSource(std::shared_ptr<FlimReaderDataSource> source);
+   void newDataSource(std::shared_ptr<RealignableDataSource> source);
 
 protected:
 
-   std::shared_ptr<FlimReaderDataSource> getCurrentSource();
+   std::shared_ptr<RealignableDataSource> getCurrentSource();
    void realign();
    void reload();
 
    void updateParameterGroupBox(int index);
 
-   void openWindows(std::shared_ptr<FlimReaderDataSource> source);
+   void openWindows(std::shared_ptr<RealignableDataSource> source);
    void removeWindow(QObject* obj);
 
    void saveCurrent();
-   void save(std::shared_ptr<FlimReaderDataSource> source, bool force_close = false);
+   void save(std::shared_ptr<RealignableDataSource> source, bool force_close = false);
 
    void writeAlignmentInfoCurrent();
-   void writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source);
+   void writeAlignmentInfo(std::shared_ptr<RealignableDataSource> source);
 
    QMdiSubWindow* createSubWindow(QWidget* widget, const QString& title);
 
@@ -85,7 +85,7 @@ private:
 
    QTimer* status_timer;
 
-   std::map<QMdiSubWindow*, std::weak_ptr<FlimReaderDataSource>> window_map;
+   std::map<QMdiSubWindow*, std::weak_ptr<RealignableDataSource>> window_map;
    std::list<std::thread> save_thread;
 
    friend class RealignmentStudioBatchProcessor;

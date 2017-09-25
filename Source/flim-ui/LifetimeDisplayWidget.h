@@ -8,14 +8,14 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder, public FlimDataSourceWatcher
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder //, public ImageDataSourceWatcher
 {
    Q_OBJECT
 
 public:
    
    LifetimeDisplayWidget(QWidget* parent = 0);
-   void setFlimDataSource(std::shared_ptr<FlimDataSource> flimage_);
+   void setFlimDataSource(FlimDataSource* flimage_);
 
    void updateCountRates();
    void setClosable(bool closable_) { closable = closable_; }
@@ -60,7 +60,7 @@ protected:
    void updateLifetimeImageImpl(bool rescale);
    void setupPlots();
 
-   std::shared_ptr<FlimDataSource> flimage;
+   FlimDataSource* flimage = nullptr;
    cv::Mat mapped_mar;
    cv::Mat scaled_mar;
    cv::Mat display;

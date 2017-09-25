@@ -16,7 +16,7 @@ class RealignmentDisplayWidget : public QWidget, public Ui::RealignmentDisplayWi
 
 public:
 
-	RealignmentDisplayWidget(std::shared_ptr<FlimReaderDataSource> reader, QWidget* parent = 0);
+	RealignmentDisplayWidget(std::shared_ptr<RealignableDataSource> source, QWidget* parent = 0);
 	~RealignmentDisplayWidget();
 
    void exportMovie();
@@ -35,10 +35,14 @@ protected:
    void setupPlots();
    void referenceButtonPressed();
 
-   std::shared_ptr<FlimReaderDataSource> reader;
+   std::shared_ptr<RealignableDataSource> source;
 
    std::vector<QColor> line_colors;
    std::vector<QLabel*> rate_labels;
 
    std::vector<RealignmentResult> results;
+
+   QTimer* timer;
+
+   int cur_image = 0;
 };

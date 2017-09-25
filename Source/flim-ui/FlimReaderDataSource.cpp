@@ -1,4 +1,6 @@
 #include "FlimReaderDataSource.h"
+#include "LifetimeDisplayWidget.h"
+
 #include <memory>
 
 void FlimReaderDataSourceWorker::update()
@@ -67,6 +69,12 @@ void FlimReaderDataSource::readData(bool realign)
 
       reader_thread = std::thread(&FlimReaderDataSource::readDataThread, this, realign);
    }
+}
+
+void FlimReaderDataSource::waitForComplete()
+{
+   if (reader_thread.joinable())
+      reader_thread.join();
 }
 
 
@@ -180,4 +188,11 @@ void FlimReaderDataSource::readDataThread(bool realign)
       readDataThread();
    else
       currently_reading = false;
+}
+
+QWidget* FlimReaderDataSource::getWidget()
+{
+   auto widget = new LifetimeDisplayWidget;
+   widget->setFlimDataSource(this);
+   return widget;
 }

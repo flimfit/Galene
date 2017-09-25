@@ -15,6 +15,23 @@
 #include <mutex>
 #include <vector>
 
+class RealignableDataSource
+{
+public:
+   
+   virtual QString getFilename() = 0;
+   virtual void setRealignmentParameters(const RealignmentParameters& params) = 0;
+   virtual const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() = 0;
+   virtual const std::vector<RealignmentResult>& getRealignmentResults() = 0;
+
+   virtual void setReferenceIndex(int index) = 0;
+   virtual void readData(bool realign = true) = 0;
+   virtual void waitForComplete() = 0;
+   virtual void requestDelete() = 0;
+
+   virtual QWidget* getWidget() { return nullptr; }
+};
+
 class FlimReaderDataSource;
 
 class FlimReaderDataSourceWorker : public ThreadedObject
@@ -58,7 +75,7 @@ private:
    QTimer* timer;
 };
 
-class FlimReaderDataSource : public FlimDataSource
+class FlimReaderDataSource : public FlimDataSource, public RealignableDataSource
 {
    Q_OBJECT
 
@@ -66,7 +83,8 @@ signals:
 
    void error(const QString& message);
    void alignmentComplete();
-
+   void deleteRequested(); 
+   
 public:
 
    FlimReaderDataSource(const QString& filename_, QObject* parent = 0);
@@ -82,6 +100,17 @@ public:
    cv::Mat getMeanArrivalTime();
 
    void readData(bool realign = true);
+   void waitForComplete();
+   void requestDelete() { emit deleteRequested(); }
+
+
+   void setRealignmentParameters(const RealignmentParameters& params) { reader->setRealignmentParameters(params); }
+   const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return reader->getFrameAligner(); }
+   QString getFilename() { return QString::fromStdString(reader->getFilename()); }
+   void setReferenceIndex(int index) { reader->setReferenceIndex(index); }
+   const std::vector<RealignmentResult>& getRealignmentResults() { return reader->getRealignmentResults(); }
+   
+   QWidget* getWidget();
 
    //   virtual std::list<std::vector<quint16>>& getHistogramData() = 0;
    std::vector<uint>& getCurrentDecay(int channel) { return current_decay_dummy; };

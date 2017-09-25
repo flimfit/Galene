@@ -76,7 +76,7 @@ ControlBinder(this, "FLIMDisplay")
          sub->setWidget(widget);
          sub->setAttribute(Qt::WA_DeleteOnClose);
          mdi_area->addSubWindow(sub);
-         widget->setFlimDataSource(reader->getFLIMage());
+         widget->setFlimDataSource(reader->getFLIMage().get());
          widget->show();
          widget->setWindowTitle(QFileInfo(filename).baseName());
       }
@@ -221,7 +221,7 @@ void FlimDisplay::setupTCSPC()
    sub->setAttribute(Qt::WA_DeleteOnClose);
    mdi_area->addSubWindow(sub);
 
-   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage());
+   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage().get());
 }
 
 void FlimDisplay::showTcspcSettings()

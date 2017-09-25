@@ -86,15 +86,15 @@ void RealignmentStudio::updateParameterGroupBox(int index)
 }
 
 
-std::shared_ptr<FlimReaderDataSource> RealignmentStudio::openFile(const QString& filename)
+std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString& filename)
 {
-   std::shared_ptr<FlimReaderDataSource> source;
+   std::shared_ptr<RealignableDataSource> source;
 
    try
    {
       source = std::make_shared<FlimReaderDataSource>(filename);
-      connect(source.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
-      source->getReader()->setRealignmentParameters(getRealignmentParameters());
+      //connect(source.get(), &RealignableDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+      source->setRealignmentParameters(getRealignmentParameters());
 
       emit newDataSource(source);
    }
@@ -159,30 +159,33 @@ void RealignmentStudio::closeEvent(QCloseEvent* event)
 }
 
 
-void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source)
+void RealignmentStudio::openWindows(std::shared_ptr<RealignableDataSource> source)
 {
-   auto widget = new LifetimeDisplayWidget;
-   widget->setFlimDataSource(source);
-
-   QString filename = QString::fromStdString(source->getReader()->getFilename());
+   QString filename = source->getFilename();
    QString title = QFileInfo(filename).baseName();
-
-   auto w1 = createSubWindow(widget, title);
-   window_map[w1] = source;
 
    auto realignment_widget = new RealignmentDisplayWidget(source);
    auto w2 = createSubWindow(realignment_widget, title);
    window_map[w2] = source;
 
-   FlimReader* reader = source->getReader().get();
-   connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [reader](int index) { reader->setReferenceIndex(index); }); // reader isn't a QObject
-
-   // Make windows close each other
    connect(w2, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
-   connect(w1, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
 
-   connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
-   connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
+   connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [source](int index) { source->setReferenceIndex(index); }); // source isn't a QObject
+   
+
+
+   QWidget* widget = source->getWidget();
+   if (widget)
+   {
+      auto w1 = createSubWindow(widget, title);
+      window_map[w1] = source;
+      
+      connect(w1, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
+      
+      // Make windows close each other
+      connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
+      connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);   
+   }
 
    source->readData();
 }
@@ -195,7 +198,7 @@ void RealignmentStudio::removeWindow(QObject* obj)
       window_map.erase(w);
 };
 
-std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
+std::shared_ptr<RealignableDataSource> RealignmentStudio::getCurrentSource()
 {
    auto active_window = mdi_area->activeSubWindow();
    auto weak_source = window_map[active_window];
@@ -216,8 +219,7 @@ void RealignmentStudio::realign()
       return;
    }
 
-   auto reader = source->getReader();
-   reader->setRealignmentParameters(getRealignmentParameters());
+   source->setRealignmentParameters(getRealignmentParameters());
    source->readData();
 }
 
@@ -231,8 +233,7 @@ void RealignmentStudio::reload()
       return;
    }
 
-   auto reader = source->getReader();
-   reader->setRealignmentParameters(getRealignmentParameters());
+   source->setRealignmentParameters(getRealignmentParameters());
    source->readData(false);
 }
 
@@ -281,7 +282,7 @@ void RealignmentStudio::writeAlignmentInfoCurrent()
 	writeAlignmentInfo(getCurrentSource());
 }
 
-void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source)
+void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<RealignableDataSource> source)
 {
    if (!source)
    {
@@ -289,14 +290,12 @@ void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource>
       return;
    }
 
-
-   auto reader = source->getReader();
-   auto& aligner = reader->getFrameAligner();
+   auto& aligner = source->getFrameAligner();
 
    if (aligner == nullptr)
       return;
 
-   QFileInfo file(QString::fromStdString(reader->getFilename()));
+   QFileInfo file(source->getFilename());
    QString new_file = file.dir().absoluteFilePath(file.baseName().append("_realignment.csv"));
    std::string s = new_file.toStdString();
 
@@ -309,8 +308,12 @@ void RealignmentStudio::saveCurrent()
 	save(getCurrentSource());
 }
 
-void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool force_close)
+void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source_, bool force_close)
 {
+   FlimReaderDataSource* source;
+   if (!(source = dynamic_cast<FlimReaderDataSource*>(source_.get())))
+      return;
+
    if (source == nullptr)
       return;
 
@@ -357,7 +360,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
       }
       
       if (save_realignment_info)
-	      writeAlignmentInfo(source);
+	      writeAlignmentInfo(source_);
 
       if (save_movie)
       {
@@ -380,7 +383,7 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
 
 
       if (close_after_save || force_close)
-         source->requestDelete();
+         source_->requestDelete();
 
 
       task->setFinished();
