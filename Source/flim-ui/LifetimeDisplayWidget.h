@@ -8,7 +8,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder //, public ImageDataSourceWatcher
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder
 {
    Q_OBJECT
 
