@@ -8,6 +8,9 @@ find_package(Qt5Network)
 find_package(OpenMP REQUIRED)
 find_package(dlib REQUIRED)
 
+set(OME_ROOT ../../ome-files-build/stage/)
+set(OME_FILES_INCLUDE_DIRS ${OME_ROOT}/include)
+
 find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
@@ -70,7 +73,8 @@ include_directories(${fifo_flim_INCLUDE_DIR}
                     ${QSimpleUpdater_INCLUDE_DIR}
                     ${QT_USE_FILE}
                     ${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_CURRENT_BINARY_DIR})
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    ${OME_FILES_INCLUDE_DIRS})
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)

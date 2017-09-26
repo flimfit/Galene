@@ -17,8 +17,11 @@ export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
 export PATH="/usr/local/opt/qt5/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.10
 
+cmake -GNinja -HSource/ome-cmake-superbuild -Bome-files-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ome-files-install -Dsource-cache="cache/source/" -Dhead:BOOL=ON -Dtest:BOOL=OFF -Dextended-tests:BOOL=OFF -Dqtgui:BOOL=OFF
+cmake --build ome-files-build
+
 # Generate make files and build 
-cmake -G"Unix Makefiles" -HSource -BBuild -DCMAKE_BUILD_TYPE=Release
+cmake -GNinja -HSource -BBuild -DCMAKE_BUILD_TYPE=Release
 cmake --build Build
 
 # sign code (requires that signature is installed in keychain)

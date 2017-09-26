@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/../ome-files-build/stage")
+
 set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
 
 # check to see if SDK exists and use it if so
@@ -36,7 +38,7 @@ endif()
 
 project (Galene) 
 
-hunter_add_package(Boost COMPONENTS filesystem system)
+#hunter_add_package(Boost COMPONENTS filesystem system)
 hunter_add_package(OpenCV)
 hunter_add_package(dlib)
 
