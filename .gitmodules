@@ -10,3 +10,6 @@
 [submodule "Source/FlimReader"]
 	path = Source/FlimReader
 	url = https://github.com/flimfit/FlimReader.git
+[submodule "Source/ome-cmake-superbuild"]
+	path = ome-cmake-superbuild
+	url = https://github.com/ome/ome-cmake-superbuild/

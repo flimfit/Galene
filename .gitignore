@@ -1,5 +1,7 @@
 Build/*
 Build*/*
+cache/*
+ome-files-build/*
 *.mex*
 *.log
 *.autosave
