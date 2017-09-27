@@ -1,5 +1,5 @@
-project(flim-ui) 
 cmake_minimum_required(VERSION 3.7)
+project(flim-ui) 
 
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
@@ -7,12 +7,14 @@ find_package(Qt5OpenGL)
 find_package(Qt5Network)
 find_package(OpenMP REQUIRED)
 find_package(dlib REQUIRED)
-
-set(OME_ROOT ../../ome-files-build/stage/)
-set(OME_FILES_INCLUDE_DIRS ${OME_ROOT}/include)
-
-find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+
+find_package(Boost COMPONENTS log iostreams)
+find_package(OMEXML REQUIRED)
+find_package(OMEFiles REQUIRED)
+
+include_directories(${OME_FILES_ROOT}/include)
 
 include("cmake/DeployQt.cmake")
 
@@ -56,6 +58,7 @@ set(HEADERS
    FifoTcspcControlDisplayFactory.h
    FlimServer.h
    FlimReaderDataSource.h
+   IntensityDataSource.h
    RealignmentStudio.h
    RealignmentDisplayWidget.h
    RealignmentImageSource.h
@@ -119,7 +122,7 @@ target_link_libraries(Galene
    ${InstrumentControl_LIBRARIES}
    ${FlimReader_LIBRARIES}
    ${dlib_LIBRARIES}
-   ${libtiff_LIBRARIES})
+   OME::Files)
 
 target_link_libraries(GaleneTest
    ${OpenCV_LIBS}
@@ -127,7 +130,7 @@ target_link_libraries(GaleneTest
    ${InstrumentControl_LIBRARIES}
    ${FlimReader_LIBRARIES}
    ${dlib_LIBRARIES}
-   ${libtiff_LIBRARIES})
+   OME::Files)
 
 add_custom_command(
         TARGET Galene POST_BUILD

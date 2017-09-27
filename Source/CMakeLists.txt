@@ -1,24 +1,17 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/../ome-files-build/stage")
-
 set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
 
 # check to see if SDK exists and use it if so
 if(EXISTS ${TARGET_SDKROOT})
-    set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
 else()
+    set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
     message(WARNING "Could not find macOS 10.10 SDK, falling back on default")
 endif()
  
-# Use hunter to acquire dependencies where we can 
-include("cmake/HunterGate.cmake")
-HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.18.43.tar.gz"
-    SHA1 "d2c8c42cd07f7cefe18fd9a9b9c13114b1a15a27"
-    LOCAL
-)
+set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
+set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
 
 # Get current version from git
 find_package(Git)
@@ -38,18 +31,10 @@ endif()
 
 project (Galene) 
 
-#hunter_add_package(Boost COMPONENTS filesystem system)
-hunter_add_package(OpenCV)
-hunter_add_package(dlib)
-
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-
-# Work around bug with OpenCV highgui components when compiled with ReleaseWithDebugInfo
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
 
 find_package(MATLAB)
-
+find_package(BOOST)
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
@@ -61,10 +46,10 @@ if(MATLAB_FOUND)
     # This will be used for generating the figures,
     # Matlab is not required for the main application
     set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
-    add_subdirectory(FlimReader/FlimReaderMex)
+    #add_subdirectory(FlimReader/FlimReaderMex)
 endif()
 
-add_subdirectory(FlimReader/FlimReaderTest)
+#add_subdirectory(FlimReader/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 

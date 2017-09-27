@@ -2,6 +2,7 @@ Build/*
 Build*/*
 cache/*
 ome-files-build/*
+ome-files-install/*
 *.mex*
 *.log
 *.autosave
