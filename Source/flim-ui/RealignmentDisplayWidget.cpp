@@ -1,11 +1,14 @@
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
+#include "Cv3dUtils.h"
 
 RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDataSource> source, QWidget* parent) :
    QWidget(parent), source(source)
 {
    setupUi(this);
    setupPlots();
+   z_scroll->setVisible(false);
+
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
    timer = new QTimer(this);
@@ -89,11 +92,18 @@ void RealignmentDisplayWidget::displayImage(int image)
    bool use_aligned = show_aligned_button->isChecked();
    if (image < results.size())
    {
-      if (use_aligned)
-         image_widget->SetImage(results[image].realigned);
-      else
-         image_widget->SetImage(results[image].frame);
+      cv::Mat sel_image = (use_aligned) ? results[image].realigned : results[image].frame;
 
+      if (sel_image.dims > 2)
+      {
+         z_scroll->setVisible(sel_image.size[0] > 1);
+         z_scroll->setMaximum(sel_image.size[0]);
+         int z = z_scroll->value();
+         sel_image = extractSlice(sel_image, z);
+      }
+
+      image_widget->SetImage(sel_image);
+      
       correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();

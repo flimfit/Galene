@@ -35,6 +35,8 @@ signals:
 
 protected:
 
+   void showZscroll(bool show = true) { z_scroll->setVisible(show); }
+
    void sourceDeleteRequested() { deleteLater(); };
 
    void setAutoscaleIntensity(bool autoscale_intensity_);
@@ -76,6 +78,8 @@ protected:
    int display_intensity_max = 100;
    bool autoscale_intensity = true;
    bool closable = true;
+
+   int z = 0;
 
    QString unit = "ps";
    double scale_factor = 1e-3;

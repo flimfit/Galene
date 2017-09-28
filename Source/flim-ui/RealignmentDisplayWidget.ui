@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,1">
    <item>
     <widget class="ImageRenderWidget" name="image_widget" native="true">
      <property name="sizePolicy">
@@ -33,6 +33,13 @@
        <width>300</width>
        <height>300</height>
       </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollBar" name="z_scroll">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>

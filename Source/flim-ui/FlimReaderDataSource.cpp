@@ -1,5 +1,6 @@
 #include "FlimReaderDataSource.h"
 #include "LifetimeDisplayWidget.h"
+#include "Cv3dUtils.h"
 
 #include <memory>
 
@@ -33,8 +34,6 @@ FlimReaderDataSource::~FlimReaderDataSource()
    terminate = true;
    currently_reading = false;
    reader->stopReading();
-
-   //disconnect(*conn);
 
    QMetaObject::invokeMethod(worker, "stop");
 
@@ -101,7 +100,7 @@ void FlimReaderDataSource::update()
       int n_chan = reader->getNumChannels();
       int n_t = (int)data->timepoints.size();
 
-      if (intensity.size().area() < n_px) return;
+      if (area(intensity) < n_px) return;
 
       uint16_t* data_ptr = data->getDataPtr();
       for (int p = 0; p < n_px; p++)
@@ -126,9 +125,7 @@ void FlimReaderDataSource::update()
       if (!intensity_normalisation.empty())
       {
          cv::Mat norm;
-         double mn, mx;
-         cv::minMaxIdx(intensity_normalisation, &mn, &mx);
-         intensity_normalisation.convertTo(norm, CV_32F, 1/mx);
+         intensity_normalisation.convertTo(norm, CV_32F);
          cv::divide(intensity, norm, intensity);
       }
    }
@@ -144,11 +141,13 @@ void FlimReaderDataSource::readDataThread(bool realign)
    int n_chan = reader->getNumChannels();
    int n_x = reader->numX();
    int n_y = reader->numY();
+   int n_z = 1;
 
    {
+      std::vector<int> dims = {n_z, n_y, n_x};
       std::lock_guard<std::mutex> lk(image_mutex);
-      intensity = cv::Mat(n_y, n_x, CV_32F, cv::Scalar(0));
-      mean_arrival_time = cv::Mat(n_y, n_x, CV_32F, cv::Scalar(0));
+      intensity = cv::Mat(dims, CV_32F, cv::Scalar(0));
+      mean_arrival_time = cv::Mat(dims, CV_32F, cv::Scalar(0));
    }
 
    data = std::make_shared<FlimCube<uint16_t>>();

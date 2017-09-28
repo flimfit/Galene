@@ -67,6 +67,7 @@ set(HEADERS
    SimTcspcControlDisplay.h
    RealignmentResultsWriter.h
    MetaDataDialog.h
+   RealignableDataSource.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
