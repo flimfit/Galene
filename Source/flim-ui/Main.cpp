@@ -5,6 +5,7 @@
 #include "RealignmentStudio.h"
 #include "BHRatesWidget.h"
 #include "FlimReaderDataSource.h"
+#include "IntensityDataSource.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -43,6 +44,8 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
+   auto* ids = new IntensityReader("test.tif");
+
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
    qRegisterMetaType<FlimRates>("FlimRates");
    qRegisterMetaType<std::vector<int64_t>>("std::vector<int32_t>");
