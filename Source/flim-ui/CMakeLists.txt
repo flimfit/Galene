@@ -45,6 +45,8 @@ set(SOURCE
    SimTcspcControlDisplay.cpp
    RealignmentDisplayWidget.cpp
    RealignmentResultsWriter.cpp
+   IntensityReader.cpp
+   IntensityDataSource.cpp
 )
 
 set(HEADERS
@@ -67,6 +69,8 @@ set(HEADERS
    RealignmentResultsWriter.h
    MetaDataDialog.h
    RealignableDataSource.h
+   IntensityReader.h
+   IntensityDataSource.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}

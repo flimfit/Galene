@@ -1,3 +1,5 @@
+#pragma warning(disable: 4503) // for ome-files code, produces over-long names
+
 #include <QApplication>
 #include <QCoreApplication>
 #include "QSimpleUpdater.h"
@@ -44,7 +46,15 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
-   auto* ids = new IntensityReader("test.tif");
+   ome::common::setLogLevel(ome::logging::trivial::warning);
+
+   auto* ids = new IntensityReader("C:\\Users\\CIMLab\\Documents\\User Data\\Sean\\Motion correction\\tubhiswt-4D\\tubhiswt_C0_TP0.ome.tif");
+
+   RealignmentParameters params;
+   params.type = RealignmentType::Warp;
+   params.n_resampling_points = 5;
+   ids->setRealignmentParameters(params);
+   ids->alignFrames();
 
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
    qRegisterMetaType<FlimRates>("FlimRates");
