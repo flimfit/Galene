@@ -6,7 +6,6 @@ find_package(Qt5PrintSupport)
 find_package(Qt5OpenGL)
 find_package(Qt5Network)
 find_package(OpenMP REQUIRED)
-find_package(dlib REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
@@ -90,8 +89,7 @@ endif()
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
-add_executable(GaleneTest 
-                    ${SOURCE} 
+set (Galene_OBJECTS ${SOURCE} 
                     ${HEADERS}
                     ${UI_HEADERS} 
                     ${UI_RESOURCES} 
@@ -103,35 +101,23 @@ add_executable(GaleneTest
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
+set(Galene_LIBS     ${OpenCV_LIBS}
+                    ${fifo_flim_LIBS} 
+                    ${InstrumentControl_LIBRARIES}
+                    ${FlimReader_LIBRARIES}
+                    ${dlib_LIBRARIES}
+                    OME::Files)
 
-add_executable(Galene MACOSX_BUNDLE 
-                    ${SOURCE} 
-                    ${HEADERS}
-                    ${UI_HEADERS} 
-                    ${UI_RESOURCES} 
-                    $<TARGET_OBJECTS:InstrumentControl> 
-                    $<TARGET_OBJECTS:InstrumentControlUI> 
-                    $<TARGET_OBJECTS:fifo_flim>
-                    $<TARGET_OBJECTS:FlimReader>
-                    $<TARGET_OBJECTS:FrameAligner>
-                    $<TARGET_OBJECTS:QSimpleUpdater>
-                    ${RESOURCE_FILES})
+if (APPLE) # easier debugging through vs code
+    add_executable(GaleneTest ${Galene_OBJECTS})
+    target_link_libraries(GaleneTest ${Galene_LIBS})
+    qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
+    
+endif()
 
-target_link_libraries(Galene
-   ${OpenCV_LIBS}
-   ${fifo_flim_LIBS} 
-   ${InstrumentControl_LIBRARIES}
-   ${FlimReader_LIBRARIES}
-   ${dlib_LIBRARIES}
-   OME::Files)
-
-target_link_libraries(GaleneTest
-   ${OpenCV_LIBS}
-   ${fifo_flim_LIBS} 
-   ${InstrumentControl_LIBRARIES}
-   ${FlimReader_LIBRARIES}
-   ${dlib_LIBRARIES}
-   OME::Files)
+add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
+target_link_libraries(Galene ${Galene_LIBS})
+qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
 add_custom_command(
         TARGET Galene POST_BUILD
@@ -142,14 +128,7 @@ add_custom_command(
 set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                          MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
-qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
-
-if (WIN32)
-    windeployqt(Galene INCLUDE_MODULES ${QTLIBS})
-elseif(APPLE)
-    macdeployqt(Galene INCLUDE_MODULES ${QTLIBS})
-endif()
+deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
 set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)

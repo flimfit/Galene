@@ -19,7 +19,7 @@ export PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.10
 export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 
-#brew install --with-clang llvm qt cmake libtiff libpng opencv qt5 boost xerces-c xalan-c
+#brew install --with-clang llvm qt cmake opencv boost xerces-c xalan-c
 
 if [ ! -d "ome-files-install" ]; then
    cmake -GNinja -Home-cmake-superbuild -Bome-files-build -DCMAKE_BUILD_TYPE=Release \

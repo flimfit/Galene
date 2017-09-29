@@ -22,8 +22,9 @@ int getCvPixelType(ome::xml::model::enums::PixelType pixel_type)
       case ome::xml::model::enums::PixelType::DOUBLE: return CV_64F;
       case ome::xml::model::enums::PixelType::COMPLEXFLOAT: return CV_32FC2;
       case ome::xml::model::enums::PixelType::COMPLEXDOUBLE: return CV_64FC2;
-      case ome::xml::model::enums::PixelType::BIT: throw std::runtime_error("unsupported data format");
+      default: throw std::runtime_error("unsupported data format");
    }
+   return CV_8S;
 }
 
 class IntensityReader : public AligningReader

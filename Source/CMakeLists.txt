@@ -1,42 +1,23 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
-set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
-
-# check to see if SDK exists and use it if so
-if(EXISTS ${TARGET_SDKROOT})
-else()
-    set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
-    message(WARNING "Could not find macOS 10.10 SDK, falling back on default")
-endif()
- 
 set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
 set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
 
+include ("cmake/TargetAppleSdk.cmake")
+target_apple_sdk(10.10)
 
-# Get current version from git
-find_package(Git)
-set(VERSION "0.0.0")
-if(GIT_FOUND)
-    execute_process(
-            COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} describe
-            OUTPUT_VARIABLE VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-message(STATUS "VERSION: ${VERSION}")
-string(REGEX MATCH "([0-9]+)\.([0-9]+)\.([0-9]+)" MATCHED ${VERSION})
-
-set(VERSION_MAJOR ${CMAKE_MATCH_1})
-set(VERSION_MINOR ${CMAKE_MATCH_2})
-set(VERSION_PATCH ${CMAKE_MATCH_3})
-add_definitions(-DVERSION="${VERSION}")
+include ("cmake/GitVersion.cmake") # Get version number from git
 
 project (Galene) 
 
+add_definitions(-DVERSION="${VERSION}")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 
+find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
+
 find_package(MATLAB)
-find_package(BOOST)
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
