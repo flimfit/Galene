@@ -15,6 +15,7 @@
 #include "RealignmentImageSource.h"
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
+#include "IntensityDataSource.h"
 #include <functional>
 #include <thread>
 
@@ -90,9 +91,15 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
 {
    std::shared_ptr<RealignableDataSource> source;
 
+   QFileInfo file(filename);
+   auto ext = file.completeSuffix();
+
    try
    {
-      source = std::make_shared<FlimReaderDataSource>(filename);
+      if (ext == "ome.tif")
+         source = std::make_shared<IntensityDataSource>(filename);
+      else
+         source = std::make_shared<FlimReaderDataSource>(filename);
       //connect(source.get(), &RealignableDataSource::error, this, &RealignmentStudio::displayErrorMessage);
       source->setRealignmentParameters(getRealignmentParameters());
 

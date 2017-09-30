@@ -47,6 +47,7 @@ set(SOURCE
    RealignmentResultsWriter.cpp
    IntensityReader.cpp
    IntensityDataSource.cpp
+   RealignableDataSource.cpp
 )
 
 set(HEADERS

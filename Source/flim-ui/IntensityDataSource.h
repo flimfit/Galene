@@ -1,15 +1,18 @@
 #pragma once
 
-#include "FlimReaderDataSource.h"
+#include "RealignableDataSource.h"
 #include "IntensityReader.h"
 
 #include <QObject>
 
 
 
-class IntensityDataSource : public QObject, public AligningReader
+class IntensityDataSource : public QObject, public RealignableDataSource
 {
    Q_OBJECT
+
+signals:
+   void error(const QString&);
 
 public:
 
@@ -20,15 +23,20 @@ public:
    }
 
    QString getFilename() { return filename; };
-   void setRealignmentParameters(const RealignmentParameters& params) { AligningReader::setRealignmentParameters(params); };
-   const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return frame_aligner; };
-   const std::vector<RealignmentResult>& getRealignmentResults() { return realignment; };
+   
+   void setupForRead();
+   void update();
+   void alignFrames();
+   void readAlignedData();
 
-   void setReferenceIndex(int index) {};
-   void readData(bool realign = true) {};
-   void waitForComplete() {};
+   void cancelRead();
+   
    void requestDelete() {};
 
+protected:
+
+   AligningReader& aligningReader() { return *reader; };
+   
 
 private:
 

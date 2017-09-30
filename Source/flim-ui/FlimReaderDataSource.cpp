@@ -4,16 +4,6 @@
 
 #include <memory>
 
-void FlimReaderDataSourceWorker::update()
-{
-   if (executing)
-   {
-      source->update();
-      emit updateComplete();
-   }
-}
-
-
 FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* parent) :
    FlimDataSource(parent)
 {
@@ -22,7 +12,7 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
 
    reader->setTemporalResolution(8); // TODO
 
-   worker = new FlimReaderDataSourceWorker(nullptr, this);
+   worker = new DataSourceWorker(this);
    connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
    int n_chan = reader->getNumChannels();
@@ -54,27 +44,6 @@ cv::Mat FlimReaderDataSource::getMeanArrivalTime()
    std::lock_guard<std::mutex> lk(image_mutex);
    return mean_arrival_time;
 };
-
-void FlimReaderDataSource::readData(bool realign)
-{
-   if (currently_reading)
-   {
-      //read_again_when_finished = true;
-   }
-   else
-   {
-      if (reader_thread.joinable())
-         reader_thread.join();
-
-      reader_thread = std::thread(&FlimReaderDataSource::readDataThread, this, realign);
-   }
-}
-
-void FlimReaderDataSource::waitForComplete()
-{
-   if (reader_thread.joinable())
-      reader_thread.join();
-}
 
 
 void FlimReaderDataSource::update()
@@ -131,12 +100,14 @@ void FlimReaderDataSource::update()
    }
 
    emit decayUpdated();
-   //QMetaObject::invokeMethod(this, "decayUpdated");
 }
 
-// Use readData to call 
-void FlimReaderDataSource::readDataThread(bool realign)
+void FlimReaderDataSource::setupForRead()
 {
+   connect(task.get(), &TaskProgress::cancelRequested, this, &FlimReaderDataSource::cancelRead);
+
+   reader->clearStopSignal();
+   
    int n_px = reader->dataSizePerChannel();
    int n_chan = reader->getNumChannels();
    int n_x = reader->numX();
@@ -151,43 +122,38 @@ void FlimReaderDataSource::readDataThread(bool realign)
    }
 
    data = std::make_shared<FlimCube<uint16_t>>();
-   read_again_when_finished = false;
-   currently_reading = true;
-   terminate = false;
+}
 
-   task = std::make_shared<TaskProgress>("Loading data...", true);
-   TaskRegister::addTask(task);
-   connect(task.get(), &TaskProgress::cancelRequested, [&]() { 
-      reader->stopReading(); 
-      terminate = true;
-   });
-
+void FlimReaderDataSource::alignFrames()
+{
    try
    {
-      if (realign)
-      {
-         task->setTaskName("Preloading frames...");
-         reader->clearStopSignal();
-         reader->alignFrames();
-         emit alignmentComplete();
-      }
-      task->setTaskName("Reading data...");
-      reader->readData(data);
-      update();
-      emit readComplete();
+      reader->alignFrames();
    }
    catch (std::runtime_error e)
    {
       emit error(e.what());
    }
-
-   task->setFinished();
-
-   if (read_again_when_finished && !terminate)
-      readDataThread();
-   else
-      currently_reading = false;
 }
+
+void FlimReaderDataSource::readAlignedData()
+{
+   try
+   {
+      reader->readData(data);      
+   }
+   catch (std::runtime_error e)
+   {
+      emit error(e.what());
+   }
+}
+
+void FlimReaderDataSource::cancelRead()
+{
+   reader->stopReading(); 
+   terminate = true;
+}
+
 
 QWidget* FlimReaderDataSource::getWidget()
 {
