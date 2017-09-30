@@ -19,7 +19,7 @@ export PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.10
 export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 
-#brew install --with-clang llvm qt cmake opencv boost xerces-c xalan-c
+#brew install --with-clang llvm qt cmake opencv boost xerces-c xalan-c dlib
 
 if [ ! -d "ome-files-install" ]; then
    cmake -GNinja -Home-cmake-superbuild -Bome-files-build -DCMAKE_BUILD_TYPE=Release \
@@ -29,12 +29,8 @@ if [ ! -d "ome-files-install" ]; then
       -Dtest:BOOL=OFF \
       -Dextended-tests:BOOL=OFF \
       -Dqtgui:BOOL=OFF \
-      -Dome-cmake-superbuild_USE_SYSTEM_tiff:BOOL=ON \
-      -Dome-cmake-superbuild_USE_SYSTEM_png:BOOL=ON \
-      -Dome-cmake-superbuild_USE_SYSTEM_bzip2:BOOL=ON \
-      -Dome-cmake-superbuild_USE_SYSTEM_boost:BOOL=ON \
-      -Dome-cmake-superbuild_USE_SYSTEM_xalan:BOOL=ON \
-      -Dome-cmake-superbuild_USE_SYSTEM_xerces:BOOL=ON 
+      -Dbuild-prerequisites:BOOL=OFF ^
+      -Dbuild-packages=ome-common;ome-model;ome-files ^
    cmake --build ome-files-build --target install
 fi
 
