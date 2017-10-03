@@ -38,6 +38,9 @@
    </item>
    <item>
     <widget class="QScrollBar" name="z_scroll">
+     <property name="pageStep">
+      <number>1</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

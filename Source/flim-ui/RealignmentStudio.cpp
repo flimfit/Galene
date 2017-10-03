@@ -291,22 +291,13 @@ void RealignmentStudio::writeAlignmentInfoCurrent()
 
 void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<RealignableDataSource> source)
 {
-   if (!source)
+   if (source)
    {
-      QMessageBox::warning(this, "Warning", "No FLIM image open");
-      return;
+      QString fileroot = QFileInfo(source->getFilename()).baseName();
+      source->writeRealignmentInfo(fileroot);      
    }
-
-   auto& aligner = source->getFrameAligner();
-
-   if (aligner == nullptr)
-      return;
-
-   QFileInfo file(source->getFilename());
-   QString new_file = file.dir().absoluteFilePath(file.baseName().append("_realignment.csv"));
-   std::string s = new_file.toStdString();
-
-   aligner->writeRealignmentInfo(new_file.toStdString());
+   else
+      QMessageBox::warning(this, "Warning", "No FLIM image open");
 }
 
 
@@ -315,86 +306,46 @@ void RealignmentStudio::saveCurrent()
 	save(getCurrentSource());
 }
 
-void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source_, bool force_close)
+void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool force_close)
 {
-   FlimReaderDataSource* source;
-   if (!(source = dynamic_cast<FlimReaderDataSource*>(source_.get())))
-      return;
-
    if (source == nullptr)
       return;
 
    // clean out threads that are finished
    save_thread.remove_if([](std::thread& t) { return !t.joinable(); });
 
-   QFileInfo fi = QString::fromStdString(source->getReader()->getFilename());
+   QFileInfo fi = source->getFilename();
    QString name = fi.baseName() + suffix_edit->text();
-   std::string filename = workspace->getFileName(name, ".ffh").toStdString();
-   std::string preview_filename = workspace->getFileName(name, ".png").toStdString();
-   QString aligned_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-stack.tif");
-   QString aligned_preserving_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-int-presv-stack.tif");
-   QString unaligned_movie_filename = workspace->getFileName(fi.baseName(), "-unaligned-stack.tif");
-   QString coverage_movie_filename = workspace->getFileName(fi.baseName(), "-coverage-stack.tif");
+   QString filename = workspace->getFileName(name, ".ffh");
+   QString preview_filename = workspace->getFileName(name, ".png");
 
    auto task = std::make_shared<TaskProgress>("Saving...");
    TaskRegister::addTask(task);
 
    save_thread.push_back(std::thread([=]()
    {
-      auto reader = source->getReader();
-      auto data = source->getData();
-      auto tags = reader->getTags();
-      auto reader_tags = reader->getReaderTags();
-      auto images = reader->getImageMap();
+      try
+	   {
+         if (save_preview)
+            source->savePreview(preview_filename);
 
-      if (save_preview)
-      {
-         const cv::Mat& intensity = source->getIntensity();
+         if (save_realignment_info)
+            source->writeRealignmentInfo(name);
 
-         double mn, mx;
-         cv::minMaxLoc(intensity, &mn, &mx);
+         if (save_movie)
+            source->writeRealignmentMovies(name);
 
-         cv::Scalar mean, std;
-         cv::meanStdDev(intensity, mean, std);
-         double i_max = mean[0] + 1.96 * std[0]; // 97.5% 
-
-         cv::Mat output;
-         intensity.convertTo(output, CV_8U, 255.0 / i_max);
-
-#ifndef SUPPRESS_OPENCV_HIGHGUI
-         cv::imwrite(preview_filename, output);
-#endif
-      }
-      
-      if (save_realignment_info)
-	      writeAlignmentInfo(source_);
-
-      if (save_movie)
-      {
-         auto& results = reader->getRealignmentResults();
-         RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
-         RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(results, aligned_preserving_movie_filename);
-         RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
-         RealignmentResultsWriter::exportCoverageMovie(results, coverage_movie_filename);
-      }
-
-
-	  try
-	  {
-		  FlimCubeWriter<uint16_t> writer(filename, data, tags, reader_tags, images);
-	  }
-	  catch (std::runtime_error e)
-	  {
-		  displayErrorMessage(e.what());
-	  }
-
+         source->saveData(filename);
+	   }
+	   catch (std::runtime_error e)
+	   {
+		   displayErrorMessage(e.what());
+	   }
 
       if (close_after_save || force_close)
-         source_->requestDelete();
-
+         source->requestDelete();
 
       task->setFinished();
-
    }));
    
 

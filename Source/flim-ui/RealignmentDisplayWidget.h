@@ -30,11 +30,14 @@ signals:
 protected:
 
    void update();
-   void displayImage(int image);
+   void setImage(int image);
+   void setZ(int z);
    void axisClick(const QPointF& point);
    void setupPlots();
    void referenceButtonPressed();
 
+   void drawImage();
+   
    std::shared_ptr<RealignableDataSource> source;
 
    std::vector<QColor> line_colors;

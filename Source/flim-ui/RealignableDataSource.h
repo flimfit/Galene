@@ -36,12 +36,17 @@ public:
    
    void readData(bool realign = true);   
    void waitForComplete();
-      
+
+   void writeRealignmentMovies(const QString& filename_root); 
+   void writeRealignmentInfo(const QString& filename_root);
+   
    const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader().getFrameAligner(); }
    void setReferenceIndex(int index) { aligningReader().setReferenceIndex(index); }
    void setRealignmentParameters(const RealignmentParameters& params) { aligningReader().setRealignmentParameters(params); }
    const std::vector<RealignmentResult>& getRealignmentResults() { return aligningReader().getRealignmentResults(); }
    
+   virtual void savePreview(const QString& filename) {};
+   virtual void saveData(const QString& filename) = 0;   
    virtual QString getFilename() = 0;
    virtual void requestDelete() = 0;
    virtual QWidget* getWidget() { return nullptr; }
@@ -54,6 +59,7 @@ protected:
    virtual void setupForRead() = 0;
    virtual void alignFrames()  = 0;
    virtual void readAlignedData() = 0;
+   
 
    // Use readData to call 
    void readDataThread(bool realign = true);   

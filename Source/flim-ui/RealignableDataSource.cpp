@@ -1,4 +1,5 @@
 #include "RealignableDataSource.h"
+#include "RealignmentResultsWriter.h"
 
 DataSourceWorker::DataSourceWorker(RealignableDataSource* source, QObject* parent) :
 ThreadedObject(parent), source(source)
@@ -79,4 +80,26 @@ void RealignableDataSource::readDataThread(bool realign)
       readDataThread();
    else
       currently_reading = false;
+}
+
+void RealignableDataSource::writeRealignmentMovies(const QString& filename_root)
+{
+   QString aligned_movie_filename = filename_root + "-aligned-stack.tif";
+   QString aligned_preserving_movie_filename = filename_root + "-aligned-int-presv-stack.tif";
+   QString unaligned_movie_filename = filename_root + "-unaligned-stack.tif";
+   QString coverage_movie_filename = filename_root + "-coverage-stack.tif";
+   QString info_filename = filename_root + "_realignment.csv";
+
+   const auto& results = getRealignmentResults();
+   RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
+   RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(results, aligned_preserving_movie_filename);
+   RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
+   RealignmentResultsWriter::exportCoverageMovie(results, coverage_movie_filename);
+
+}
+
+void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
+{
+   QString info_filename = filename_root + "_realignment.csv";
+   getFrameAligner()->writeRealignmentInfo(info_filename.toStdString());   
 }

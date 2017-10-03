@@ -16,14 +16,12 @@ signals:
 
 public:
 
-   IntensityDataSource(const QString& filename, QObject* parent = 0) : 
-      QObject(parent), filename(filename)
-   {
-      reader = std::make_unique<IntensityReader>(filename.toStdString());
-   }
-
+   IntensityDataSource(const QString& filename, QObject* parent = 0);
+   
    QString getFilename() { return filename; };
    
+   void saveData(const QString& filename);
+
    void setupForRead();
    void update();
    void alignFrames();

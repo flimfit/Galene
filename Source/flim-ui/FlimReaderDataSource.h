@@ -39,6 +39,9 @@ public:
 
    QString getFilename() { return QString::fromStdString(reader->getFilename()); }
    
+   void saveData(const QString& filename);
+   void savePreview(const QString& filename);
+   
    QWidget* getWidget();
 
    //   virtual std::list<std::vector<quint16>>& getHistogramData() = 0;

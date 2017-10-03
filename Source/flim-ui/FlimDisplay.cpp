@@ -82,7 +82,7 @@ ControlBinder(this, "FLIMDisplay")
       }
       catch (std::runtime_error e)
       {
-         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1'").arg(filename));
+         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1': %2").arg(filename).arg(e.what()));
       }
    });
 

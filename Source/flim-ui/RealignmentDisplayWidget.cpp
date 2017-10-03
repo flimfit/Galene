@@ -13,12 +13,13 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
 
    timer = new QTimer(this);
    connect(timer, &QTimer::timeout, this, &RealignmentDisplayWidget::update);
-   timer->start(2000);
+   timer->start(5000);
    
    //connect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
-   connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
+   connect(z_scroll, &QScrollBar::valueChanged, this, &RealignmentDisplayWidget::setZ);   
+   connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::setImage);
    connect(slider, &QSlider::sliderMoved, current_frame_spin, &QSpinBox::setValue);
-   connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
+   //connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
 
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
@@ -80,34 +81,49 @@ void RealignmentDisplayWidget::update()
    correlation_plot->yAxis->setRange(0, 1.2);
    //correlation_plot->replot();
 
-   slider->setMaximum(n - 1);
-   slider->setValue(0);
-   current_frame_spin->setValue(0);
+   slider->setMaximum(std::max(0,n - 1));
 
-   displayImage(cur_image);
+   if (cur_image <= (n-1))
+   {
+      slider->setValue(cur_image);
+      current_frame_spin->setValue(cur_image);
+   }
+
+   drawImage();
 }
 
-void RealignmentDisplayWidget::displayImage(int image)
+void RealignmentDisplayWidget::setZ(int z)
+{
+   drawImage();
+}
+
+void RealignmentDisplayWidget::setImage(int image)
+{
+   cur_image = image;
+   drawImage();
+}
+
+void RealignmentDisplayWidget::drawImage()
 {
    bool use_aligned = show_aligned_button->isChecked();
-   if (image < results.size())
+
+   if (cur_image < results.size())
    {
-      cv::Mat sel_image = (use_aligned) ? results[image].realigned : results[image].frame;
+      cv::Mat sel_image = (use_aligned) ? results[cur_image].realigned : results[cur_image].frame;
 
       if (sel_image.dims > 2)
       {
          z_scroll->setVisible(sel_image.size[0] > 1);
-         z_scroll->setMaximum(sel_image.size[0]);
+         z_scroll->setMaximum(sel_image.size[0] - 1);
          int z = z_scroll->value();
          sel_image = extractSlice(sel_image, z);
       }
 
       image_widget->SetImage(sel_image);
       
-      correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
+      correlation_plot->graph(1)->setData({ (double)cur_image }, { results[cur_image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();
-      cur_image = image;
    }
 }
 

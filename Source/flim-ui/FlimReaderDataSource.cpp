@@ -1,6 +1,7 @@
 #include "FlimReaderDataSource.h"
 #include "LifetimeDisplayWidget.h"
 #include "Cv3dUtils.h"
+#include "FlimCubeWriter.h"
 
 #include <memory>
 
@@ -160,4 +161,18 @@ QWidget* FlimReaderDataSource::getWidget()
    auto widget = new LifetimeDisplayWidget;
    widget->setFlimDataSource(this);
    return widget;
+}
+
+void FlimReaderDataSource::saveData(const QString& filename)
+{
+   auto tags = reader->getTags();
+   auto reader_tags = reader->getReaderTags();
+   auto images = reader->getImageMap();
+
+   FlimCubeWriter<uint16_t> writer(filename.toStdString(), data, tags, reader_tags, images);
+}
+
+void FlimReaderDataSource::savePreview(const QString& filename)
+{
+   writeScaledImage(filename.toStdString(), getIntensity());   
 }

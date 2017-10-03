@@ -1,5 +1,13 @@
 #include "IntensityDataSource.h"
 
+
+IntensityDataSource::IntensityDataSource(const QString& filename, QObject* parent) : 
+QObject(parent), filename(filename)
+{
+   reader = std::make_unique<IntensityReader>(filename.toStdString());
+}
+
+
 void IntensityDataSource::update()
 {
 
@@ -39,4 +47,10 @@ void IntensityDataSource::cancelRead()
 {
    reader->stopReading(); 
    terminate = true;
+}
+
+
+void IntensityDataSource::saveData(const QString& filename)
+{
+   reader->write(filename.toStdString());
 }
