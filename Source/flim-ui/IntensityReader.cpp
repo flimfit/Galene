@@ -70,6 +70,9 @@ void IntensityReader::readMetadata()
    n_z = (int)reader->getSizeZ();
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
+
+
+   n_t = std::min(n_t, 5);
    
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
@@ -107,21 +110,25 @@ void IntensityReader::readFrames(std::vector<cv::Mat>& data, bool merge_channels
       if (terminate) break;
 
       auto coords = reader->getZCTCoords(p);
-      reader->openBytes(p, buf);
 
-      int nel = buf.num_elements();
-      auto shape = buf.shape();
+      if (coords[2] < n_t)
+      {
+         reader->openBytes(p, buf);
 
-      // Create CV wrapper
-      int type = getCvPixelType(buf.pixelType());
-      cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
+         int nel = buf.num_elements();
+         auto shape = buf.shape();
 
-      // Convert to 32F
-      cvbuf.convertTo(cv32, CV_32F);
+         // Create CV wrapper
+         int type = getCvPixelType(buf.pixelType());
+         cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
 
-      // Copy into frame
-      cv::Mat slice = extractSlice(data[coords[2]], coords[0]);
-      slice += cv32;
+         // Convert to 32F
+         cvbuf.convertTo(cv32, CV_32F);
+
+         // Copy into frame
+         cv::Mat slice = extractSlice(data[coords[2]], coords[0]);
+         slice += cv32;
+      }
    }
 }
 

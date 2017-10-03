@@ -64,19 +64,21 @@ void RealignmentDisplayWidget::update()
    float minc = std::numeric_limits<float>::min();
    float maxc = std::numeric_limits<float>::min();
    QVector<double> x(n);
-   QVector<double> y(n);
+   QVector<double> y1(n), y2(n);
 
    for (int i = 0; i < n; i++)
    {
       x[i] = i;
-      y[i] = results[i].correlation;
+      y1[i] = results[i].correlation;
+      y2[i] = results[i].unaligned_correlation;
 
       if (results[i].correlation < minc)
          minc = results[i].correlation;
       if (results[i].correlation > maxc)
          maxc = results[i].correlation;
    }
-   correlation_plot->graph(0)->setData(x, y);
+   correlation_plot->graph(0)->setData(x, y1);
+   correlation_plot->graph(1)->setData(x, y2);
    correlation_plot->graph(0)->rescaleAxes();
    correlation_plot->yAxis->setRange(0, 1.2);
    //correlation_plot->replot();
@@ -121,7 +123,7 @@ void RealignmentDisplayWidget::drawImage()
 
       image_widget->SetImage(sel_image);
       
-      correlation_plot->graph(1)->setData({ (double)cur_image }, { results[cur_image].correlation });
+      correlation_plot->graph(2)->setData({ (double)cur_image }, { results[cur_image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();
    }
@@ -150,12 +152,15 @@ void RealignmentDisplayWidget::setupPlots()
 {
    correlation_plot->addGraph();
    correlation_plot->graph(0)->setPen(QPen(Qt::black));
+   correlation_plot->addGraph();
+   correlation_plot->graph(1)->setPen(QPen(Qt::red));
+
    correlation_plot->xAxis->setLabel("Frame");
    correlation_plot->yAxis->setLabel("Correlation");
 
    correlation_plot->addGraph();
-   correlation_plot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 7));
-   correlation_plot->graph(1)->setPen(QPen(Qt::red));
+   correlation_plot->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 7));
+   correlation_plot->graph(2)->setPen(QPen(Qt::red));
 
    connect(correlation_plot, &QCustomPlot::axisClick, this, &RealignmentDisplayWidget::axisClicked);
 }

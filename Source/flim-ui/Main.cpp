@@ -48,14 +48,6 @@ int main(int argc, char *argv[])
 {
    ome::common::setLogLevel(ome::logging::trivial::warning);
 
-   auto* ids = new IntensityReader("C:\\Users\\CIMLab\\Documents\\User Data\\Sean\\Motion correction\\tubhiswt-4D\\tubhiswt_C0_TP0.ome.tif");
-
-   RealignmentParameters params;
-   params.type = RealignmentType::Warp;
-   params.n_resampling_points = 5;
-   ids->setRealignmentParameters(params);
-   ids->alignFrames();
-
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
    qRegisterMetaType<FlimRates>("FlimRates");
    qRegisterMetaType<std::vector<int64_t>>("std::vector<int32_t>");
