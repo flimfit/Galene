@@ -39,18 +39,19 @@ IF NOT EXIST ome-files-install\ (
    REM build debug
    cmake -GNinja -Home-cmake-superbuild -Bome-files-build\debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
    cmake --build ome-files-build\debug --target install
-
 )
 
 
 SET OME_FILES_ROOT=%cd%\ome-files-install
 SET OME_FILES_ROOT=%OME_FILES_ROOT:\=/% 
 
+
+REM rmdir Build /s /q
 echo Generating CMake Project
 echo Using Generator: %GENERATOR%
 cmake -G %GENERATOR% -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 echo Building 64bit Project in Release mode
-cmake --build Build --config Release --target PACKAGE
+REM cmake --build Build --config Release --target PACKAGE
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%

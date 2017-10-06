@@ -18,20 +18,27 @@ find_package(Boost REQUIRED)
 find_package(OpenCV REQUIRED)
 
 find_package(MATLAB)
-add_subdirectory(QSimpleUpdater)
-add_subdirectory(QtInstrumentControl/InstrumentControl)
-add_subdirectory(QtInstrumentControl/InstrumentControlUI)
-add_subdirectory(FlimReader/frame-aligner/FrameAligner)
-add_subdirectory(FlimReader/FlimReader)
-
 if(MATLAB_FOUND)
     # Set output directory for FlimReaderMex file.
     # This will be used for generating the figures,
     # Matlab is not required for the main application
     set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
-    #add_subdirectory(FlimReader/FlimReaderMex)
 endif()
 
+set(DLIB_USE_BLAS ON)
+set(DDLIB_USE_LAPACK ON)
+set(DLIB_USE_CUDA OFF)
+set(DLIB_JPEG_SUPPORT OFF)
+set(DLIB_LINK_WITH_SQLITE3 OFF)
+set(DLIB_PNG_SUPPORT OFF)
+set(DLIB_GIF_SUPPORT OFF)
+
+add_subdirectory(dlib)
+add_subdirectory(QSimpleUpdater)
+add_subdirectory(QtInstrumentControl/InstrumentControl)
+add_subdirectory(QtInstrumentControl/InstrumentControlUI)
+add_subdirectory(FlimReader/frame-aligner/FrameAligner)
+add_subdirectory(FlimReader/FlimReader)
 #add_subdirectory(FlimReader/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)

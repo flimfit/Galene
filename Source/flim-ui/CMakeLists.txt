@@ -110,7 +110,7 @@ set(Galene_LIBS     ${OpenCV_LIBS}
                     ${fifo_flim_LIBS} 
                     ${InstrumentControl_LIBRARIES}
                     ${FlimReader_LIBRARIES}
-                    ${dlib_LIBRARIES}
+                    dlib::dlib
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code
