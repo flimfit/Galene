@@ -42,6 +42,7 @@ public:
 
 signals:
 
+   void error(const QString& msg);
    void newDataSource(std::shared_ptr<RealignableDataSource> source);
 
 protected:
@@ -76,7 +77,7 @@ private:
    bool save_movie = false;
    bool save_realignment_info = false;
 
-   void displayErrorMessage(const QString error);
+   void displayErrorMessage(const QString& error);
 
    LifetimeDisplayWidget* preview_widget;
    FlimWorkspace* workspace;

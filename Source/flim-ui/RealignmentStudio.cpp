@@ -46,6 +46,8 @@ RealignmentStudio::RealignmentStudio() :
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
    connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
    
+   connect(this, &RealignmentStudio::error, this, &RealignmentStudio::displayErrorMessage, Qt::QueuedConnection);
+
    connect(mode_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentStudio::updateParameterGroupBox);
 
    connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows);
@@ -97,10 +99,17 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
    try
    {
       if (ext == "ome.tif")
-         source = std::make_shared<IntensityDataSource>(filename);
+      {
+         auto s = std::make_shared<IntensityDataSource>(filename);
+         connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+         source = s;
+      }
       else
-         source = std::make_shared<FlimReaderDataSource>(filename);
-      //connect(source.get(), &RealignableDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+      {
+         auto s = std::make_shared<FlimReaderDataSource>(filename);
+         connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+         source = s;
+      }
       source->setRealignmentParameters(getRealignmentParameters());
 
       emit newDataSource(source);
@@ -109,6 +118,11 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
    {
       QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
    }
+   catch (std::exception e)
+   {
+      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
+   }
+
 
    return source;
 }
@@ -315,9 +329,8 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
    save_thread.remove_if([](std::thread& t) { return !t.joinable(); });
 
    QFileInfo fi = source->getFilename();
-   QString name = fi.baseName() + suffix_edit->text();
-   QString filename = workspace->getFileName(name, ".ffh");
-   QString preview_filename = workspace->getFileName(name, ".png");
+   QString name = fi.absoluteDir().filePath(fi.baseName() + suffix_edit->text());
+   QString preview_filename = name + ".png";
 
    auto task = std::make_shared<TaskProgress>("Saving...");
    TaskRegister::addTask(task);
@@ -335,11 +348,11 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
          if (save_movie)
             source->writeRealignmentMovies(name);
 
-         source->saveData(filename);
+         source->saveData(name);
 	   }
 	   catch (std::runtime_error e)
 	   {
-		   displayErrorMessage(e.what());
+		   emit error(e.what());
 	   }
 
       if (close_after_save || force_close)
@@ -383,7 +396,7 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
 }
 
 
-void RealignmentStudio::displayErrorMessage(const QString msg)
+void RealignmentStudio::displayErrorMessage(const QString& msg)
 {
    QMessageBox::critical(this, "Error", msg);
 }

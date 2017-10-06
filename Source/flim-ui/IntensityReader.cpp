@@ -48,15 +48,6 @@ void IntensityReader::readMetadata()
    // Get total number of images (series)
    auto ic = reader->getSeriesCount();
 
-   auto a = reader->getCoreMetadataList();
-
-   for (int channel = 0;
-      channel < reader->getEffectiveSizeC();
-      ++channel)
-   {
-   }
-
-
    if (ic > 1)
       std::cout << "Only reading first image";
 
@@ -70,65 +61,66 @@ void IntensityReader::readMetadata()
    n_z = (int)reader->getSizeZ();
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
-
-
-   n_t = std::min(n_t, 5);
    
+   n_t--; // TODO: Last frame seems problematic 
+
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
 
 void IntensityReader::read()
 {
    waitForAlignmentComplete();
-   readFrames(data, false);
 }
 
-void IntensityReader::getIntensityFrames() 
-{ 
-   readFrames(frames, false); 
-};
-
-
-void IntensityReader::readFrames(std::vector<cv::Mat>& data, bool merge_channels)
+void IntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
-   // Get total number of planes (for this image index)
-   int pc = reader->getImageCount();
-
    ome::files::VariantPixelBuffer buf;
+   cv::Mat cv8;
 
-   std::vector<int> dims = { scan_params.n_z, scan_params.n_y, scan_params.n_x };
-
-   data.clear();
-   for (int i = 0; i<n_t; i++)
-      data.push_back(cv::Mat(dims, CV_32F, cv::Scalar(0)));
-
-   cv::Mat cv32;
-
-   // Loop over planes (for this image index)
-   for (int p = 0; p < pc; ++p)
+   for (int z = 0; z < n_z; z++)
    {
-      if (terminate) break;
-
-      auto coords = reader->getZCTCoords(p);
-
-      if (coords[2] < n_t)
+      try
       {
-         reader->openBytes(p, buf);
+         auto index = reader->getIndex(z, chan, t);
+         reader->openBytes(index, buf);
 
-         int nel = buf.num_elements();
-         auto shape = buf.shape();
-
-         // Create CV wrapper
          int type = getCvPixelType(buf.pixelType());
          cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
-
-         // Convert to 32F
-         cvbuf.convertTo(cv32, CV_32F);
+         cvbuf.convertTo(cv8, CV_8U);
 
          // Copy into frame
-         cv::Mat slice = extractSlice(data[coords[2]], coords[0]);
-         slice += cv32;
+         extractSlice(data, z) += cv8;
       }
+      catch (std::exception e)
+      {
+         std::cout << e.what();
+      }
+   }
+}
+
+cv::Mat IntensityReader::getStack(int chan, int t)
+{
+   std::vector<int> dims = { n_z, n_y, n_x };
+   cv::Mat stack(dims, CV_8U, cv::Scalar(0));
+   addStack(chan, t, stack);
+   return stack;
+}
+
+
+void IntensityReader::getIntensityFrames()
+{
+   std::vector<int> dims = { n_z, n_y, n_x };
+
+   frames.clear();
+   for (int i = 0; i<n_t; i++)
+      frames.push_back(cv::Mat(dims, CV_8U, cv::Scalar(0)));
+
+   // Loop over planes (for this image index)
+   for (int t = 0; t < n_t; ++t)
+   {
+      if (terminate) break;
+       for(int chan = 0; chan < n_chan; chan++)
+         addStack(chan, t, frames[t]);
    }
 }
 
@@ -141,52 +133,91 @@ void IntensityReader::write(const std::string& output_filename)
 
    // OME-XML metadata store.
    auto meta = std::make_shared<OMEXMLMetadata>();
-   auto retrieve = std::static_pointer_cast<MetadataRetrieve>(meta);
 
-   std::vector<std::shared_ptr<CoreMetadata>> series_list(1, std::make_shared<CoreMetadata>());
-   auto core = series_list[0];
+   const auto pixel_type = enums::PixelType::UINT8;
+   const auto dim_order = enums::DimensionOrder::XYZTC;
+
+   std::vector<std::shared_ptr<CoreMetadata>> series_list;
+   auto core = std::make_shared<CoreMetadata>();
    core->sizeX = n_x;
    core->sizeY = n_y;
+   core->sizeZ = n_z;
+   core->sizeT = n_t;
    core->sizeC = std::vector<dimension_size_type>(n_chan, 1);
-   core->pixelType = enums::PixelType::UINT16;
+   core->pixelType = pixel_type;
    core->interleaved = false;
-   core->bitsPerPixel = 16U;
-   core->dimensionOrder = enums::DimensionOrder::XYZCT;
+   core->imageCount = n_z * n_t * n_chan;
+   core->bitsPerPixel = PixelProperties<pixel_type>::pixel_bit_size();
+   core->dimensionOrder = dim_order;
+   series_list.push_back(core);
    fillMetadata(*meta, series_list);
+
+   auto a = meta->getPixelsDimensionOrder(0);
 
    // Create TIFF writer
    auto writer = std::make_shared<out::OMETIFFWriter>();
+   auto retrieve = std::static_pointer_cast<MetadataRetrieve>(meta);
+
+   
    writer->setMetadataRetrieve(retrieve);
+   writer->setInterleaved(false);
+   writer->setWriteSequentially(true);
    writer->setId(output_filename);
    writer->setSeries(0);
+   typedef PixelBuffer<PixelProperties<pixel_type>::std_type> pxbuffer;
+   auto extents = boost::extents[n_x][n_y][1][1][1][1][1][1][1];
+   auto storage_order = PixelBufferBase::make_storage_order(dim_order, false);
 
-   typedef PixelBuffer<PixelProperties<enums::PixelType::UINT16>::std_type> u16buffer;
-   auto extents = boost::extents[n_x][n_y][n_z][1][1][1][1][1][1];
-   auto storage_order = PixelBufferBase::make_storage_order(enums::DimensionOrder::XYZCT, false);
+   auto series_metadata = reader->getGlobalMetadata();
+   
+   auto store = reader->getMetadataStore();
 
-   std::vector<int> dims = {n_z, n_y, n_x};
-   cv::Mat cvbuf(dims, CV_16U);
+   for (auto& s : series_metadata)
+   {
+      auto a1 = s.first;
+      auto s2 = s.second;
+      std::cout << a1 << " : " << s2 << "\n";
+   }
+
+
+   VariantPixelBuffer lut;
+   cv::Mat cvbuf;
 
    // Loop over planes (for this image index)
    int idx = 0;
-   for (int t = 0; t < n_t; t++)
-      for (int c = 0; c < n_chan; c++)
+   for (int c = 0; c < n_chan; c++)
+      for (int t = 0; t < n_t; t++)
       {
-         getRealignedStack(c, t, cvbuf);
+         cv::Mat stack = getRealignedStack(c, t);
+         stack.convertTo(cvbuf, CV_8U);
 
          for(int z = 0; z < n_z; z++)
          {
-            auto zbuf = std::make_shared<u16buffer>(&cvbuf.at<uint16_t>(z, 0, 0),
-               extents, enums::PixelType::UINT16, ENDIAN_NATIVE, storage_order);
+            auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<uint8_t>(z, 0, 0),
+               extents, pixel_type, ENDIAN_NATIVE, storage_order);
             VariantPixelBuffer vbuf(zbuf);
             writer->saveBytes(idx++, vbuf);         
+
+            int plane = reader->getIndex(z, c, t);
+            reader->getLookupTable(plane, lut);
+            //writer->setLookupTable(plane, lut);
+             
          }
       }
 
    writer->close();
 }
 
-void IntensityReader::getRealignedStack(int chan, int t, cv::Mat& data)
+cv::Mat IntensityReader::getRealignedStack(int chan, int t)
 {
-   frames[t].copyTo(data, CV_16U);
+   cv::Mat realigned;
+   cv::Mat stack = getStack(chan, t);
+   stack.convertTo(stack, CV_32F);
+   
+   if (frame_aligner)
+      realigned = frame_aligner->realignAsFrame(t, stack);
+   else
+      realigned = stack;
+
+   return realigned;
 }

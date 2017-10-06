@@ -35,6 +35,7 @@ void IntensityDataSource::readAlignedData()
 {
    try
    {
+      reader->waitForAlignmentComplete();
       reader->read(); // TODO      
    }
    catch (std::runtime_error e)
@@ -50,7 +51,8 @@ void IntensityDataSource::cancelRead()
 }
 
 
-void IntensityDataSource::saveData(const QString& filename)
+void IntensityDataSource::saveData(const QString& root_name)
 {
+   QString filename = root_name + ".ome.tif";
    reader->write(filename.toStdString());
 }

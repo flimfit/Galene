@@ -73,6 +73,8 @@ void FlimReaderDataSource::update()
       if (area(intensity) < n_px) return;
 
       uint16_t* data_ptr = data->getDataPtr();
+      float* intensity_ptr = (float*) intensity.data;
+      float* mean_arrival_time_ptr = (float*) mean_arrival_time.data;
       for (int p = 0; p < n_px; p++)
       {
          uint16_t I = 0;
@@ -85,8 +87,8 @@ void FlimReaderDataSource::update()
 
                data_ptr++;
             }
-         intensity.at<float>(p) = I;
-         mean_arrival_time.at<float>(p) = It / I;
+         intensity_ptr[p] = I;
+         mean_arrival_time_ptr[p] = It / I;
 
       }
 
@@ -163,8 +165,9 @@ QWidget* FlimReaderDataSource::getWidget()
    return widget;
 }
 
-void FlimReaderDataSource::saveData(const QString& filename)
+void FlimReaderDataSource::saveData(const QString& root_name)
 {
+   QString filename = root_name + ".ffh";
    auto tags = reader->getTags();
    auto reader_tags = reader->getReaderTags();
    auto images = reader->getImageMap();

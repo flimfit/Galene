@@ -13,7 +13,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
 
    timer = new QTimer(this);
    connect(timer, &QTimer::timeout, this, &RealignmentDisplayWidget::update);
-   timer->start(5000);
+   timer->start(2000);
    
    //connect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
    connect(z_scroll, &QScrollBar::valueChanged, this, &RealignmentDisplayWidget::setZ);   

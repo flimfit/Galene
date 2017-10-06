@@ -27,8 +27,11 @@ public:
 protected:
 
    void readMetadata();
-   void readFrames(std::vector<cv::Mat>& data, bool merge_channels = false);
-   void getRealignedStack(int chan, int t, cv::Mat& data);
+
+   cv::Mat getStack(int chan, int t);
+   cv::Mat getRealignedStack(int chan, int t);
+
+   void addStack(int chan, int t, cv::Mat& data);
 
    ImageScanParameters scan_params;
    std::shared_ptr<ome::files::FormatReader> reader;

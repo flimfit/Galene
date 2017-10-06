@@ -101,5 +101,7 @@ void RealignableDataSource::writeRealignmentMovies(const QString& filename_root)
 void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
 {
    QString info_filename = filename_root + "_realignment.csv";
-   getFrameAligner()->writeRealignmentInfo(info_filename.toStdString());   
+   
+   if (getFrameAligner())
+      getFrameAligner()->writeRealignmentInfo(info_filename.toStdString());   
 }
