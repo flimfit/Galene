@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
    
 
    auto updater = QSimpleUpdater::getInstance();
-   updater->setModuleVersion(update_url, VERSION); // from CMake
+   updater->setModuleVersion(update_url, "VERSION"); // from CMake
    updater->setModuleName(update_url, "flim-ui");
    updater->checkForUpdates(update_url);
    

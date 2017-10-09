@@ -11,7 +11,7 @@ include ("cmake/GitVersion.cmake") # Get version number from git
 
 project (Galene) 
 
-add_definitions(-DVERSION="${VERSION}")
+#add_definitions(-DVERSION=${VERSION})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 
 find_package(Boost REQUIRED)
