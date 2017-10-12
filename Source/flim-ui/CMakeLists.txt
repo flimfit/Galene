@@ -1,17 +1,18 @@
 cmake_minimum_required(VERSION 3.7)
-project(flim-ui) 
+project(flim-ui LANGUAGES CXX CUDA) 
 
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
 find_package(Qt5OpenGL)
 find_package(Qt5Network)
-find_package(OpenMP REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
+
+find_package(CUDA)
 
 include_directories(${OME_FILES_ROOT}/include)
 
@@ -106,40 +107,41 @@ set (Galene_OBJECTS ${SOURCE}
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
-set(Galene_LIBS     ${OpenCV_LIBS}
+set (Galene_LIBS    ${OpenCV_LIBS}
                     ${fifo_flim_LIBS} 
                     ${InstrumentControl_LIBRARIES}
                     ${FlimReader_LIBRARIES}
-                    dlib::dlib
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
-    target_link_libraries(GaleneTest ${Galene_LIBS})
+    target_link_libraries(GaleneTest ${Galene_LIBS} ${CUDA_LIBRARIES})
     qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
-    
+    set_property(TARGET GaleneTest PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
-add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
-target_link_libraries(Galene ${Galene_LIBS})
-qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
+if (NOT APPLE)
+   add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
+   target_link_libraries(Galene ${Galene_LIBS})
+   qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
-add_custom_command(
-        TARGET Galene POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
-                ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
+   add_custom_command(
+         TARGET Galene POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E copy
+                  ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
+                  ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
 
-set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
-                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
+   set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+                                          MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-deployqt(Galene INCLUDE_MODULES ${QTLIBS})
+   deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
-set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
-include(InstallRequiredSystemLibraries)
+   set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
+   include(InstallRequiredSystemLibraries)
 
-install(TARGETS Galene RUNTIME DESTINATION bin 
-                        BUNDLE DESTINATION bundle)
+   install(TARGETS Galene RUNTIME DESTINATION bin 
+                           BUNDLE DESTINATION bundle)
+endif()                           
 
 if (WIN32)
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)
