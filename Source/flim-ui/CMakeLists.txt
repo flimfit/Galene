@@ -103,7 +103,7 @@ set (Galene_OBJECTS ${SOURCE}
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
                     $<TARGET_OBJECTS:FlimReader>
-                    $<TARGET_OBJECTS:FrameAligner>
+        
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
@@ -111,11 +111,12 @@ set (Galene_LIBS    ${OpenCV_LIBS}
                     ${fifo_flim_LIBS} 
                     ${InstrumentControl_LIBRARIES}
                     ${FlimReader_LIBRARIES}
+                    ${CUDA_LIBRARIES}
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
-    target_link_libraries(GaleneTest ${Galene_LIBS} ${CUDA_LIBRARIES})
+    target_link_libraries(GaleneTest ${Galene_LIBS})
     qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
     set_property(TARGET GaleneTest PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 endif()
