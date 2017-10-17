@@ -30,12 +30,17 @@ void DataSourceWorker::update()
       source->update();
 }
 
+RealignableDataSource::~RealignableDataSource()
+{
+   terminate = true;
+   waitForComplete();
+}
+
 void RealignableDataSource::waitForComplete()
 {
    if (reader_thread.joinable())
       reader_thread.join();
 }
-
 
 void RealignableDataSource::readData(bool realign)
 {

@@ -34,6 +34,8 @@ class RealignableDataSource
 {
 public:
    
+   virtual ~RealignableDataSource();
+
    void readData(bool realign = true);   
    void waitForComplete();
 
