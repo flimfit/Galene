@@ -198,7 +198,7 @@ void IntensityReader::write(const std::string& output_filename)
             VariantPixelBuffer vbuf(zbuf);
             writer->saveBytes(idx++, vbuf);         
 
-            int plane = reader->getIndex(z, c, t);
+            size_t plane = reader->getIndex(z, c, t);
             reader->getLookupTable(plane, lut);
             //writer->setLookupTable(plane, lut);
              

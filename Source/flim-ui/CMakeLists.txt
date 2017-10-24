@@ -18,8 +18,6 @@ include_directories(${OME_FILES_ROOT}/include)
 
 include("cmake/DeployQt.cmake")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
 set(CMAKE_AUTOMOC ON)
 add_definitions(${QT_DEFINITIONS}) 
 
@@ -103,7 +101,6 @@ set (Galene_OBJECTS ${SOURCE}
                     $<TARGET_OBJECTS:InstrumentControlUI> 
                     $<TARGET_OBJECTS:fifo_flim>
                     $<TARGET_OBJECTS:FlimReader>
-        
                     $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
@@ -127,17 +124,22 @@ if (NOT APPLE)
    qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
    add_custom_command(
-         TARGET Galene POST_BUILD
-         COMMAND ${CMAKE_COMMAND} -E copy
+        TARGET Galene POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
                   ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
                   ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
+
+    add_custom_command(
+        TARGET Galene POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${OME_FILES_ROOT}/share/
+                    ${CMAKE_CURRENT_BINARY_DIR}/share/)
 
    set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                           MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
    deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
-   set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
    include(InstallRequiredSystemLibraries)
 
    install(TARGETS Galene RUNTIME DESTINATION bin 
@@ -146,4 +148,6 @@ endif()
 
 if (WIN32)
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share DESTINATION /)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png DESTINATION /)
 endif()
