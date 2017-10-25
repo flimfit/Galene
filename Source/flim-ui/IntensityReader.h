@@ -14,7 +14,7 @@ public:
 
    IntensityReader(const std::string& filename);
 
-   void getIntensityFrames();
+   int getNumIntensityFrames() { return n_t; };
 
    ImageScanParameters getImageScanParameters() { return scan_params; }
 
@@ -27,6 +27,7 @@ public:
 protected:
 
    void readMetadata();
+   void loadIntensityFramesImpl();
 
    cv::Mat getStack(int chan, int t);
    cv::Mat getRealignedStack(int chan, int t);
@@ -38,6 +39,8 @@ protected:
    std::string filename;
 
    std::vector<cv::Mat> data;
+
+   std::mutex read_mutex;
 
    int n_x, n_y, n_z, n_t, n_chan;
    bool terminate = false;

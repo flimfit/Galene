@@ -1,7 +1,12 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
-set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
+if(DEFINED ENV{OME_FILES_ROOT})
+    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
+else()
+    set(OME_FILES_ROOT "../ome-files-install")
+endif()
+
 set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
 
 #include ("cmake/TargetAppleSdk.cmake")
@@ -33,6 +38,7 @@ set(DLIB_LINK_WITH_SQLITE3 OFF)
 set(DLIB_PNG_SUPPORT OFF)
 set(DLIB_GIF_SUPPORT OFF)
 set(DLIB_NO_GUI_SUPPORT ON)
+set(DLIB_IN_PROJECT_BUILD ON)
 
 add_definitions(-DDLIB_USE_LAPACK)
 
@@ -55,7 +61,7 @@ set(CPACK_PACKAGE_NAME "Galene")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Galene Installer")
 set(CPACK_PACKAGE_VERSION ${VERSION}) # Version of installer
 set(CPACK_PACKAGE_VENDOR "Sean Warren")
-set(CPACK_PACKAGE_EXECUTABLES Galene "Galene ${VERSION}")
+set(CPACK_PACKAGE_EXECUTABLES Galene "Galene")
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/../LICENCE.txt)
 
 if (WIN32)
