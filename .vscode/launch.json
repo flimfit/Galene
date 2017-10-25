@@ -1,13 +1,24 @@
 {
    "version": "0.2.0",
    "configurations": [
+   { 
+      "name": "(lldb) Attach",
+      "type": "cppdbg",
+      "request": "attach",
+      "program": "${workspaceRoot}/Build/flim-ui/GaleneTest",
+      "processId": "${command:pickProcess}",
+      "MIMode": "lldb"
+   },
       {
          "name": "(lldb) Launch Test",
          "type": "cppdbg",
          "request": "launch",
          "program": "${workspaceRoot}/Build/flim-ui/GaleneTest",
          "MIMode": "lldb",
-         "cwd": "${workspaceRoot}/"         
+         "cwd": "${workspaceRoot}/",
+         "environment": [
+            {"name":"DYLIB_LIBRARY_PATH", "value":"${workspaceRoot}/ome-files-install/lib"}
+         ]
       }
    ]
 }
