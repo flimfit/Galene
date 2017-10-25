@@ -339,6 +339,8 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
    {
       try
 	   {
+         source->saveData(name);
+
          if (save_preview)
             source->savePreview(preview_filename);
 
@@ -347,8 +349,6 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
 
          if (save_movie)
             source->writeRealignmentMovies(name);
-
-         source->saveData(name);
 	   }
 	   catch (std::runtime_error e)
 	   {

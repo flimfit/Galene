@@ -62,7 +62,7 @@ void IntensityReader::readMetadata()
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
    
-   n_t--; // TODO: Last frame seems problematic 
+   n_t = 3; // TODO: Last frame seems problematic 
 
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
@@ -74,6 +74,7 @@ void IntensityReader::read()
 
 void IntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
+   std::lock_guard<std::mutex> lk(read_mutex);
    ome::files::VariantPixelBuffer buf;
    cv::Mat cv8;
 
@@ -107,20 +108,34 @@ cv::Mat IntensityReader::getStack(int chan, int t)
 }
 
 
-void IntensityReader::getIntensityFrames()
+void IntensityReader::loadIntensityFramesImpl()
 {
    std::vector<int> dims = { n_z, n_y, n_x };
 
-   frames.clear();
-   for (int i = 0; i<n_t; i++)
-      frames.push_back(cv::Mat(dims, CV_8U, cv::Scalar(0)));
+   cv::Mat cur_frame(dims, CV_8U, cv::Scalar(0));
+
+   {
+      std::lock_guard<std::mutex> lk(frame_mutex);
+      frames.resize(n_t);
+   }
 
    // Loop over planes (for this image index)
    for (int t = 0; t < n_t; ++t)
    {
+      cur_frame.setTo(cv::Scalar(0));
       if (terminate) break;
        for(int chan = 0; chan < n_chan; chan++)
-         addStack(chan, t, frames[t]);
+         addStack(chan, t, cur_frame);
+
+       cv::Mat frame_cpy;
+       cur_frame.copyTo(frame_cpy);
+       
+       {
+          std::lock_guard<std::mutex> lk(frame_mutex);
+          frames[t] = frame_cpy;
+       }
+       frame_cv.notify_all();
+
    }
 }
 
@@ -135,7 +150,8 @@ void IntensityReader::write(const std::string& output_filename)
    auto meta = std::make_shared<OMEXMLMetadata>();
 
    const auto pixel_type = enums::PixelType::UINT8;
-   const auto dim_order = enums::DimensionOrder::XYZTC;
+   const auto dim_order = enums::DimensionOrder::XYZCT;
+//   const auto file_dim_order = enums::DimensionOrder::XYZCT;
 
    std::vector<std::shared_ptr<CoreMetadata>> series_list;
    auto core = std::make_shared<CoreMetadata>();
@@ -163,6 +179,7 @@ void IntensityReader::write(const std::string& output_filename)
    writer->setInterleaved(false);
    writer->setWriteSequentially(true);
    writer->setId(output_filename);
+   writer->setCompression("LZW");
    writer->setSeries(0);
    typedef PixelBuffer<PixelProperties<pixel_type>::std_type> pxbuffer;
    auto extents = boost::extents[n_x][n_y][1][1][1][1][1][1][1];

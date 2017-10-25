@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
    QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-   qInstallMessageHandler(myMessageOutput);
+   //qInstallMessageHandler(myMessageOutput);
 
 
    QApplication a(argc, argv);
