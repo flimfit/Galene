@@ -150,8 +150,8 @@ void IntensityReader::write(const std::string& output_filename)
    auto meta = std::make_shared<OMEXMLMetadata>();
 
    const auto pixel_type = enums::PixelType::UINT8;
-   const auto dim_order = enums::DimensionOrder::XYZCT;
-//   const auto file_dim_order = enums::DimensionOrder::XYZCT;
+   const auto dim_order = enums::DimensionOrder::XYZTC;
+   const auto file_dim_order = enums::DimensionOrder::XYZCT;
 
    std::vector<std::shared_ptr<CoreMetadata>> series_list;
    auto core = std::make_shared<CoreMetadata>();
@@ -164,7 +164,7 @@ void IntensityReader::write(const std::string& output_filename)
    core->interleaved = false;
    core->imageCount = n_z * n_t * n_chan;
    core->bitsPerPixel = PixelProperties<pixel_type>::pixel_bit_size();
-   core->dimensionOrder = dim_order;
+   core->dimensionOrder = file_dim_order;
    series_list.push_back(core);
    fillMetadata(*meta, series_list);
 
@@ -202,8 +202,8 @@ void IntensityReader::write(const std::string& output_filename)
 
    // Loop over planes (for this image index)
    int idx = 0;
-   for (int c = 0; c < n_chan; c++)
-      for (int t = 0; t < n_t; t++)
+   for (int t = 0; t < n_t; t++)
+      for (int c = 0; c < n_chan; c++)
       {
          cv::Mat stack = getRealignedStack(c, t);
          stack.convertTo(cvbuf, CV_8U);
@@ -213,12 +213,7 @@ void IntensityReader::write(const std::string& output_filename)
             auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<uint8_t>(z, 0, 0),
                extents, pixel_type, ENDIAN_NATIVE, storage_order);
             VariantPixelBuffer vbuf(zbuf);
-            writer->saveBytes(idx++, vbuf);         
-
-            size_t plane = reader->getIndex(z, c, t);
-            reader->getLookupTable(plane, lut);
-            //writer->setLookupTable(plane, lut);
-             
+            writer->saveBytes(idx++, vbuf);
          }
       }
 

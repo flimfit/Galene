@@ -17,15 +17,15 @@
 const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
 
 #ifdef WIN32
-int setenv(const wchar_t *name, const wchar_t *value, int overwrite)
+int setenv(const char_t *name, const char_t *value, int overwrite)
 {
    int errcode = 0;
    if (!overwrite) {
       size_t envsize = 0;
-      errcode = _wgetenv_s(&envsize, NULL, 0, name);
+      errcode = getenv_s(&envsize, NULL, 0, name);
       if (errcode || envsize) return errcode;
    }
-   return _wputenv_s(name, value);
+   return putenv_s(name, value);
 }
 #endif
 
@@ -63,7 +63,8 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 int main(int argc, char *argv[])
 {
 
-   setenv(L"OME_HOME", boost::filesystem::initial_path().c_str(), true);
+   QFileInfo file(argv[0]);
+   setenv("OME_HOME", qPrintable(file.absolutePath()), true);
 
    ome::common::setLogLevel(ome::logging::trivial::warning);
 
