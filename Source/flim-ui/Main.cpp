@@ -17,7 +17,7 @@
 const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
 
 #ifdef WIN32
-int setenv(const char_t *name, const char_t *value, int overwrite)
+int setenv(const char *name, const char *value, int overwrite)
 {
    int errcode = 0;
    if (!overwrite) {
@@ -25,7 +25,7 @@ int setenv(const char_t *name, const char_t *value, int overwrite)
       errcode = getenv_s(&envsize, NULL, 0, name);
       if (errcode || envsize) return errcode;
    }
-   return putenv_s(name, value);
+   return _putenv_s(name, value);
 }
 #endif
 

@@ -133,7 +133,7 @@ if (NOT APPLE)
         TARGET Galene POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                     ${OME_FILES_ROOT}/share/
-                    ${CMAKE_CURRENT_BINARY_DIR}/share/)
+                    $<TARGET_FILE_DIR:Galene>/share/)
 
    set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                           MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
@@ -148,6 +148,6 @@ endif()
 
 if (WIN32)
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share DESTINATION /)
+    install(DIRECTORY $<TARGET_FILE_DIR:Galene>/share DESTINATION /)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png DESTINATION /)
 endif()

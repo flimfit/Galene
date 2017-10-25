@@ -19,7 +19,7 @@ SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
 
 SET PATH=%PATH%;%VCPKG_ROOT%\installed\x64-windows\bin;%VCPKG_ROOT%\installed\x64-windows\debug\bin
 
-IF EXIST ome-files-install\ (
+IF NOT EXIST ome-files-install\ (
    REM Execute this command first to switch to VS2017 console
    REM "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 
@@ -38,13 +38,13 @@ IF EXIST ome-files-install\ (
    if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
    
    REM build debug
-   REM cmake -GNinja -Home-cmake-superbuild -Bome-files-build\debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
-   REM cmake --build ome-files-build\debug --target install
+   cmake -GNinja -Home-cmake-superbuild -Bome-files-build\debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
+   cmake --build ome-files-build\debug --target install
    if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
    REM build relwithdebinfo
-   REM cmake -GNinja -Home-cmake-superbuild -Bome-files-build\relwithdebinfo -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RELWITHDEBINFO_POSTFIX=rd %OME_BUILD_FLAGS%
-   REM cmake --build ome-files-build\relwithdebinfo --target install
+   cmake -GNinja -Home-cmake-superbuild -Bome-files-build\relwithdebinfo -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RELWITHDEBINFO_POSTFIX=rd %OME_BUILD_FLAGS%
+   cmake --build ome-files-build\relwithdebinfo --target install
    if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 )
@@ -61,5 +61,5 @@ cmake -G %GENERATOR% -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 echo Building 64bit Project in Release mode
-REM cmake --build Build --config Release --target PACKAGE
+cmake --build Build --config Release --target PACKAGE
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
