@@ -28,6 +28,8 @@ protected:
 
    void readMetadata();
    void loadIntensityFramesImpl();
+   cv::Mat getIntensityFrameImmediately(int frame);
+
 
    cv::Mat getStack(int chan, int t);
    cv::Mat getRealignedStack(int chan, int t);

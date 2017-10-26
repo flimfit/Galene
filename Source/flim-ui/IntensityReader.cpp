@@ -62,7 +62,7 @@ void IntensityReader::readMetadata()
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
    
-   n_t = 3; // TODO: Last frame seems problematic 
+   n_t--; // TODO: Last frame seems problematic 
 
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
@@ -76,7 +76,7 @@ void IntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
    std::lock_guard<std::mutex> lk(read_mutex);
    ome::files::VariantPixelBuffer buf;
-   cv::Mat cv8;
+   cv::Mat cv16;
 
    for (int z = 0; z < n_z; z++)
    {
@@ -87,10 +87,10 @@ void IntensityReader::addStack(int chan, int t, cv::Mat& data)
 
          int type = getCvPixelType(buf.pixelType());
          cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
-         cvbuf.convertTo(cv8, CV_8U);
+         cvbuf.convertTo(cv16, CV_16U);
 
          // Copy into frame
-         extractSlice(data, z) += cv8;
+         extractSlice(data, z) += cv16;
       }
       catch (std::exception e)
       {
@@ -138,6 +138,16 @@ void IntensityReader::loadIntensityFramesImpl()
 
    }
 }
+
+cv::Mat IntensityReader::getIntensityFrameImmediately(int t)
+{
+   std::vector<int> dims = { n_z, n_y, n_x };
+   cv::Mat frame(dims, CV_8U, cv::Scalar(0));
+   for (int chan = 0; chan < n_chan; chan++)
+      addStack(chan, t, frame);
+   return frame;
+}
+
 
 
 void IntensityReader::write(const std::string& output_filename)
