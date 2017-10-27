@@ -7,6 +7,7 @@
 #include <ome/files/out/OMETIFFWriter.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
+#include "ProducerConsumer.h"
 
 int getCvPixelType(ome::xml::model::enums::PixelType pixel_type)
 {
@@ -189,8 +190,8 @@ void IntensityReader::write(const std::string& output_filename)
    writer->setInterleaved(false);
    writer->setWriteSequentially(true);
    writer->setId(output_filename);
-   writer->setCompression("LZW");
    writer->setSeries(0);
+   auto order = writer->getDimensionOrder();
    typedef PixelBuffer<PixelProperties<pixel_type>::std_type> pxbuffer;
    auto extents = boost::extents[n_x][n_y][1][1][1][1][1][1][1];
    auto storage_order = PixelBufferBase::make_storage_order(dim_order, false);
@@ -206,26 +207,33 @@ void IntensityReader::write(const std::string& output_filename)
       std::cout << a1 << " : " << s2 << "\n";
    }
 
-
    VariantPixelBuffer lut;
-   cv::Mat cvbuf;
 
-   // Loop over planes (for this image index)
-   int idx = 0;
-   for (int t = 0; t < n_t; t++)
-      for (int c = 0; c < n_chan; c++)
+   auto producer = [&](size_t idx)
+   {
+      int c = idx % n_chan;
+      int t = idx / n_chan;
+
+      cv::Mat cvbuf;
+      cv::Mat stack = getRealignedStack(c, t);
+      stack.convertTo(cvbuf, CV_8U);
+      return cvbuf;
+   };
+
+   auto consumer = [&](size_t idx, cv::Mat cvbuf)
+   {
+      for (int z = 0; z < n_z; z++)
       {
-         cv::Mat stack = getRealignedStack(c, t);
-         stack.convertTo(cvbuf, CV_8U);
-
-         for(int z = 0; z < n_z; z++)
-         {
-            auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<uint8_t>(z, 0, 0),
-               extents, pixel_type, ENDIAN_NATIVE, storage_order);
-            VariantPixelBuffer vbuf(zbuf);
-            writer->saveBytes(idx++, vbuf);
-         }
+         auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<uint8_t>(z, 0, 0),
+            extents, pixel_type, ENDIAN_NATIVE, storage_order);
+         VariantPixelBuffer vbuf(zbuf);
+         writer->saveBytes(idx*n_z + z, vbuf);
       }
+   };
+
+   int n_producer = 3; // to match cuda memory/kernel engines
+   ProducerConsumer<cv::Mat>(n_producer, producer, consumer, n_t * n_chan);
+
 
    writer->close();
 }
