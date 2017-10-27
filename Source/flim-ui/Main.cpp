@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
    qRegisterMetaType<T_DATAFRAME_SRVREQUEST>("T_DATAFRAME_SRVREQUEST");
    qRegisterMetaType<E_ERROR_CODES>("E_ERROR_CODES");
    qRegisterMetaType<E_PQ_MEAS_TYPE>("E_PQ_MEAS_TYPE");
-   qRegisterMetaType<std::map<QString,QVariant>>("std::map<QString, QVariant>");
+   qRegisterMetaType<std::map<QString, QVariant>>("std::map<QString, QVariant>");
    qRegisterMetaType<std::vector<std::pair<QString, QVariant>>>("std::vector<std::pair<QString, QVariant>>");
-   qRegisterMetaType<std::shared_ptr<FlimReaderDataSource>>("std::shared_ptr<FlimReaderDataSource>");
+   qRegisterMetaType<std::shared_ptr<FlimReaderDataSource>>("std::shared_ptr<RealignableDataSource>");
 
    QCoreApplication::setOrganizationName("FLIMfit");
    QCoreApplication::setOrganizationDomain("flimfit.org");

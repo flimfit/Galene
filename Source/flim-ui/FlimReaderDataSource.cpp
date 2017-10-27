@@ -62,7 +62,7 @@ void FlimReaderDataSource::update()
       std::lock_guard<std::mutex> lk(read_mutex);
 
       if (!currently_reading) return;
-      if (!data->isReady()) return;
+      if (!data || !data->isReady()) return;
 
       std::lock_guard<std::mutex> lk_im(image_mutex);
 

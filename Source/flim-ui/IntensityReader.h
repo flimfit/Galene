@@ -13,6 +13,7 @@ class IntensityReader : public AligningReader
 public:
 
    IntensityReader(const std::string& filename);
+   ~IntensityReader() { int a = 1; }
 
    int getNumIntensityFrames() { return n_t; };
 
@@ -46,4 +47,6 @@ protected:
 
    int n_x, n_y, n_z, n_t, n_chan;
    bool terminate = false;
+
+   bool swap_zt = false;
 };

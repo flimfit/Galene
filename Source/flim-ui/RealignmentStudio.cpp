@@ -50,7 +50,7 @@ RealignmentStudio::RealignmentStudio() :
 
    connect(mode_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentStudio::updateParameterGroupBox);
 
-   connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows);
+   connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows, Qt::QueuedConnection);
 
    file_list_view->setModel(workspace);
    file_list_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
@@ -110,9 +110,11 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
          connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
          source = s;
       }
-      source->setRealignmentParameters(getRealignmentParameters());
 
       emit newDataSource(source);
+      source->setRealignmentParameters(getRealignmentParameters());
+      source->readData();
+
    }
    catch (std::runtime_error e)
    {
@@ -192,8 +194,6 @@ void RealignmentStudio::openWindows(std::shared_ptr<RealignableDataSource> sourc
    connect(w2, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
 
    connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [source](int index) { source->setReferenceIndex(index); }); // source isn't a QObject
-   
-
 
    QWidget* widget = source->getWidget();
    if (widget)
@@ -207,8 +207,6 @@ void RealignmentStudio::openWindows(std::shared_ptr<RealignableDataSource> sourc
       connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
       connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);   
    }
-
-   source->readData();
 }
 
 void RealignmentStudio::removeWindow(QObject* obj)
@@ -356,7 +354,11 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
 	   }
 
       if (close_after_save || force_close)
-         source->requestDelete();
+      {
+         for (auto& w : window_map)
+            if (w.second.lock() == source)
+               QMetaObject::invokeMethod(w.first, "close", Qt::QueuedConnection);
+      }
 
       task->setFinished();
    }));

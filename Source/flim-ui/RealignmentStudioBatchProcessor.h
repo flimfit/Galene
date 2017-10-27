@@ -32,6 +32,7 @@ public:
       for(auto file : files)
       {
          auto source = studio->openFile(file);
+         source->readData(true);
          source->waitForComplete();
          studio->save(source, true);
          task->incrementStep();

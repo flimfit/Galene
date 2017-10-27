@@ -16,6 +16,8 @@ find_package(CUDA)
 find_package(lapack)
 find_package(blas)
 
+find_package(CUDA REQUIRED)
+
 include_directories(${OME_FILES_ROOT}/include)
 
 include("cmake/DeployQt.cmake")
@@ -112,7 +114,7 @@ set (Galene_LIBS    ${OpenCV_LIBS}
                     ${FlimReader_LIBRARIES}
                     ${CUDA_LIBRARIES}
                     ${LAPACK_LIBRARIES}
-                    ${BLAS_LIBRARIES}
+                    ${BLAS_LIBRARIES}             
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code

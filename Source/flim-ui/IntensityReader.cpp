@@ -31,6 +31,8 @@ int getCvPixelType(ome::xml::model::enums::PixelType pixel_type)
 IntensityReader::IntensityReader(const std::string& filename) :
       filename(filename)
 {
+   async_load_intensity_frames = true;
+
    // Create TIFF reader
    reader = std::make_shared<ome::files::in::OMETIFFReader>();
 
@@ -62,6 +64,16 @@ void IntensityReader::readMetadata()
    n_z = (int)reader->getSizeZ();
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
+
+   swap_zt = (n_t == 1 && n_z > 1);
+   
+   if (swap_zt)
+   {
+      int nb = n_t;
+      n_t = n_z;
+      n_z = nb;
+      std::cout << "Swapping z and t\n";
+   }
    
    n_t--; // TODO: Last frame seems problematic 
 
@@ -83,7 +95,12 @@ void IntensityReader::addStack(int chan, int t, cv::Mat& data)
    {
       try
       {
-         auto index = reader->getIndex(z, chan, t);
+         size_t index;
+         if (swap_zt)
+            index = reader->getIndex(t, chan, z);
+         else
+            reader->getIndex(z, chan, t);
+
          reader->openBytes(index, buf);
 
          int type = getCvPixelType(buf.pixelType());
@@ -123,6 +140,9 @@ void IntensityReader::loadIntensityFramesImpl()
    // Loop over planes (for this image index)
    for (int t = 0; t < n_t; ++t)
    {
+      if (terminate)
+         return;
+
       cur_frame.setTo(cv::Scalar(0));
       if (terminate) break;
        for(int chan = 0; chan < n_chan; chan++)
@@ -215,13 +235,16 @@ void IntensityReader::write(const std::string& output_filename)
       int t = idx / n_chan;
 
       cv::Mat cvbuf;
+      std::cout << "Getting stack " << t << "\n";
       cv::Mat stack = getRealignedStack(c, t);
       stack.convertTo(cvbuf, CV_8U);
+      std::cout << "Got stack " << t << "\n";
       return cvbuf;
    };
 
    auto consumer = [&](size_t idx, cv::Mat cvbuf)
    {
+      std::cout << "Writing stack " << idx << "\n";
       for (int z = 0; z < n_z; z++)
       {
          auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<uint8_t>(z, 0, 0),
