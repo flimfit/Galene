@@ -40,8 +40,6 @@ set(DLIB_GIF_SUPPORT OFF)
 set(DLIB_NO_GUI_SUPPORT ON)
 set(DLIB_IN_PROJECT_BUILD ON)
 
-add_definitions(-DDLIB_USE_LAPACK)
-
 add_subdirectory(dlib)
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)

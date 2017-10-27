@@ -13,6 +13,8 @@ find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 
 find_package(CUDA)
+find_package(lapack)
+find_package(blas)
 
 include_directories(${OME_FILES_ROOT}/include)
 
@@ -109,6 +111,8 @@ set (Galene_LIBS    ${OpenCV_LIBS}
                     ${InstrumentControl_LIBRARIES}
                     ${FlimReader_LIBRARIES}
                     ${CUDA_LIBRARIES}
+                    ${LAPACK_LIBRARIES}
+                    ${BLAS_LIBRARIES}
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code
