@@ -69,6 +69,15 @@ void OmeIntensityReader::readMetadata()
 
    n_t--; // TODO: Last frame seems problematic 
 
+   swap_zt = (n_t == 1 && n_z > 1);
+   if (swap_zt)
+   {
+      int nb = n_t;
+      n_t = n_z;
+      n_z = nb;
+      std::cout << "Swapping z and t\n";
+   }
+
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
 

@@ -6,14 +6,14 @@
 #    - CMake >= 3.7
 #    - Qt >=5.7
 # Currently assumes these are installed by brew, i.e. using 
-#    - brew install qt cmake opencv boost xerces-c xalan-c
+#    - brew install qt cmake opencv boost xerces-c xalan-c exiv2 libraw
 
 # Set manual locations for clang, Qt. 
 # Override these if not installed via brew
-export OME_FILES_ROOT=$(pwd)/ome-files-install
+export OME_FILES_ROOT=$(pwd)/lib/install
 export PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
-export CMAKE_PREFIX_PATH=$(pwd)/lib-install
+export CMAKE_PREFIX_PATH=$(pwd)/lib/install
 
 # Generate make files and build 
 BUILD_TYPE=Debug

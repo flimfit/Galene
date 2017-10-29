@@ -10,10 +10,12 @@
    },
    "C_Cpp.intelliSenseEngine": "Tag Parser",
    "files.associations": {
+      "*.cu": "cpp",
       "*.m": "matlab",
       "algorithm": "cpp",
       "random": "cpp",
       "fstream": "cpp",
-      "*.ipp": "cpp"
+      "*.ipp": "cpp",
+      "xlocale": "cpp"
    }
 }

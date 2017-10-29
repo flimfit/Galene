@@ -14,3 +14,9 @@
 [submodule "Source/dlib"]
 	path = Source/dlib
 	url = https://github.com/seanwarren/dlib/
+[submodule "lib/src/bioimageconvert"]
+	path = lib/src/bioimageconvert
+	url = https://github.com/seanwarren/bioimageconvert
+[submodule "lib/src/ome-cmake-superbuild"]
+	path = lib/src/ome-cmake-superbuild
+	url = https://github.com/seanwarren/ome-cmake-superbuild/

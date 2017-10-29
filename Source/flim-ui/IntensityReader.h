@@ -12,7 +12,7 @@ class IntensityReader : public AligningReader
 public:
 
    IntensityReader(const std::string& filename);
-   ~IntensityReader() { int a = 1; }
+   ~IntensityReader() { }
 
    static std::shared_ptr<IntensityReader> getReader(const std::string& filename);
 
