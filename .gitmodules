@@ -14,6 +14,3 @@
 [submodule "Source/dlib"]
 	path = Source/dlib
 	url = https://github.com/seanwarren/dlib/
-[submodule "lib/ome-cmake-superbuild"]
-	path = lib/ome-cmake-superbuild
-	url = https://github.com/seanwarren/ome-cmake-superbuild/
