@@ -3,6 +3,8 @@ Build*/*
 cache/*
 ome-files-build/*
 ome-files-install/*
+lib-build/*
+lib-install/*
 *.mex*
 *.log
 *.autosave

@@ -1,10 +1,10 @@
 #include "IntensityDataSource.h"
-
+#include "IntensityWriter.h"
 
 IntensityDataSource::IntensityDataSource(const QString& filename, QObject* parent) : 
 QObject(parent), filename(filename)
 {
-   reader = std::make_unique<IntensityReader>(filename.toStdString());
+   reader = IntensityReader::getReader(filename.toStdString());
 }
 
 
@@ -54,5 +54,7 @@ void IntensityDataSource::cancelRead()
 void IntensityDataSource::saveData(const QString& root_name)
 {
    QString filename = root_name + ".ome.tif";
-   reader->write(filename.toStdString());
+
+   IntensityWriter writer(reader);
+   writer.write(filename.toStdString());
 }

@@ -9,9 +9,6 @@ endif()
 
 set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
 
-#include ("cmake/TargetAppleSdk.cmake")
-#target_apple_sdk(10.10)
-
 include ("cmake/GitVersion.cmake") # Get version number from git
 
 project (Galene) 
@@ -39,8 +36,6 @@ set(DLIB_PNG_SUPPORT OFF)
 set(DLIB_GIF_SUPPORT OFF)
 set(DLIB_NO_GUI_SUPPORT ON)
 set(DLIB_IN_PROJECT_BUILD ON)
-
-add_definitions(-DDLIB_USE_LAPACK)
 
 add_subdirectory(dlib)
 add_subdirectory(QSimpleUpdater)

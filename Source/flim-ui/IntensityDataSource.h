@@ -5,8 +5,6 @@
 
 #include <QObject>
 
-
-
 class IntensityDataSource : public QObject, public RealignableDataSource
 {
    Q_OBJECT
@@ -38,7 +36,7 @@ protected:
 
 private:
 
-   std::unique_ptr<IntensityReader> reader;
+   std::shared_ptr<IntensityReader> reader;
 
    QString filename;
    int n_chan;

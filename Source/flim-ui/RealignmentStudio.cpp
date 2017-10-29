@@ -98,7 +98,7 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
 
    try
    {
-      if (ext == "ome.tif")
+      if (ext == "ome.tif" || ext == "lsm")
       {
          auto s = std::make_shared<IntensityDataSource>(filename);
          connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);

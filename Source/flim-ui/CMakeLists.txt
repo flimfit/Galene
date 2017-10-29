@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(flim-ui LANGUAGES CXX CUDA) 
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
 find_package(Qt5OpenGL)
@@ -11,9 +13,10 @@ set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBIN
 find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
+find_package(BioImage REQUIRED)
+add_definitions(-DBIM_USE_OPENCV)
 
 find_package(CUDA)
-
 include_directories(${OME_FILES_ROOT}/include)
 
 include("cmake/DeployQt.cmake")
@@ -47,6 +50,9 @@ set(SOURCE
    IntensityReader.cpp
    IntensityDataSource.cpp
    RealignableDataSource.cpp
+   BioImageIntensityReader.cpp
+   OmeIntensityReader.cpp
+   IntensityWriter.cpp
 )
 
 set(HEADERS
@@ -71,6 +77,9 @@ set(HEADERS
    RealignableDataSource.h
    IntensityReader.h
    IntensityDataSource.h
+   BioImageIntensityReader.h
+   OmeIntensityReader.h
+   IntensityWriter.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
@@ -81,7 +90,8 @@ include_directories(${fifo_flim_INCLUDE_DIR}
                     ${QT_USE_FILE}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
-                    ${OME_FILES_INCLUDE_DIRS})
+                    ${OME_FILES_INCLUDE_DIRS}
+                    ${BIOIMAGE_INCLUDE_DIRS})
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)
@@ -109,6 +119,7 @@ set (Galene_LIBS    ${OpenCV_LIBS}
                     ${InstrumentControl_LIBRARIES}
                     ${FlimReader_LIBRARIES}
                     ${CUDA_LIBRARIES}
+                    ${BIOIMAGE_LIBRARIES}
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code
