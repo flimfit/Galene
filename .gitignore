@@ -1,8 +1,8 @@
 Build/*
 Build*/*
-cache/*
-ome-files-build/*
-ome-files-install/*
+lib/cache/*
+lib-build/*
+lib-install/*
 *.mex*
 *.log
 *.autosave

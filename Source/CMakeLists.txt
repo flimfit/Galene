@@ -4,13 +4,10 @@ set(CMAKE_CXX_STANDARD 14)
 if(DEFINED ENV{OME_FILES_ROOT})
     set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
 else()
-    set(OME_FILES_ROOT "${CMAKE_SOURCE_DIR}/../ome-files-install")
+    set(OME_FILES_ROOT "${CMAKE_SOURCE_DIR}/lib-install")
 endif()
 
 set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
-
-#include ("cmake/TargetAppleSdk.cmake")
-#target_apple_sdk(10.10)
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 

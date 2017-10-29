@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <boost/filesystem.hpp>
+#include <ome/files/CoreMetadata.h>
 
 const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
 
