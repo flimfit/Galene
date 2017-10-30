@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 project(flim-ui LANGUAGES CXX CUDA) 
 
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
 find_package(Qt5OpenGL)

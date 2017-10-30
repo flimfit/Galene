@@ -15,7 +15,6 @@ SET TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
 SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
 
 
-
 SET BIOIMAGE_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install ^
    -DBIC_ENABLE_FFMPEG=OFF ^
    -DBIC_ENABLE_GDCM=OFF ^
@@ -45,7 +44,7 @@ cmake -GNinja -Hlib/src/bioimageconvert -Blib/build/bioimageconvert/relwithdebin
 cmake --build lib/build/bioimageconvert/relwithdebinfo --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
-EXIT /B %ERRORLEVEL%
+
 
 SET OME_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install ^
    -Dsource-cache="lib/cache/source/" ^
@@ -57,13 +56,13 @@ SET OME_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install ^
    -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DVCPKG_TARGET_TRIPLET=x64-windows
 
 REM build release
-REM cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/release -DCMAKE_BUILD_TYPE=Release %OME_BUILD_FLAGS%
-REM cmake --build lib/build/ome-files/release --target install
+cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/release -DCMAKE_BUILD_TYPE=Release %OME_BUILD_FLAGS%
+cmake --build lib/build/ome-files/release --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 REM build debug
-REM cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
-REM cmake --build lib/build/ome-files/debug --target install
+1cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
+cmake --build lib/build/ome-files/debug --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 REM build relwithdebinfo
