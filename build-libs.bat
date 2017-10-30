@@ -45,9 +45,9 @@ cmake -GNinja -Hlib/src/bioimageconvert -Blib/build/bioimageconvert/relwithdebin
 cmake --build lib/build/bioimageconvert/relwithdebinfo --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
+EXIT /B %ERRORLEVEL%
 
-
-SET OME_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install/ome-files ^
+SET OME_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install ^
    -Dsource-cache="lib/cache/source/" ^
    -Dhead:BOOL=ON ^
    -Dtest:BOOL=OFF ^
@@ -57,13 +57,13 @@ SET OME_BUILD_FLAGS=-DCMAKE_INSTALL_PREFIX=lib/install/ome-files ^
    -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DVCPKG_TARGET_TRIPLET=x64-windows
 
 REM build release
-cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/release -DCMAKE_BUILD_TYPE=Release %OME_BUILD_FLAGS%
-cmake --build lib/build/ome-files/release --target install
+REM cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/release -DCMAKE_BUILD_TYPE=Release %OME_BUILD_FLAGS%
+REM cmake --build lib/build/ome-files/release --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 REM build debug
-cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
-cmake --build lib/build/ome-files/debug --target install
+REM cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
+REM cmake --build lib/build/ome-files/debug --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 REM build relwithdebinfo

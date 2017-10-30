@@ -1,8 +1,7 @@
 Build/*
-Build*/*
 lib/cache/*
-lib-build/*
-lib-install/*
+lib/build/*
+lib/install/*
 *.mex*
 *.log
 *.autosave
