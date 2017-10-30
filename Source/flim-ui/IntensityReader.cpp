@@ -3,6 +3,7 @@
 
 #include "OmeIntensityReader.h"
 #include "BioImageIntensityReader.h"
+#include "ImarisIntensityReader.h"
 
 IntensityReader::IntensityReader(const std::string& filename) : 
    filename(filename)
@@ -21,6 +22,9 @@ std::shared_ptr<IntensityReader> IntensityReader::getReader(const std::string& f
    if (BioImageIntensityReader::supportedExtensions().contains(ext))
       return std::make_shared<BioImageIntensityReader>(filename);
 
+   if (ImarisIntensityReader::supportedExtensions().contains(ext))
+      return std::make_shared<ImarisIntensityReader>(filename);
+
    throw std::runtime_error("Unsupported file type");
 }
 
@@ -33,7 +37,7 @@ void IntensityReader::read()
 cv::Mat IntensityReader::getStack(int chan, int t)
 {
    std::vector<int> dims = { n_z, n_y, n_x };
-   cv::Mat stack(dims, CV_8U, cv::Scalar(0));
+   cv::Mat stack(dims, CV_16U, cv::Scalar(0));
    addStack(chan, t, stack);
    return stack;
 }
@@ -43,7 +47,7 @@ void IntensityReader::loadIntensityFramesImpl()
 {
    std::vector<int> dims = { n_z, n_y, n_x };
 
-   cv::Mat cur_frame(dims, CV_8U, cv::Scalar(0));
+   cv::Mat cur_frame(dims, CV_16U, cv::Scalar(0));
 
    {
       std::lock_guard<std::mutex> lk(frame_mutex);
@@ -76,7 +80,7 @@ void IntensityReader::loadIntensityFramesImpl()
 cv::Mat IntensityReader::getIntensityFrameImmediately(int t)
 {
    std::vector<int> dims = { n_z, n_y, n_x };
-   cv::Mat frame(dims, CV_8U, cv::Scalar(0));
+   cv::Mat frame(dims, CV_16U, cv::Scalar(0));
    for (int chan = 0; chan < n_chan; chan++)
       addStack(chan, t, frame);
    return frame;

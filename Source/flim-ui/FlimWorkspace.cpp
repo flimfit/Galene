@@ -34,7 +34,8 @@ void FlimWorkspace::update()
            QString("*.ptu"), 
            QString("*.spc"),
            QString("*.ome.tif"),
-           QString("*.lsm") }, 
+           QString("*.lsm"),
+           QString("*.ims")}, 
          QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)

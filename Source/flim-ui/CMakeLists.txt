@@ -51,6 +51,7 @@ set(SOURCE
    BioImageIntensityReader.cpp
    OmeIntensityReader.cpp
    IntensityWriter.cpp
+   ImarisIntensityReader.cpp
 )
 
 set(HEADERS
@@ -78,6 +79,7 @@ set(HEADERS
    BioImageIntensityReader.h
    OmeIntensityReader.h
    IntensityWriter.h
+   ImarisIntensityReader.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
@@ -89,7 +91,9 @@ include_directories(${fifo_flim_INCLUDE_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${OME_FILES_INCLUDE_DIRS}
-                    ${BIOIMAGE_INCLUDE_DIRS})
+                    ${HDF5_INCLUDE_DIRS}
+                    ${BIOIMAGE_INCLUDE_DIRS}
+                    ${Boost_INCLUDE_DIRS})
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)
@@ -119,7 +123,8 @@ set (Galene_LIBS    ${OpenCV_LIBS}
                     ${CUDA_LIBRARIES}
                     ${BIOIMAGE_LIBRARIES}
                     ${LAPACK_LIBRARIES}
-                    ${BLAS_LIBRARIES}             
+                    ${BLAS_LIBRARIES}
+                    ${HDF5_LIBRARIES} 
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code

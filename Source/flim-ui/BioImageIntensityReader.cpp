@@ -36,7 +36,7 @@ void BioImageIntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
    std::lock_guard<std::mutex> lk(read_mutex);
    
-   cv::Mat cv8;
+   cv::Mat cv16;
 
    for (int z = 0; z < n_z; z++)
    {
@@ -50,11 +50,11 @@ void BioImageIntensityReader::addStack(int chan, int t, cv::Mat& data)
          //int type = getCvPixelType(buf.pixelType());
          //cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
          
-         cvbuf.convertTo(cv8, CV_8U);
+         cvbuf.convertTo(cv16, CV_16U);
 
          // Copy into frame
          if (cvbuf.size().width == n_x && cvbuf.size().height == n_y)
-            extractSlice(data, z) += cv8;
+            extractSlice(data, z) += cv16;
          else  
             std::cout << "Slice (Z:" << z << ", C: " << chan << ", T: " << t << ") is the wrong size!" << "\n";
       }
