@@ -99,6 +99,7 @@ void FlimReaderDataSource::update()
          cv::Mat norm;
          intensity_normalisation.convertTo(norm, CV_32F);
          cv::divide(intensity, norm, intensity);
+         intensity *= 100;
       }
    }
 

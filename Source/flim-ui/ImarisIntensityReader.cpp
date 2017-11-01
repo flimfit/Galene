@@ -2,8 +2,6 @@
 #include <boost/lexical_cast.hpp>
 #include <Cv3dUtils.h>
 
-using namespace H5;
-
 template<typename T>
 T readAttribute(hid_t h, const std::string& attr)
 {

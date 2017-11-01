@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IntensityReader.h"
-#include <H5Cpp.h>
+#include <hdf5.h>
 
 class ImarisIntensityReader : public IntensityReader
 {

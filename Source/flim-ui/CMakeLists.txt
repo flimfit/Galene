@@ -17,6 +17,8 @@ add_definitions(-DBIM_USE_OPENCV)
 find_package(CUDA)
 include_directories(${OME_FILES_ROOT}/include)
 
+find_package(hdf5)
+
 include("cmake/DeployQt.cmake")
 
 set(CMAKE_AUTOMOC ON)

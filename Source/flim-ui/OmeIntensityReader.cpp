@@ -67,8 +67,6 @@ void OmeIntensityReader::readMetadata()
    n_t = (int)reader->getSizeT();
    n_chan = (int)reader->getSizeC();
 
-   n_t--; // TODO: Last frame seems problematic 
-
    swap_zt = (n_t == 1 && n_z > 1);
    if (swap_zt)
    {
@@ -77,6 +75,8 @@ void OmeIntensityReader::readMetadata()
       n_z = nb;
       std::cout << "Swapping z and t\n";
    }
+
+   n_t--; // TODO: Last frame seems problematic 
 
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
@@ -91,7 +91,7 @@ void OmeIntensityReader::addStack(int chan, int t, cv::Mat& data)
    {
       try
       {
-         auto index = reader->getIndex(z, chan, t);
+         size_t index = swap_zt ? reader->getIndex(t, chan, z) : reader->getIndex(z, chan, t);
          reader->openBytes(index, buf);
 
          int type = getCvPixelType(buf.pixelType());

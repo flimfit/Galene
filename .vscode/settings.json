@@ -16,6 +16,10 @@
       "random": "cpp",
       "fstream": "cpp",
       "*.ipp": "cpp",
-      "xlocale": "cpp"
+      "xiosbase": "cpp",
+      "condition_variable": "cpp",
+      "future": "cpp",
+      "mutex": "cpp",
+      "list": "cpp"
    }
 }

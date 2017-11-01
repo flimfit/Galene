@@ -18,7 +18,6 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 
 find_package(Boost REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(hdf5 REQUIRED)
 
 find_package(MATLAB)
 if(MATLAB_FOUND)
