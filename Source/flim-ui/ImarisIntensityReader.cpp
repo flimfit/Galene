@@ -44,19 +44,11 @@ void ImarisIntensityReader::readMetadata()
    n_x = readAttribute<int>(vImageId, "X");
    n_y = readAttribute<int>(vImageId, "Y");
    n_z = readAttribute<int>(vImageId, "Z");
+   n_chan = readAttribute<int>(vImageId, "NumberOfChannels");
    H5Gclose(vImageId);
-
-   n_chan = 0;
-   hid_t h = -1;
-   do
-   {
-      std::string name = "Channel " + boost::lexical_cast<std::string>(++n_chan);
-      h = H5Gopen(vDataSetInfoId, name.c_str(), H5P_DEFAULT);
-      if (h >= 0) H5Gclose(h);
-      std::cout << h << "\n";
-   } while (h >= 0);
-   n_chan--;
  
+   std::cout << "Channels: " << n_chan << "\n";
+
    hid_t vTimeInfo = H5Gopen(vDataSetInfoId, "TimeInfo", H5P_DEFAULT);
    n_t = readAttribute<int>(vTimeInfo, "FileTimePoints");
    H5Gclose(vTimeInfo);
@@ -93,9 +85,6 @@ void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
 
    std::vector<uint64_t> dims = {(uint64_t) n_z, (uint64_t) n_y, (uint64_t) n_x};
    hid_t vFileSpaceId = H5Screate_simple(3, dims.data(), NULL);
-
-   //std::cout << "cvtype " << cv_type << ", " << n_z << "," << n_y << "," << n_x << "\n";
-   
 
    std::vector<int> cv_dims = {n_z, n_y, n_x};
    cv::Mat buf(cv_dims, cv_type);

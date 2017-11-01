@@ -61,7 +61,7 @@ cmake --build lib/build/ome-files/release --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 REM build debug
-1cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
+cmake -GNinja -Hlib/src/ome-cmake-superbuild -Blib/build/ome-files/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEBUG_POSTFIX=d %OME_BUILD_FLAGS%
 cmake --build lib/build/ome-files/debug --target install
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
