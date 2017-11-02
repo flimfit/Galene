@@ -1,7 +1,7 @@
 #include "IntensityWriter.h"
 #include "ImarisIntensityReader.h"
 
-class ImarisIntensityWriter : public AbstractIntensityWriter
+class ImarisIntensityWriter : public IntensityWriter
 {
 public:
    ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader);

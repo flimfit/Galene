@@ -52,7 +52,7 @@ set(SOURCE
    RealignableDataSource.cpp
    BioImageIntensityReader.cpp
    OmeIntensityReader.cpp
-   IntensityWriter.cpp
+   OmeIntensityWriter.cpp
    ImarisIntensityReader.cpp
    ImarisIntensityWriter.cpp
 )
@@ -82,6 +82,7 @@ set(HEADERS
    BioImageIntensityReader.h
    OmeIntensityReader.h
    IntensityWriter.h
+   OmeIntensityWriter.h
    ImarisIntensityReader.h
    ImarisIntensityWriter.h
 )

@@ -1,5 +1,6 @@
 #include "IntensityDataSource.h"
-#include "IntensityWriter.h"
+#include "ImarisIntensityWriter.h"
+#include "OmeIntensityWriter.h"
 
 IntensityDataSource::IntensityDataSource(const QString& filename, QObject* parent) : 
 QObject(parent), filename(filename)
@@ -53,8 +54,18 @@ void IntensityDataSource::cancelRead()
 
 void IntensityDataSource::saveData(const QString& root_name)
 {
-   QString filename = root_name + ".ome.tif";
+   auto imaris_writer = std::dynamic_pointer_cast<ImarisIntensityReader>(reader);
 
-   IntensityWriter writer(reader);
-   writer.write(filename.toStdString());
+   if (imaris_writer)
+   {
+      QString filename = root_name + ".ims";
+      ImarisIntensityWriter writer(imaris_writer);
+      writer.write(filename.toStdString());
+   }
+   else
+   {
+      QString filename = root_name + ".ome.tif";
+      OmeIntensityWriter writer(reader);
+      writer.write(filename.toStdString());
+   }
 }

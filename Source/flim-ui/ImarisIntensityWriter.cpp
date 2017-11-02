@@ -1,10 +1,11 @@
 #include "ImarisIntensityWriter.h"
+#include "IntensityReader.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include "ProducerConsumer.h"
 
 ImarisIntensityWriter::ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader) : 
-   AbstractIntensityWriter(reader)
+   IntensityWriter(reader)
 {
 
 }
@@ -20,10 +21,6 @@ void ImarisIntensityWriter::write(const std::string& filename)
 
    hid_t vDataSetId = H5Gopen(file, "DataSet", H5P_DEFAULT);
    hid_t level0 = H5Gopen(vDataSetId, "ResolutionLevel 0", H5P_DEFAULT);
-
-
-
-   size_t dims[2] = {n_y, n_x};
 
    auto producer = [&](size_t idx)
    {

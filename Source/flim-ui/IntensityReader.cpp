@@ -1,6 +1,7 @@
 #include "IntensityReader.h"
 #include <QFileInfo>
 
+#include "OmeIntensityWriter.h"
 #include "OmeIntensityReader.h"
 #include "BioImageIntensityReader.h"
 #include "ImarisIntensityReader.h"
@@ -27,6 +28,7 @@ std::shared_ptr<IntensityReader> IntensityReader::getReader(const std::string& f
 
    throw std::runtime_error("Unsupported file type");
 }
+
 
 void IntensityReader::read()
 {
@@ -62,8 +64,9 @@ void IntensityReader::loadIntensityFramesImpl()
 
       cur_frame.setTo(cv::Scalar(0));
       if (terminate) break;
-       for(int chan = 0; chan < n_chan; chan++)
-         addStack(chan, t, cur_frame);
+      for(int chan = 0; chan < n_chan; chan++)
+         if (chan == 1 || chan == 3)
+            addStack(chan, t, cur_frame);
 
        cv::Mat frame_cpy;
        cur_frame.copyTo(frame_cpy);
@@ -82,7 +85,8 @@ cv::Mat IntensityReader::getIntensityFrameImmediately(int t)
    std::vector<int> dims = { n_z, n_y, n_x };
    cv::Mat frame(dims, CV_16U, cv::Scalar(0));
    for (int chan = 0; chan < n_chan; chan++)
-      addStack(chan, t, frame);
+      if (chan == 1 || chan == 3)
+         addStack(chan, t, frame);
    return frame;
 }
 

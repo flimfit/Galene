@@ -1,4 +1,4 @@
-#include "IntensityWriter.h"
+#include "OmeIntensityWriter.h"
 
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/MetadataTools.h>
@@ -8,8 +8,8 @@
 
 #include "ProducerConsumer.h"
 
-AbstractIntensityWriter::AbstractIntensityWriter(std::shared_ptr<IntensityReader> reader) :
-   reader(reader)
+IntensityWriter::IntensityWriter(std::shared_ptr<IntensityReader> reader) :
+reader(reader)
 {
    n_x = reader->numX();
    n_y = reader->numY();
@@ -19,14 +19,12 @@ AbstractIntensityWriter::AbstractIntensityWriter(std::shared_ptr<IntensityReader
 }
 
 
-IntensityWriter::IntensityWriter(std::shared_ptr<IntensityReader> reader) : 
-   AbstractIntensityWriter(reader)
+OmeIntensityWriter::OmeIntensityWriter(std::shared_ptr<IntensityReader> reader) : 
+   IntensityWriter(reader)
 {
-
 }
 
-
-void IntensityWriter::write(const std::string& output_filename)
+void OmeIntensityWriter::write(const std::string& output_filename)
 {
    using namespace ome::xml::meta;
    using namespace ome::xml::model;

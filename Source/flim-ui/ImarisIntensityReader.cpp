@@ -47,8 +47,6 @@ void ImarisIntensityReader::readMetadata()
    n_chan = readAttribute<int>(vImageId, "NumberOfChannels");
    H5Gclose(vImageId);
  
-   std::cout << "Channels: " << n_chan << "\n";
-
    hid_t vTimeInfo = H5Gopen(vDataSetInfoId, "TimeInfo", H5P_DEFAULT);
    n_t = readAttribute<int>(vTimeInfo, "FileTimePoints");
    H5Gclose(vTimeInfo);
@@ -57,6 +55,9 @@ void ImarisIntensityReader::readMetadata()
    
    bool bidirectional = false;
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
+
+   n_t = std::min(n_t, 5);
+
 }
 
 void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
