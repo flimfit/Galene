@@ -15,7 +15,7 @@ public:
    ~IntensityReader() { }
 
    static std::shared_ptr<IntensityReader> getReader(const std::string& filename);
-
+   const std::string& getFilename() { return filename; }
    int getNumIntensityFrames() { return n_t; };
    ImageScanParameters getImageScanParameters() { return scan_params; }
 

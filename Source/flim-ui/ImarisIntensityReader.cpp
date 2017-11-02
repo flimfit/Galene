@@ -88,7 +88,7 @@ void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
 
    std::vector<int> cv_dims = {n_z, n_y, n_x};
    cv::Mat buf(cv_dims, cv_type);
-   H5Dread(vDataId, H5T_NATIVE_UCHAR, H5S_ALL, vFileSpaceId, H5P_DEFAULT, buf.data);
+   H5Dread(vDataId, type_id, H5S_ALL, vFileSpaceId, H5P_DEFAULT, buf.data);
 
    cv::Mat cv16;
    buf.convertTo(cv16, CV_16U);

@@ -8,7 +8,7 @@
 
 #include "ProducerConsumer.h"
 
-IntensityWriter::IntensityWriter(std::shared_ptr<IntensityReader> reader) :
+AbstractIntensityWriter::AbstractIntensityWriter(std::shared_ptr<IntensityReader> reader) :
    reader(reader)
 {
    n_x = reader->numX();
@@ -16,6 +16,13 @@ IntensityWriter::IntensityWriter(std::shared_ptr<IntensityReader> reader) :
    n_z = reader->numZ();
    n_t = reader->numT();
    n_chan = reader->numC();
+}
+
+
+IntensityWriter::IntensityWriter(std::shared_ptr<IntensityReader> reader) : 
+   AbstractIntensityWriter(reader)
+{
+
 }
 
 

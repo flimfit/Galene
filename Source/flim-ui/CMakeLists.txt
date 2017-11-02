@@ -54,6 +54,7 @@ set(SOURCE
    OmeIntensityReader.cpp
    IntensityWriter.cpp
    ImarisIntensityReader.cpp
+   ImarisIntensityWriter.cpp
 )
 
 set(HEADERS
@@ -82,6 +83,7 @@ set(HEADERS
    OmeIntensityReader.h
    IntensityWriter.h
    ImarisIntensityReader.h
+   ImarisIntensityWriter.h
 )
 
 include_directories(${fifo_flim_INCLUDE_DIR}
