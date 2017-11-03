@@ -27,8 +27,7 @@ void BioImageIntensityReader::readMetadata()
    n_t = image5d->numberT();
    n_chan = image5d->numberC();
    
-   //n_t--; // TODO: Last frame seems problematic 
-
+   setUseAllChannels();   
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
 
@@ -43,13 +42,7 @@ void BioImageIntensityReader::addStack(int chan, int t, cv::Mat& data)
       try
       {
          auto im = image5d->imageAt(t, z);
-         cv::Mat cvbuf = im->asCVMat(chan);
-         //auto index = reader->getIndex(z, chan, t);
-         //reader->openBytes(index, buf);
-
-         //int type = getCvPixelType(buf.pixelType());
-         //cv::Mat cvbuf(scan_params.n_y, scan_params.n_x, type, buf.data());
-         
+         cv::Mat cvbuf = im->asCVMat(chan);         
          cvbuf.convertTo(cv16, CV_16U);
 
          // Copy into frame

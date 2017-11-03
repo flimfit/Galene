@@ -16,6 +16,7 @@
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
 #include "IntensityDataSource.h"
+#include "GpuFrameWarper.h"
 #include <functional>
 #include <thread>
 
@@ -69,7 +70,11 @@ RealignmentStudio::RealignmentStudio() :
    Bind(save_realignment_info_check, this, &RealignmentStudio::setSaveRealignmentInfo, &RealignmentStudio::getSaveRealignmentInfo);
    Bind(save_movie_check, this, &RealignmentStudio::setSaveMovie, &RealignmentStudio::getSaveMovie);
 
-
+   if (GpuFrameWarper::hasSupportedGpu())
+   {
+      use_gpu_check->setEnabled(true);
+      use_gpu_check->setChecked(true);
+   }
 }
 
 void RealignmentStudio::updateParameterGroupBox(int index)
@@ -110,6 +115,8 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
          connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
          source = s;
       }
+
+      source->requestChannelsFromUser();
 
       emit newDataSource(source);
       source->setRealignmentParameters(getRealignmentParameters());
@@ -393,6 +400,7 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.correlation_threshold = threshold_spin->value();
    params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
+   params.prefer_gpu = use_gpu_check->isChecked();
 
    return params;
 }
@@ -405,4 +413,7 @@ void RealignmentStudio::displayErrorMessage(const QString& msg)
 
 RealignmentStudio::~RealignmentStudio()
 {
+   for(auto& thread : save_thread)
+      if(thread.joinable())
+         thread.join();
 }

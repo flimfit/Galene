@@ -1,5 +1,6 @@
 #include "RealignableDataSource.h"
 #include "RealignmentResultsWriter.h"
+#include "CustomDialog.h"
 
 DataSourceWorker::DataSourceWorker(RealignableDataSource* source, QObject* parent) :
 ThreadedObject(parent), source(source)
@@ -109,4 +110,35 @@ void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
    
    if (getFrameAligner())
       getFrameAligner()->writeRealignmentInfo(info_filename.toStdString());   
+}
+
+std::vector<bool> last_use_chan;
+
+void RealignableDataSource::requestChannelsFromUser()
+{
+   int n_chan = aligningReader().getNumChannels();
+
+   bool* use_chan = new bool[n_chan];
+
+   CustomDialog d("Realignment Options", nullptr, BS_OKAY_ONLY);
+   d.addLabel    ("Please select channels to use for realignment");
+   for(int i=0; i<n_chan; i++)
+   {
+      use_chan[i] = (i < last_use_chan.size()) ? last_use_chan[i] : true;
+      d.addCheckBox("Channel " + QString::number(i), &use_chan[i]);
+   }
+
+   d.exec();
+
+   std::vector<bool> use_chan_v(n_chan);
+   for(int i=0; i<n_chan; i++)
+      use_chan_v[i] = use_chan[i];
+
+   aligningReader().setChannelsToUse(use_chan_v);
+
+   last_use_chan.resize(std::max(last_use_chan.size(), (size_t)n_chan));
+   for(int i=0; i<n_chan; i++)
+      last_use_chan[i] = use_chan[i];
+
+   delete[] use_chan;   
 }

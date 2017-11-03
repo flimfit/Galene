@@ -36,6 +36,23 @@ QStringList ImarisIntensityReader::supportedExtensions()
    return { "ims" };
 }
 
+int getCvTypeFromH5T(hid_t type)
+{
+   int cv_type = 0;
+   if (H5Tequal(type, H5T_NATIVE_UCHAR))
+      cv_type = CV_8U;
+   else if (H5Tequal(type, H5T_NATIVE_USHORT))
+      cv_type = CV_16U;
+   else if (H5Tequal(type, H5T_NATIVE_UINT32))
+      cv_type = CV_32S;
+   else if (H5Tequal(type, H5T_NATIVE_FLOAT))
+      cv_type = CV_32F;   
+   else
+      throw std::runtime_error("Unrecognised type");
+
+   return cv_type;
+}
+
 void ImarisIntensityReader::readMetadata()
 {
    hid_t vDataSetInfoId = H5Gopen(file, "DataSetInfo", H5P_DEFAULT);
@@ -56,8 +73,9 @@ void ImarisIntensityReader::readMetadata()
    bool bidirectional = false;
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 
-   n_t = std::min(n_t, 5);
+   //n_t = std::min(n_t, 50);
 
+   setUseAllChannels();
 }
 
 void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
@@ -72,17 +90,7 @@ void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
    hid_t vDataId = H5Dopen(vChannelId, "Data", H5P_DEFAULT);
    hid_t type = H5Dget_type(vDataId);
    hid_t type_id = H5Tget_native_type(type, H5T_DIR_ASCEND);
-
-   int cv_type = -1;
-   if (H5Tequal(type, H5T_NATIVE_UCHAR)) 
-      cv_type = CV_8U;
-   else if (H5Tequal(type, H5T_NATIVE_USHORT))
-      cv_type = CV_16U;
-   else if (H5Tequal(type, H5T_NATIVE_UINT32)) 
-      cv_type = CV_32S;
-   else if (H5Tequal(type, H5T_NATIVE_FLOAT)) 
-      cv_type = CV_32F;
-
+   int cv_type = getCvTypeFromH5T(type);
 
    std::vector<uint64_t> dims = {(uint64_t) n_z, (uint64_t) n_y, (uint64_t) n_x};
    hid_t vFileSpaceId = H5Screate_simple(3, dims.data(), NULL);

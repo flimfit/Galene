@@ -53,6 +53,8 @@ public:
    virtual void requestDelete() = 0;
    virtual QWidget* getWidget() { return nullptr; }
 
+   void requestChannelsFromUser();
+
 protected:
 
    virtual AligningReader& aligningReader() = 0;

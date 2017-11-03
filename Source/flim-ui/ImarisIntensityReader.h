@@ -18,3 +18,5 @@ protected:
    hid_t file;
    hid_t level0;
 };
+
+int getCvTypeFromH5T(hid_t type);

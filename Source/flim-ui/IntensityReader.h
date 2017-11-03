@@ -27,7 +27,7 @@ public:
    int numY() { return n_y; }
    int numZ() { return n_z; }
    int numT() { return n_t; }
-   int numC() { return n_chan; }
+   int getNumChannels() { return n_chan; }
    
    cv::Mat getRealignedStack(int chan, int t);
    

@@ -16,10 +16,10 @@ export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 export CMAKE_PREFIX_PATH=$(pwd)/lib/install
 
 # Generate make files and build 
-BUILD_TYPE=Debug
+BUILD_TYPE=RelWithDebInfo
 #rm -rf Build_$BUILD_TYPE
-cmake -GNinja -HSource -BBuild_$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-cmake --build Build_$BUILD_TYPE  # --clean-first
+cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+cmake --build Build/$BUILD_TYPE  # --clean-first
 
 # sign code (requires that signature is installed in keychain)
 # codesign --verbose --deep -s P6MM899VL9 Build/flim-ui/Galene.app/

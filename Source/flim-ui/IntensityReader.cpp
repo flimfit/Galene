@@ -65,7 +65,7 @@ void IntensityReader::loadIntensityFramesImpl()
       cur_frame.setTo(cv::Scalar(0));
       if (terminate) break;
       for(int chan = 0; chan < n_chan; chan++)
-         if (chan == 1 || chan == 3)
+         if (use_channel[chan])
             addStack(chan, t, cur_frame);
 
        cv::Mat frame_cpy;
@@ -85,7 +85,7 @@ cv::Mat IntensityReader::getIntensityFrameImmediately(int t)
    std::vector<int> dims = { n_z, n_y, n_x };
    cv::Mat frame(dims, CV_16U, cv::Scalar(0));
    for (int chan = 0; chan < n_chan; chan++)
-      if (chan == 1 || chan == 3)
+      if (use_channel[chan])
          addStack(chan, t, frame);
    return frame;
 }

@@ -78,6 +78,8 @@ void OmeIntensityReader::readMetadata()
 
    n_t--; // TODO: Last frame seems problematic 
 
+   setUseAllChannels();
+   
    scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
 }
 

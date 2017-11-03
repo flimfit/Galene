@@ -5,7 +5,7 @@
       "name": "(lldb) Attach",
       "type": "cppdbg",
       "request": "attach",
-      "program": "${workspaceRoot}/Build/flim-ui/GaleneTest",
+      "program": "${workspaceRoot}/Build/Debug/flim-ui/GaleneTest",
       "processId": "${command:pickProcess}",
       "MIMode": "lldb"
    },

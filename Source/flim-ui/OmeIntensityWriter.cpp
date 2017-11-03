@@ -15,7 +15,7 @@ reader(reader)
    n_y = reader->numY();
    n_z = reader->numZ();
    n_t = reader->numT();
-   n_chan = reader->numC();
+   n_chan = reader->getNumChannels();
 }
 
 
