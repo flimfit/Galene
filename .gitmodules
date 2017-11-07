@@ -11,6 +11,3 @@
 	path = Source/FlimReader
 	url = https://github.com/flimfit/FlimReader.git
 	branch = 3d-realignment
-[submodule "Source/dlib"]
-	path = Source/dlib
-	url = https://github.com/seanwarren/dlib/
