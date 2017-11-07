@@ -3,6 +3,21 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include "ProducerConsumer.h"
+#include "Cv3dUtils.h"
+
+void pyrDown3d(const cv::Mat& m, cv::Mat& out)
+{
+   if (m.dims == 2) return pyrDown(m, out);
+
+   int n_z_out = m.size[Z] / 2;
+   std::vector<int> out_dims = { n_z_out, m.size[Y] / 2, m.size[X] / 2 };
+   std::cout << n_z_out << ", " << m.size[Y] / 2 << ", " << m.size[X] / 2 << "\n";
+   out = cv::Mat(out_dims, m.type());
+
+   for(int z=0; z<n_z_out; z++)
+      pyrDown(extractSlice(m, z*2), extractSlice(out, z));
+}
+
 
 ImarisIntensityWriter::ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader) : 
    IntensityWriter(reader)
@@ -58,8 +73,13 @@ void ImarisIntensityWriter::write(const std::string& filename)
          hid_t type = H5Dget_type(vDataId);
          hid_t type_id = H5Tget_native_type(type, H5T_DIR_ASCEND);
 
-         cvbuf.convertTo(cvbuf, getCvTypeFromH5T(type));         
-         if (i > 0) pyrDown(cvbuf, cvbuf);
+         cvbuf.convertTo(cvbuf, getCvTypeFromH5T(type));  
+         cv::Mat temp;       
+         if (i > 0)
+         {
+            pyrDown3d(cvbuf, temp);
+            cvbuf = temp;            
+         }
 
          std::vector<uint64_t> dims = { (uint64_t) cvbuf.size[0], (uint64_t) cvbuf.size[1], (uint64_t) cvbuf.size[2] };
          hid_t vFileSpaceId = H5Screate_simple(3, dims.data(), NULL);
