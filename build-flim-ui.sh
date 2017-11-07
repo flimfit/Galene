@@ -17,7 +17,7 @@ export CMAKE_PREFIX_PATH=$(pwd)/lib/install
 
 # Generate make files and build 
 BUILD_TYPE=RelWithDebInfo
-#rm -rf Build_$BUILD_TYPE
+#rm -rf Build/$BUILD_TYPE
 cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 cmake --build Build/$BUILD_TYPE  # --clean-first
 
