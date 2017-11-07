@@ -61,9 +61,19 @@ void ImarisIntensityReader::readMetadata()
    n_x = readAttribute<int>(vImageId, "X");
    n_y = readAttribute<int>(vImageId, "Y");
    n_z = readAttribute<int>(vImageId, "Z");
-   n_chan = readAttribute<int>(vImageId, "NumberOfChannels");
+   //n_chan = readAttribute<int>(vImageId, "NumberOfChannels");
    H5Gclose(vImageId);
  
+   n_chan = 0; 
+   hid_t h = -1; 
+   do 
+   { 
+      std::string name = "Channel " + boost::lexical_cast<std::string>(++n_chan); 
+      h = H5Gopen(vDataSetInfoId, name.c_str(), H5P_DEFAULT); 
+      if (h >= 0) H5Gclose(h); 
+      std::cout << h << "\n"; 
+   } while (h >= 0); 
+
    hid_t vTimeInfo = H5Gopen(vDataSetInfoId, "TimeInfo", H5P_DEFAULT);
    n_t = readAttribute<int>(vTimeInfo, "FileTimePoints");
    H5Gclose(vTimeInfo);
