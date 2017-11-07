@@ -401,6 +401,7 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
    params.prefer_gpu = use_gpu_check->isChecked();
+   params.default_reference_frame = (DefaultReferenceFrame) default_reference_combo->currentIndex();
 
    return params;
 }
