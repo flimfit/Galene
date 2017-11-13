@@ -3,6 +3,7 @@ lib/cache/*
 lib/build/*
 lib/install/*
 lib/src/*
+lib/stamp/*
 *.mex*
 *.log
 *.autosave

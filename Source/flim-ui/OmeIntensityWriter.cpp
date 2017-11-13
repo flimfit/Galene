@@ -72,8 +72,8 @@ void OmeIntensityWriter::write(const std::string& output_filename)
 
    auto producer = [&](size_t idx)
    {
-      int c = idx % n_chan;
-      int t = idx / n_chan;
+      int c = (int) (idx % n_chan);
+      int t = (int) (idx / n_chan);
 
       cv::Mat cvbuf;
       cv::Mat stack = reader->getRealignedStack(c, t);

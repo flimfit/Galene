@@ -1,6 +1,8 @@
 @echo off
 
-REM SET PATH=%PATH%;%VCPKG_ROOT%\installed\x64-windows\bin;%VCPKG_ROOT%\installed\x64-windows\debug\bin
+SETLOCAL
+
+SET PATH=%PATH%;%VCPKG_ROOT%\installed\x64-windows\bin;%VCPKG_ROOT%\installed\x64-windows\debug\bin
 SET TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
 SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
 

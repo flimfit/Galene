@@ -118,6 +118,8 @@ void RealignableDataSource::requestChannelsFromUser()
 {
    int n_chan = aligningReader().getNumChannels();
 
+   if (n_chan == 1) return;
+
    bool* use_chan = new bool[n_chan];
 
    CustomDialog d("Realignment Options", nullptr, BS_OKAY_ONLY);
