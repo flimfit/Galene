@@ -9,20 +9,16 @@ points_file = [data.file '_realignment.csv'];
 
 set(0,'DefaultAxesFontSize',8)
 
-points = ReadPointFile(points_file,data.n_px,data.zoom,data.scan_rate);
-
-%{
-Amplitude=17.7778;
-Frequency=1.33333;
-
-simulated = Amplitude * - sin(2*pi*Frequency*data.t_unscaled);
-
-tmin = 2;
-tmax = 4;
-%}
+points = ReadPointFile(points_file,data.n_px(1),data.zoom,data.scan_rate);
 
 tmin = 0;
 tmax = max(points.t(:));
+
+points.t_frame = points.t_frame + 0.5*points.t_frame(2);
+
+%points.t = points.t - 5;
+%points.t_frame = points.t_frame - 5;
+%tmax = 10;
 
 
 fig = figure(1);
@@ -58,7 +54,7 @@ end
 
 hold off;
 set(gca,'box','off','TickDir','out');
-ylabel('Displacement (\mum)');
+%ylabel('Displacement (\mum)');
 xlim([tmin tmax]);
 %ylim([-200 200]);
 subplot(3,1,3);
@@ -66,7 +62,7 @@ plot(points.t_frame,points.correlation);
 hold on;
 plot(points.t_frame,points.unaligned_correlation);
 set(gca,'box','off','TickDir','out');
-ylabel('Correlation');
+%ylabel('Correlation');
 xlabel('Time (s)')
 ylim([0 1.2])
 xlim([tmin tmax]);
@@ -77,5 +73,5 @@ end
 xlim([tmin tmax])
 hold off;
 fig.PaperUnits = 'centimeters';
-fig.PaperPosition = [0 0 10 5];
+fig.PaperPosition = [0 0 5 5];
 print(fig,[output_folder filename '-traces.pdf'],'-dpdf','-painters')

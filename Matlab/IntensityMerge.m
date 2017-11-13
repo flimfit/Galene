@@ -13,10 +13,11 @@ FlimReaderMex(r,'Delete');
 clear FlimReaderMex
 
 intensity_normalisation = double(intensity_normalisation);
-intensity_normalisation(end-1:end,:) = 50;
+%intensity_normalisation(end-1:end,:) = 50;
+intensity_normalisation = reshape(intensity_normalisation,[255,256]);
 imagesc(intensity_normalisation)
 
-
+intensity_normalisation(intensity_normalisation > 1e3) = 0;
 intensity_normalisation = intensity_normalisation / max(intensity_normalisation(:));
 
 intensity = imread(intensity_file);

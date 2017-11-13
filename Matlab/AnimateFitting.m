@@ -8,7 +8,7 @@ dbuffer = [folder 'dbuffer.csv'];
 im = ReadTifStack([folder 'processbuffer.tif']);
 ref = imread([folder 'reference.tif']);
 ref = ref(:,:,1);
-points = ReadDbufferFile(dbuffer,data.n_px,data.zoom,data.scan_rate);
+points = ReadDbufferFile(dbuffer,data.n_px(1),data.zoom,data.scan_rate);
 
 %%
 
@@ -69,7 +69,7 @@ imwrite(imi,'reference.png');
 
 
 %%
-points = ReadDbufferFile(dbuffer,data.n_px,data.zoom,data.scan_rate);
+points = ReadDbufferFile(dbuffer,data.n_px(1),data.zoom,data.scan_rate);
 
 tf = linspace(1,points.lines*points.lines,length(p))'-1;
 x = mod(tf,points.lines)+1;
