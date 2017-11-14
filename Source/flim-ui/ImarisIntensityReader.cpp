@@ -1,6 +1,9 @@
 #include "ImarisIntensityReader.h"
 #include <boost/lexical_cast.hpp>
 #include <Cv3dUtils.h>
+#include <mutex>
+
+std::mutex hdf5_mutex;
 
 template<typename T>
 T readAttribute(hid_t h, const std::string& attr)
@@ -19,6 +22,8 @@ T readAttribute(hid_t h, const std::string& attr)
 ImarisIntensityReader::ImarisIntensityReader(const std::string& filename) :
    IntensityReader(filename)
 {
+   std::lock_guard<std::mutex> lk(hdf5_mutex);
+
    // Create TIFF reader
    file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY | H5F_ACC_DEBUG, H5P_DEFAULT);
    if (file < 0)
@@ -91,6 +96,7 @@ void ImarisIntensityReader::readMetadata()
 void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
    std::lock_guard<std::mutex> lk(read_mutex);
+   std::lock_guard<std::mutex> hdf5_lk(hdf5_mutex);
    
    std::string timepoint = "TimePoint " + boost::lexical_cast<std::string>(t);
    std::string channel = "Channel " + boost::lexical_cast<std::string>(chan);

@@ -4,6 +4,9 @@
 #include <boost/filesystem.hpp>
 #include "ProducerConsumer.h"
 #include "Cv3dUtils.h"
+#include <mutex>
+
+extern std::mutex hdf5_mutex;
 
 void pyrDown3d(const cv::Mat& m, cv::Mat& out)
 {
@@ -27,6 +30,7 @@ ImarisIntensityWriter::ImarisIntensityWriter(std::shared_ptr<ImarisIntensityRead
 
 void ImarisIntensityWriter::write(const std::string& filename)
 {
+   std::unique_lock<std::mutex> lk(hdf5_mutex);
    boost::filesystem::copy_file(reader->getFilename(), filename, boost::filesystem::copy_option::overwrite_if_exists);
 
    // Create TIFF reader
@@ -46,6 +50,8 @@ void ImarisIntensityWriter::write(const std::string& filename)
       levels.push_back(H5Gopen(vDataSetId, res_level.c_str(), H5P_DEFAULT));
    }
 
+   lk.unlock();
+
    auto producer = [&](size_t idx)
    {
       int chan = idx % n_chan;
@@ -59,6 +65,8 @@ void ImarisIntensityWriter::write(const std::string& filename)
 
    auto consumer = [&](size_t idx, cv::Mat cvbuf)
    {
+      std::lock_guard<std::mutex> lk(hdf5_mutex);
+
       int chan = idx % n_chan;
       int t = idx / n_chan;
 

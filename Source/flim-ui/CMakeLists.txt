@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
 project(flim-ui LANGUAGES CXX CUDA) 
 
-find_package(Qt5Widgets)
-find_package(Qt5PrintSupport)
-find_package(Qt5OpenGL)
-find_package(Qt5Network)
+find_package(Qt5 COMPONENTS Widgets PrintSupport OpenGL Network)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
+find_package(dlib REQUIRED)
 find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
@@ -18,11 +16,11 @@ find_package(CUDA)
 include_directories(${OME_FILES_ROOT}/include)
 
 find_package(hdf5)
+set_target_properties(${HDF5_LIBRARIES} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 include("cmake/DeployQt.cmake")
 
 set(CMAKE_AUTOMOC ON)
-add_definitions(${QT_DEFINITIONS}) 
 
 qt5_wrap_ui(UI_HEADERS 
          FlimDisplay.ui
