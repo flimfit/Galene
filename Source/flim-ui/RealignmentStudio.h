@@ -37,6 +37,13 @@ public:
    void setSaveRealignmentInfo(bool save_realignment_info_) { save_realignment_info = save_realignment_info_; };
    bool getSaveRealignmentInfo() { return save_realignment_info; }
 
+   void setDefaultReference(int default_reference_) { default_reference = default_reference_; };
+   int getDefaultReference() { return default_reference; }
+
+   void setUseGpu(bool use_gpu_) { use_gpu = use_gpu_; };
+   bool getUseGpu() { return use_gpu; }
+
+
    std::shared_ptr<RealignableDataSource> openFile(const QString& filename);
    void showFileInfo(const QString& filename);
 
@@ -70,12 +77,16 @@ protected:
 
    RealignmentParameters getRealignmentParameters();
 
+
+
 private:
 
    bool close_after_save = false;
    bool save_preview = false;
    bool save_movie = false;
    bool save_realignment_info = false;
+   bool use_gpu = true;
+   int default_reference = 0;
 
    void displayErrorMessage(const QString& error);
 

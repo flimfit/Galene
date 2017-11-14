@@ -69,12 +69,13 @@ RealignmentStudio::RealignmentStudio() :
    Bind(save_preview_check, this, &RealignmentStudio::setSavePreview, &RealignmentStudio::getSavePreview);
    Bind(save_realignment_info_check, this, &RealignmentStudio::setSaveRealignmentInfo, &RealignmentStudio::getSaveRealignmentInfo);
    Bind(save_movie_check, this, &RealignmentStudio::setSaveMovie, &RealignmentStudio::getSaveMovie);
+   Bind(default_reference_combo, this, &RealignmentStudio::setDefaultReference, &RealignmentStudio::getDefaultReference);
+   Bind(use_gpu_check, this, &RealignmentStudio::setUseGpu, &RealignmentStudio::getUseGpu);
 
    if (GpuFrameWarper::hasSupportedGpu())
-   {
       use_gpu_check->setEnabled(true);
-      use_gpu_check->setChecked(true);
-   }
+   else
+      use_gpu_check->setChecked(false);
 }
 
 void RealignmentStudio::updateParameterGroupBox(int index)
