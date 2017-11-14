@@ -30,6 +30,8 @@ public:
    int getNumChannels() { return n_chan; }
    
    cv::Mat getRealignedStack(int chan, int t);
+
+   double getProgress();
    
 protected:
 
@@ -47,7 +49,6 @@ protected:
    std::mutex read_mutex;
 
    int n_x, n_y, n_z, n_t, n_chan;
-   bool terminate = false;
 
    bool swap_zt = false;
 };

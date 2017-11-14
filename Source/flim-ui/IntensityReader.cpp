@@ -35,6 +35,17 @@ void IntensityReader::read()
    waitForAlignmentComplete();
 }
 
+double IntensityReader::getProgress()
+{
+   if (realignment.empty()) return 0;
+
+   int n_done = 0;
+   for (int i = 0; i < realignment.size(); i++)
+      n_done += realignment[i].done;
+
+   return static_cast<double>(n_done) / realignment.size();
+}
+
 
 cv::Mat IntensityReader::getStack(int chan, int t)
 {

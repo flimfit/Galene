@@ -6,12 +6,22 @@ IntensityDataSource::IntensityDataSource(const QString& filename, QObject* paren
 QObject(parent), filename(filename)
 {
    reader = IntensityReader::getReader(filename.toStdString());
+
+   worker = new DataSourceWorker(this);
+   connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 }
 
 
 void IntensityDataSource::update()
 {
+   if (terminate)
+      return;
 
+   if (task)
+   {
+      double progress = reader->getProgress();
+      task->setProgress(progress);
+   }
 }
 
 void IntensityDataSource::setupForRead()
