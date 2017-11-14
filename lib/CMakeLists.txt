@@ -10,9 +10,6 @@ set(EXT_PROJ_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install;
                   -DCMAKE_RELWITHDEBINFO_POSTFIX=rd;
                   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
 
-message(${EXT_PROJ_ARGS})
-
-
 ExternalProject_Add(
   bioimageconvert
   GIT_REPOSITORY "https://github.com/seanwarren/bioimageconvert.git"

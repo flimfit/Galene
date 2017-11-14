@@ -3,11 +3,9 @@ set(CMAKE_CXX_STANDARD 14)
 
 if(DEFINED ENV{OME_FILES_ROOT})
     set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
-else()
-    set(OME_FILES_ROOT "${CMAKE_SOURCE_DIR}/lib-install")
 endif()
 
-set(CMAKE_PREFIX_PATH "${OME_FILES_ROOT}")
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 
@@ -15,6 +13,7 @@ project (Galene)
 
 add_definitions(-DVERSION=${VERSION})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+cmake_policy(SET CMP0071 OLD)
 
 find_package(Boost REQUIRED)
 find_package(OpenCV REQUIRED)
