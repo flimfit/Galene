@@ -76,13 +76,13 @@ ControlBinder(this, "FLIMDisplay")
          sub->setWidget(widget);
          sub->setAttribute(Qt::WA_DeleteOnClose);
          mdi_area->addSubWindow(sub);
-         widget->setFlimDataSource(reader->getFLIMage());
+         widget->setFlimDataSource(reader->getFLIMage().get());
          widget->show();
          widget->setWindowTitle(QFileInfo(filename).baseName());
       }
       catch (std::runtime_error e)
       {
-         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1'").arg(filename));
+         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1': %2").arg(filename).arg(e.what()));
       }
    });
 
@@ -221,7 +221,7 @@ void FlimDisplay::setupTCSPC()
    sub->setAttribute(Qt::WA_DeleteOnClose);
    mdi_area->addSubWindow(sub);
 
-   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage());
+   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage().get());
 }
 
 void FlimDisplay::showTcspcSettings()

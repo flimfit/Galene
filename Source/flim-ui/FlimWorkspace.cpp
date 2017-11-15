@@ -27,7 +27,16 @@ void FlimWorkspace::update()
    if (has_workspace)
    {
       beginResetModel();
-      auto file_info = workspace.entryInfoList({ QString("*.ffd"), QString("*.pt3"), QString("*.ffh"), QString("*.ptu"), QString("*.spc") }, QDir::NoFilter, QDir::Time | QDir::Reversed);
+      auto file_info = workspace.entryInfoList(
+         { QString("*.ffd"), 
+           QString("*.pt3"), 
+           QString("*.ffh"), 
+           QString("*.ptu"), 
+           QString("*.spc"),
+           QString("*.ome.tif"),
+           QString("*.lsm"),
+           QString("*.ims")}, 
+         QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)
          files.append(info.fileName());

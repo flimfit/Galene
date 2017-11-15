@@ -8,14 +8,14 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 
-class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder, public FlimDataSourceWatcher
+class LifetimeDisplayWidget : public QWidget, public Ui::LifetimeDisplayWidget, private ControlBinder
 {
    Q_OBJECT
 
 public:
    
    LifetimeDisplayWidget(QWidget* parent = 0);
-   void setFlimDataSource(std::shared_ptr<FlimDataSource> flimage_);
+   void setFlimDataSource(FlimDataSource* flimage_);
 
    void updateCountRates();
    void setClosable(bool closable_) { closable = closable_; }
@@ -34,6 +34,8 @@ signals:
    void autoscaleLifetimeChanged(bool);
 
 protected:
+
+   void showZscroll(bool show = true) { z_scroll->setVisible(show); }
 
    void sourceDeleteRequested() { deleteLater(); };
 
@@ -60,7 +62,7 @@ protected:
    void updateLifetimeImageImpl(bool rescale);
    void setupPlots();
 
-   std::shared_ptr<FlimDataSource> flimage;
+   FlimDataSource* flimage = nullptr;
    cv::Mat mapped_mar;
    cv::Mat scaled_mar;
    cv::Mat display;
@@ -76,6 +78,8 @@ protected:
    int display_intensity_max = 100;
    bool autoscale_intensity = true;
    bool closable = true;
+
+   int z = 0;
 
    QString unit = "ps";
    double scale_factor = 1e-3;

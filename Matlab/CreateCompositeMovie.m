@@ -1,6 +1,8 @@
 
 SetupDatasets();
-data = dataset(6);
+data = dataset(7);
+
+add_title = false;
 
 aligned_name = [data.file '-aligned-stack.tif'];
 unaligned_name = [data.file '-unaligned-stack.tif'];
@@ -17,7 +19,7 @@ ma = ReadTifStack(ma_name);
 unaligned_ma = ReadTifStack(unaligned_ma_name);
 
 points_file = [data.file '_realignment.csv'];
-points = ReadPointFile(points_file,data.n_px,data.zoom,data.scan_rate);
+points = ReadPointFile(points_file,data.n_px(1),data.zoom,data.scan_rate);
 
 %%
 
@@ -35,6 +37,7 @@ sel = 1:size(aligned,3);
 aligned = aligned(:,:,sel);
 unaligned = unaligned(:,:,sel);
 aligned_presv = aligned_presv(:,:,sel);
+coverage = coverage(:,:,sel);
 
 
 % For NADH dataset, normalise frame intensity as power is adjusted through
@@ -47,7 +50,16 @@ if strcmp(data.title_ext,'05')
     aligned_presv = double(aligned_presv) ./ norm;
 end
 
-coverage = coverage(:,:,sel);
+% For Imperial dataset we need to skip first 5 frames
+if strcmp(data.title_ext,'07')
+    aligned = aligned(:,:,6:end);
+    unaligned = unaligned(:,:,6:end);
+    aligned_presv = aligned_presv(:,:,6:end);
+    coverage = coverage(:,:,6:end);
+    ma = ma(:,:,2:end);
+    unaligned_ma = unaligned_ma(:,:,2:end);
+end
+
 
 n = size(ma,3);
 %%
@@ -57,13 +69,19 @@ dt_frame = size(aligned,1) / data.scan_rate;
 
 [~,filename] = fileparts(data.file); 
 
-writer = VideoWriter([output_folder filename '-composite.avi']);
+if add_title
+    extra_string = '';
+else
+    extra_string = '-notitle';
+end
+
+writer = VideoWriter([output_folder filename '-composite' extra_string '.avi']);
 writer.FrameRate = data.frame_rate;
 open(writer);
 
-aligned_accum = zeros([data.n_px data.n_px]/data.resize);
-unaligned_accum = zeros([data.n_px data.n_px]/data.resize);
-coverage_accum = zeros([data.n_px data.n_px]/data.resize);
+aligned_accum = zeros(data.n_px/data.resize);
+unaligned_accum = zeros(data.n_px/data.resize);
+coverage_accum = zeros(data.n_px/data.resize);
 
 title_file = ['X:\Sean Warren\Motion correction paper\Paper\Movies\Movie Titles-' data.title_ext '.png'];
 title = imread(title_file);
@@ -86,11 +104,14 @@ clf
 n_fade = 0.5 * data.frame_rate;
 n_title = 3 * data.frame_rate;
 
-for i=1:n_title
-    writeVideo(writer,title);
-    imshow(title);
-    drawnow
+if add_title
+    for i=1:n_title
+        writeVideo(writer,title);
+        imshow(title);
+        drawnow
+    end
 end
+
 for i=1:n_fade
     f = uint8(double(title) * (n_fade-i) / n_fade);
     writeVideo(writer,f);
@@ -100,7 +121,7 @@ end
 
 for i=1:n
     
-    accept_frame = isfinite(data.threshold) && points.correlation(i) > data.threshold;
+    accept_frame = ~isfinite(data.threshold) || points.correlation(i) > data.threshold;
     
     if accept_frame
         aligned_accum = aligned_accum + double(aligned_presv(:,:,i));
@@ -139,7 +160,7 @@ for i=1:n
     
     sz = size(f);    
     fx = f0;
-    fx(pad+1:end-pad,pad+1:end,:) = f;
+    fx(pad+1:end-pad,pad+1:pad+size(f,2),:) = f;
     f = fx;
 
     mean_counts = ceil(mean(aligned_accum(:)));
@@ -161,6 +182,8 @@ for i=1:n
     daspect([1 1 1]);
     caxis([0 10])
     drawnow
-    writeVideo(writer,f);
+    for rep=1:4
+        writeVideo(writer,f);
+    end
 end
 close(writer);

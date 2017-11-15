@@ -37,6 +37,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QScrollBar" name="z_scroll">
+     <property name="pageStep">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QFrame" name="frame_2">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -235,7 +245,6 @@
        <height>150</height>
       </size>
      </property>
-     <zorder>frame_2</zorder>
     </widget>
    </item>
    <item>

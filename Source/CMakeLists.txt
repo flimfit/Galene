@@ -1,69 +1,37 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
-set(TARGET_SDKROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk")
-
-# check to see if SDK exists and use it if so
-if(EXISTS ${TARGET_SDKROOT})
-    set(CMAKE_OSX_SYSROOT ${TARGET_SDKROOT})
-else()
-    message(WARNING "Could not find macOS 10.10 SDK, falling back on default")
+if(DEFINED ENV{OME_FILES_ROOT})
+    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
 endif()
- 
-# Use hunter to acquire dependencies where we can 
-include("cmake/HunterGate.cmake")
-HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.18.43.tar.gz"
-    SHA1 "d2c8c42cd07f7cefe18fd9a9b9c13114b1a15a27"
-    LOCAL
-)
 
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
-# Get current version from git
-find_package(Git)
-set(VERSION "0.0.0")
-if(GIT_FOUND)
-    execute_process(
-            COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} describe
-            OUTPUT_VARIABLE VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-message(STATUS "VERSION: ${VERSION}")
-string(REGEX MATCH "([0-9]+)\.([0-9]+)\.([0-9]+)" MATCHED ${VERSION})
-
-set(VERSION_MAJOR ${CMAKE_MATCH_1})
-set(VERSION_MINOR ${CMAKE_MATCH_2})
-set(VERSION_PATCH ${CMAKE_MATCH_3})
-add_definitions(-DVERSION="${VERSION}")
+include ("cmake/GitVersion.cmake") # Get version number from git
 
 project (Galene) 
 
-hunter_add_package(Boost COMPONENTS filesystem system)
-hunter_add_package(OpenCV)
-hunter_add_package(dlib)
-
+add_definitions(-DVERSION=${VERSION})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
+cmake_policy(SET CMP0071 OLD)
 
-# Work around bug with OpenCV highgui components when compiled with ReleaseWithDebugInfo
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DSUPPRESS_OPENCV_HIGHGUI")
+find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
 
 find_package(MATLAB)
-
-add_subdirectory(QSimpleUpdater)
-add_subdirectory(QtInstrumentControl/InstrumentControl)
-add_subdirectory(QtInstrumentControl/InstrumentControlUI)
-add_subdirectory(FlimReader/Source/FlimReader)
-
 if(MATLAB_FOUND)
     # Set output directory for FlimReaderMex file.
     # This will be used for generating the figures,
     # Matlab is not required for the main application
     set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
-    add_subdirectory(FlimReader/Source/FlimReaderMex)
 endif()
 
-add_subdirectory(FlimReader/Source/FlimReaderTest)
+add_subdirectory(QSimpleUpdater)
+add_subdirectory(QtInstrumentControl/InstrumentControl)
+add_subdirectory(QtInstrumentControl/InstrumentControlUI)
+add_subdirectory(FlimReader/frame-aligner/FrameAligner)
+add_subdirectory(FlimReader/FlimReader)
+#add_subdirectory(FlimReader/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 
@@ -76,7 +44,7 @@ set(CPACK_PACKAGE_NAME "Galene")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Galene Installer")
 set(CPACK_PACKAGE_VERSION ${VERSION}) # Version of installer
 set(CPACK_PACKAGE_VENDOR "Sean Warren")
-set(CPACK_PACKAGE_EXECUTABLES Galene "Galene ${VERSION}")
+set(CPACK_PACKAGE_EXECUTABLES Galene "Galene")
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/../LICENCE.txt)
 
 if (WIN32)

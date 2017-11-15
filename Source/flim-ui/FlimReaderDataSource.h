@@ -4,69 +4,22 @@
 #include "FlimReader.h"
 #include "FlimCube.h"
 #include "TaskProgress.h"
-
-#include <QString>
-#include <QThread>
-#include <QTimer>
-#include "ThreadedObject.h"
+#include "RealignableDataSource.h"
 
 #include <thread>
 #include <memory>
 #include <mutex>
 #include <vector>
 
-class FlimReaderDataSource;
-
-class FlimReaderDataSourceWorker : public ThreadedObject
-{
-   Q_OBJECT
-
-public:
-   FlimReaderDataSourceWorker(QObject* parent, FlimReaderDataSource* source) :
-      ThreadedObject(parent), source(source)
-   {
-      startThread();
-   }
-
-   Q_INVOKABLE void stop()
-   {
-      timer->stop();
-      bool executing = false;
-   }
-
-   void init() 
-   {
-      timer = new QTimer();
-      connect(timer, &QTimer::timeout, this, &FlimReaderDataSourceWorker::update);
-      connect(this, &QObject::destroyed, timer, &QObject::deleteLater);
-
-      timer->setInterval(1000);
-      timer->start();
-      executing = true;
-   }
-
-   void update();
-
-signals:
-
-   void updateComplete();
-
-private:
-
-   bool executing = false;
-   FlimReaderDataSource* source;
-   QTimer* timer;
-};
-
-class FlimReaderDataSource : public FlimDataSource
+class FlimReaderDataSource : public FlimDataSource, public RealignableDataSource
 {
    Q_OBJECT
 
 signals:
 
    void error(const QString& message);
-   void alignmentComplete();
-
+   void deleteRequested(); 
+   
 public:
 
    FlimReaderDataSource(const QString& filename_, QObject* parent = 0);
@@ -81,7 +34,15 @@ public:
    cv::Mat getIntensity();
    cv::Mat getMeanArrivalTime();
 
-   void readData(bool realign = true);
+   void requestDelete() { emit deleteRequested(); }
+
+
+   QString getFilename() { return QString::fromStdString(reader->getFilename()); }
+   
+   void saveData(const QString& filename);
+   void savePreview(const QString& filename);
+   
+   QWidget* getWidget();
 
    //   virtual std::list<std::vector<quint16>>& getHistogramData() = 0;
    std::vector<uint>& getCurrentDecay(int channel) { return current_decay_dummy; };
@@ -91,10 +52,14 @@ public:
 protected:
 
    void update();
-   
-   // Use readData to call 
-   void readDataThread(bool realign = true);
+   void setupForRead();
+   void alignFrames();
+   void readAlignedData();
 
+   void cancelRead();
+
+   AligningReader& aligningReader() { return *reader; }
+   
    std::shared_ptr<FlimReader> reader;
    QString filename;
 
@@ -106,17 +71,6 @@ protected:
 
    std::shared_ptr<FlimCube<uint16_t>> data;
 
-   std::thread reader_thread;
    std::mutex image_mutex;
    std::mutex read_mutex;
-
-   FlimReaderDataSourceWorker* worker;
-
-   bool currently_reading = false;
-   bool read_again_when_finished = false;
-   bool terminate = false;
-
-   std::shared_ptr<TaskProgress> task;
-
-   friend class FlimReaderDataSourceWorker;
 };

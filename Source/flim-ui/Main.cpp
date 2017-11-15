@@ -1,3 +1,5 @@
+#pragma warning(disable: 4503) // for ome-files code, produces over-long names
+
 #include <QApplication>
 #include <QCoreApplication>
 #include "QSimpleUpdater.h"
@@ -5,11 +7,29 @@
 #include "RealignmentStudio.h"
 #include "BHRatesWidget.h"
 #include "FlimReaderDataSource.h"
+#include "IntensityDataSource.h"
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <stdlib.h>
+#include <boost/filesystem.hpp>
+#include <ome/files/CoreMetadata.h>
 
 const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
+
+#ifdef WIN32
+int setenv(const char *name, const char *value, int overwrite)
+{
+   int errcode = 0;
+   if (!overwrite) {
+      size_t envsize = 0;
+      errcode = getenv_s(&envsize, NULL, 0, name);
+      if (errcode || envsize) return errcode;
+   }
+   return _putenv_s(name, value);
+}
+#endif
+
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 
@@ -43,6 +63,12 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
+
+   QFileInfo file(argv[0]);
+   setenv("OME_HOME", qPrintable(file.absolutePath()), true);
+
+   ome::common::setLogLevel(ome::logging::trivial::warning);
+
    qRegisterMetaType<cv::Point2d>("cv::Point2d");
    qRegisterMetaType<FlimRates>("FlimRates");
    qRegisterMetaType<std::vector<int64_t>>("std::vector<int32_t>");
@@ -51,9 +77,9 @@ int main(int argc, char *argv[])
    qRegisterMetaType<T_DATAFRAME_SRVREQUEST>("T_DATAFRAME_SRVREQUEST");
    qRegisterMetaType<E_ERROR_CODES>("E_ERROR_CODES");
    qRegisterMetaType<E_PQ_MEAS_TYPE>("E_PQ_MEAS_TYPE");
-   qRegisterMetaType<std::map<QString,QVariant>>("std::map<QString, QVariant>");
+   qRegisterMetaType<std::map<QString, QVariant>>("std::map<QString, QVariant>");
    qRegisterMetaType<std::vector<std::pair<QString, QVariant>>>("std::vector<std::pair<QString, QVariant>>");
-   qRegisterMetaType<std::shared_ptr<FlimReaderDataSource>>("std::shared_ptr<FlimReaderDataSource>");
+   qRegisterMetaType<std::shared_ptr<FlimReaderDataSource>>("std::shared_ptr<RealignableDataSource>");
 
    QCoreApplication::setOrganizationName("FLIMfit");
    QCoreApplication::setOrganizationDomain("flimfit.org");
@@ -61,7 +87,7 @@ int main(int argc, char *argv[])
 
    QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-   qInstallMessageHandler(myMessageOutput);
+   //qInstallMessageHandler(myMessageOutput);
 
 
    QApplication a(argc, argv);
@@ -91,7 +117,7 @@ int main(int argc, char *argv[])
    
 
    auto updater = QSimpleUpdater::getInstance();
-   updater->setModuleVersion(update_url, VERSION); // from CMake
+   updater->setModuleVersion(update_url, "VERSION"); // from CMake
    updater->setModuleName(update_url, "flim-ui");
    updater->checkForUpdates(update_url);
    

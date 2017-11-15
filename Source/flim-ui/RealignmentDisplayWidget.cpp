@@ -1,24 +1,32 @@
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
+#include "Cv3dUtils.h"
 
-RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<FlimReaderDataSource> reader, QWidget* parent) :
-   QWidget(parent), reader(reader)
+RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDataSource> source, QWidget* parent) :
+   QWidget(parent), source(source)
 {
    setupUi(this);
    setupPlots();
+   z_scroll->setVisible(false);
+
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
-   connect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
-   connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::displayImage);
+   timer = new QTimer(this);
+   connect(timer, &QTimer::timeout, this, &RealignmentDisplayWidget::update);
+   timer->start(2000);
+   
+   //connect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
+   connect(z_scroll, &QScrollBar::valueChanged, this, &RealignmentDisplayWidget::setZ);   
+   connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::setImage);
    connect(slider, &QSlider::sliderMoved, current_frame_spin, &QSpinBox::setValue);
-   connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
+   //connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
 
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
 
 RealignmentDisplayWidget::~RealignmentDisplayWidget()
 {
-   disconnect(reader.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
+   //disconnect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
 }
 
 void RealignmentDisplayWidget::referenceButtonPressed()
@@ -49,49 +57,73 @@ void RealignmentDisplayWidget::exportMovie()
 
 void RealignmentDisplayWidget::update()
 {
-   auto r = reader->getReader();
-   results = r->getRealignmentResults();
+   results = source->getRealignmentResults();
 
    int n = (int)results.size();
 
    float minc = std::numeric_limits<float>::min();
    float maxc = std::numeric_limits<float>::min();
    QVector<double> x(n);
-   QVector<double> y(n);
+   QVector<double> y1(n), y2(n);
 
    for (int i = 0; i < n; i++)
    {
       x[i] = i;
-      y[i] = results[i].correlation;
+      y1[i] = results[i].correlation;
+      y2[i] = results[i].unaligned_correlation;
 
       if (results[i].correlation < minc)
          minc = results[i].correlation;
       if (results[i].correlation > maxc)
          maxc = results[i].correlation;
    }
-   correlation_plot->graph(0)->setData(x, y);
+   correlation_plot->graph(0)->setData(x, y1);
+   correlation_plot->graph(1)->setData(x, y2);
    correlation_plot->graph(0)->rescaleAxes();
    correlation_plot->yAxis->setRange(0, 1.2);
    //correlation_plot->replot();
 
-   slider->setMaximum(n - 1);
-   slider->setValue(0);
-   current_frame_spin->setValue(0);
+   slider->setMaximum(std::max(0,n - 1));
 
-   displayImage(0);
+   if (cur_image <= (n-1))
+   {
+      slider->setValue(cur_image);
+      current_frame_spin->setValue(cur_image);
+   }
+
+   drawImage();
 }
 
-void RealignmentDisplayWidget::displayImage(int image)
+void RealignmentDisplayWidget::setZ(int z)
+{
+   drawImage();
+}
+
+void RealignmentDisplayWidget::setImage(int image)
+{
+   cur_image = image;
+   drawImage();
+}
+
+void RealignmentDisplayWidget::drawImage()
 {
    bool use_aligned = show_aligned_button->isChecked();
-   if (image < results.size())
-   {
-      if (use_aligned)
-         image_widget->SetImage(results[image].realigned);
-      else
-         image_widget->SetImage(results[image].frame);
 
-      correlation_plot->graph(1)->setData({ (double)image }, { results[image].correlation });
+   if (cur_image < results.size())
+   {
+      cv::Mat sel_image = (use_aligned) ? results[cur_image].realigned : results[cur_image].frame;
+
+      if (sel_image.dims > 2)
+      {
+         z_scroll->setVisible(sel_image.size[0] > 1);
+         z_scroll->setMaximum(sel_image.size[0] - 1);
+         int z = z_scroll->value();
+         sel_image = extractSlice(sel_image, z);
+      }
+
+      image_widget->SetImage(sel_image);
+      
+      correlation_plot->graph(2)->setData({ (double)cur_image }, { results[cur_image].correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();
    }
@@ -120,12 +152,15 @@ void RealignmentDisplayWidget::setupPlots()
 {
    correlation_plot->addGraph();
    correlation_plot->graph(0)->setPen(QPen(Qt::black));
+   correlation_plot->addGraph();
+   correlation_plot->graph(1)->setPen(QPen(Qt::red));
+
    correlation_plot->xAxis->setLabel("Frame");
    correlation_plot->yAxis->setLabel("Correlation");
 
    correlation_plot->addGraph();
-   correlation_plot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 7));
-   correlation_plot->graph(1)->setPen(QPen(Qt::red));
+   correlation_plot->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 7));
+   correlation_plot->graph(2)->setPen(QPen(Qt::red));
 
    connect(correlation_plot, &QCustomPlot::axisClick, this, &RealignmentDisplayWidget::axisClicked);
 }

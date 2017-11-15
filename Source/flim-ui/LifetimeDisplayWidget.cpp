@@ -1,4 +1,5 @@
 #include "LifetimeDisplayWidget.h"
+#include "Cv3dUtils.h"
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
@@ -27,15 +28,15 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    connect(rate_type_combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &LifetimeDisplayWidget::updateCountRates);
 }
 
-void LifetimeDisplayWidget::setFlimDataSource(std::shared_ptr<FlimDataSource> flimage_)
+void LifetimeDisplayWidget::setFlimDataSource(FlimDataSource* flimage_)
 {
-   FlimDataSourceWatcher::setFlimDataSource(flimage_);
+   //FlimDataSourceWatcher::setFlimDataSource(flimage_);
 
    flimage = flimage_;
-   connect(flimage.get(), &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
-   connect(flimage.get(), &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
+   connect(flimage, &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
 
    while (auto w = count_rate_layout->findChild<QWidget*>())
       delete w;
@@ -189,11 +190,32 @@ void LifetimeDisplayWidget::updateDecay()
 
 void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
 {
+   cv::Mat intensity, mar;
+
    if (flimage == nullptr)
       return;
 
-   cv::Mat intensity = flimage->getIntensity();
-   cv::Mat mar = flimage->getMeanArrivalTime();
+   cv::Mat intensity_all = flimage->getIntensity();
+   cv::Mat mar_all = flimage->getMeanArrivalTime();
+
+   if (intensity_all.dims > 2) // 3D data
+   {
+      z_scroll->setMaximum(intensity.size[0]);
+      z = z_scroll->value();
+
+      showZscroll(intensity.size[0] > 1);
+
+      // Pull out required slice
+      intensity = extractSlice(intensity_all, z);
+      mar = extractSlice(mar_all, z);
+   }
+   else
+   {
+      showZscroll(false);
+      intensity = intensity_all;
+      mar = mar_all;
+   }
+
 
    double mar_min, mar_max;
    if (autoscale_tau && rescale)

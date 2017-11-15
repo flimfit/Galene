@@ -25,41 +25,30 @@ public:
 
    void closeEvent(QCloseEvent* event);
 
-   void setCloseAfterSave(bool close_after_save_) { close_after_save = close_after_save_; }
-   bool getCloseAfterSave() { return close_after_save; }
-
-   void setSavePreview(bool save_preview_) { save_preview = save_preview_; };
-   bool getSavePreview() { return save_preview; }
-
-   void setSaveMovie(bool save_movie_) { save_movie = save_movie_; };
-   bool getSaveMovie() { return save_movie; }
-
-   void setSaveRealignmentInfo(bool save_realignment_info_) { save_realignment_info = save_realignment_info_; };
-   bool getSaveRealignmentInfo() { return save_realignment_info; }
-
-   std::shared_ptr<FlimReaderDataSource> openFile(const QString& filename);
+   std::shared_ptr<RealignableDataSource> openFile(const QString& filename);
    void showFileInfo(const QString& filename);
 
 signals:
 
-   void newDataSource(std::shared_ptr<FlimReaderDataSource> source);
+   void error(const QString& msg);
+   void newDataSource(std::shared_ptr<RealignableDataSource> source);
 
 protected:
 
-   std::shared_ptr<FlimReaderDataSource> getCurrentSource();
+   std::shared_ptr<RealignableDataSource> getCurrentSource();
    void realign();
    void reload();
 
    void updateParameterGroupBox(int index);
 
-   void openWindows(std::shared_ptr<FlimReaderDataSource> source);
+   void openWindows(std::shared_ptr<RealignableDataSource> source);
    void removeWindow(QObject* obj);
 
    void saveCurrent();
-   void save(std::shared_ptr<FlimReaderDataSource> source, bool force_close = false);
+   void save(std::shared_ptr<RealignableDataSource> source, bool force_close = false);
 
    void writeAlignmentInfoCurrent();
-   void writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source);
+   void writeAlignmentInfo(std::shared_ptr<RealignableDataSource> source);
 
    QMdiSubWindow* createSubWindow(QWidget* widget, const QString& title);
 
@@ -69,14 +58,36 @@ protected:
 
    RealignmentParameters getRealignmentParameters();
 
+
+
 private:
 
    bool close_after_save = false;
    bool save_preview = false;
    bool save_movie = false;
    bool save_realignment_info = false;
+   bool use_gpu = true;
+   int default_reference = 0;
+   int mode = 0;
+   int realignment_points = 10;
+   double smoothing = 2;
+   double threshold = 0;
+   double coverage_threshold = 0;
 
-   void displayErrorMessage(const QString error);
+   Q_PROPERTY(bool close_after_save MEMBER close_after_save);
+   Q_PROPERTY(bool save_preview MEMBER save_preview);
+   Q_PROPERTY(bool save_movie MEMBER save_movie);
+   Q_PROPERTY(bool save_realignment_info MEMBER save_realignment_info);
+   Q_PROPERTY(bool use_gpu MEMBER use_gpu);
+   Q_PROPERTY(int default_reference MEMBER default_reference);
+   Q_PROPERTY(int mode MEMBER mode);
+   Q_PROPERTY(int realignment_points MEMBER realignment_points);
+   Q_PROPERTY(double smoothing MEMBER smoothing);
+   Q_PROPERTY(double threshold MEMBER threshold);
+   Q_PROPERTY(double coverage_threshold MEMBER coverage_threshold);
+
+
+   void displayErrorMessage(const QString& error);
 
    LifetimeDisplayWidget* preview_widget;
    FlimWorkspace* workspace;
@@ -85,7 +96,7 @@ private:
 
    QTimer* status_timer;
 
-   std::map<QMdiSubWindow*, std::weak_ptr<FlimReaderDataSource>> window_map;
+   std::map<QMdiSubWindow*, std::weak_ptr<RealignableDataSource>> window_map;
    std::list<std::thread> save_thread;
 
    friend class RealignmentStudioBatchProcessor;

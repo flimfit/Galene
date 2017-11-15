@@ -15,6 +15,8 @@
 #include "RealignmentImageSource.h"
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
+#include "IntensityDataSource.h"
+#include "GpuFrameWarper.h"
 #include <functional>
 #include <thread>
 
@@ -45,9 +47,11 @@ RealignmentStudio::RealignmentStudio() :
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
    connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
    
+   connect(this, &RealignmentStudio::error, this, &RealignmentStudio::displayErrorMessage, Qt::QueuedConnection);
+
    connect(mode_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentStudio::updateParameterGroupBox);
 
-   connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows);
+   connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows, Qt::QueuedConnection);
 
    file_list_view->setModel(workspace);
    file_list_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
@@ -61,12 +65,22 @@ RealignmentStudio::RealignmentStudio() :
    
    workspace_selection = file_list_view->selectionModel();
 
-   Bind(close_after_save_check, this, &RealignmentStudio::setCloseAfterSave, &RealignmentStudio::getCloseAfterSave);
-   Bind(save_preview_check, this, &RealignmentStudio::setSavePreview, &RealignmentStudio::getSavePreview);
-   Bind(save_realignment_info_check, this, &RealignmentStudio::setSaveRealignmentInfo, &RealignmentStudio::getSaveRealignmentInfo);
-   Bind(save_movie_check, this, &RealignmentStudio::setSaveMovie, &RealignmentStudio::getSaveMovie);
+   BindProperty(close_after_save_check, this, close_after_save);
+   BindProperty(save_preview_check, this, save_preview);
+   BindProperty(save_realignment_info_check, this, save_realignment_info);
+   BindProperty(save_movie_check, this, save_movie);
+   BindProperty(default_reference_combo, this, default_reference);
+   BindProperty(use_gpu_check, this, use_gpu);
+   BindProperty(mode_combo, this, mode);
+   BindProperty(realignment_points_spin, this, realignment_points);
+   BindProperty(smoothing_spin, this, smoothing);
+   BindProperty(threshold_spin, this, threshold);
+   BindProperty(coverage_threshold_spin, this, coverage_threshold);
 
-
+   if (GpuFrameWarper::hasSupportedGpu())
+      use_gpu_check->setEnabled(true);
+   else
+      use_gpu_check->setChecked(false);
 }
 
 void RealignmentStudio::updateParameterGroupBox(int index)
@@ -86,22 +100,44 @@ void RealignmentStudio::updateParameterGroupBox(int index)
 }
 
 
-std::shared_ptr<FlimReaderDataSource> RealignmentStudio::openFile(const QString& filename)
+std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString& filename)
 {
-   std::shared_ptr<FlimReaderDataSource> source;
+   std::shared_ptr<RealignableDataSource> source;
+
+   QFileInfo file(filename);
+   auto ext = file.completeSuffix();
 
    try
    {
-      source = std::make_shared<FlimReaderDataSource>(filename);
-      connect(source.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
-      source->getReader()->setRealignmentParameters(getRealignmentParameters());
+      if (ext == "ome.tif" || ext == "lsm" || ext == "ims")
+      {
+         auto s = std::make_shared<IntensityDataSource>(filename);
+         connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+         source = s;
+      }
+      else
+      {
+         auto s = std::make_shared<FlimReaderDataSource>(filename);
+         connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+         source = s;
+      }
+
+      source->requestChannelsFromUser();
 
       emit newDataSource(source);
+      source->setRealignmentParameters(getRealignmentParameters());
+      source->readData();
+
    }
    catch (std::runtime_error e)
    {
       QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
    }
+   catch (std::exception e)
+   {
+      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
+   }
+
 
    return source;
 }
@@ -159,32 +195,31 @@ void RealignmentStudio::closeEvent(QCloseEvent* event)
 }
 
 
-void RealignmentStudio::openWindows(std::shared_ptr<FlimReaderDataSource> source)
+void RealignmentStudio::openWindows(std::shared_ptr<RealignableDataSource> source)
 {
-   auto widget = new LifetimeDisplayWidget;
-   widget->setFlimDataSource(source);
-
-   QString filename = QString::fromStdString(source->getReader()->getFilename());
+   QString filename = source->getFilename();
    QString title = QFileInfo(filename).baseName();
-
-   auto w1 = createSubWindow(widget, title);
-   window_map[w1] = source;
 
    auto realignment_widget = new RealignmentDisplayWidget(source);
    auto w2 = createSubWindow(realignment_widget, title);
    window_map[w2] = source;
 
-   FlimReader* reader = source->getReader().get();
-   connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [reader](int index) { reader->setReferenceIndex(index); }); // reader isn't a QObject
-
-   // Make windows close each other
    connect(w2, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
-   connect(w1, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
 
-   connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
-   connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);
+   connect(realignment_widget, &RealignmentDisplayWidget::referenceIndexUpdated, [source](int index) { source->setReferenceIndex(index); }); // source isn't a QObject
 
-   source->readData();
+   QWidget* widget = source->getWidget();
+   if (widget)
+   {
+      auto w1 = createSubWindow(widget, title);
+      window_map[w1] = source;
+      
+      connect(w1, &QObject::destroyed, this, &RealignmentStudio::removeWindow);
+      
+      // Make windows close each other
+      connect(w1, &QObject::destroyed, w2, &QObject::deleteLater);
+      connect(w2, &QObject::destroyed, w1, &QObject::deleteLater);   
+   }
 }
 
 void RealignmentStudio::removeWindow(QObject* obj)
@@ -195,7 +230,7 @@ void RealignmentStudio::removeWindow(QObject* obj)
       window_map.erase(w);
 };
 
-std::shared_ptr<FlimReaderDataSource> RealignmentStudio::getCurrentSource()
+std::shared_ptr<RealignableDataSource> RealignmentStudio::getCurrentSource()
 {
    auto active_window = mdi_area->activeSubWindow();
    auto weak_source = window_map[active_window];
@@ -216,8 +251,7 @@ void RealignmentStudio::realign()
       return;
    }
 
-   auto reader = source->getReader();
-   reader->setRealignmentParameters(getRealignmentParameters());
+   source->setRealignmentParameters(getRealignmentParameters());
    source->readData();
 }
 
@@ -231,8 +265,7 @@ void RealignmentStudio::reload()
       return;
    }
 
-   auto reader = source->getReader();
-   reader->setRealignmentParameters(getRealignmentParameters());
+   source->setRealignmentParameters(getRealignmentParameters());
    source->readData(false);
 }
 
@@ -281,26 +314,15 @@ void RealignmentStudio::writeAlignmentInfoCurrent()
 	writeAlignmentInfo(getCurrentSource());
 }
 
-void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<FlimReaderDataSource> source)
+void RealignmentStudio::writeAlignmentInfo(std::shared_ptr<RealignableDataSource> source)
 {
-   if (!source)
+   if (source)
    {
-      QMessageBox::warning(this, "Warning", "No FLIM image open");
-      return;
+      QString fileroot = QFileInfo(source->getFilename()).baseName();
+      source->writeRealignmentInfo(fileroot);      
    }
-
-
-   auto reader = source->getReader();
-   auto& aligner = reader->getFrameAligner();
-
-   if (aligner == nullptr)
-      return;
-
-   QFileInfo file(QString::fromStdString(reader->getFilename()));
-   QString new_file = file.dir().absoluteFilePath(file.baseName().append("_realignment.csv"));
-   std::string s = new_file.toStdString();
-
-   aligner->writeRealignmentInfo(new_file.toStdString());
+   else
+      QMessageBox::warning(this, "Warning", "No FLIM image open");
 }
 
 
@@ -309,7 +331,7 @@ void RealignmentStudio::saveCurrent()
 	save(getCurrentSource());
 }
 
-void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool force_close)
+void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool force_close)
 {
    if (source == nullptr)
       return;
@@ -317,74 +339,41 @@ void RealignmentStudio::save(std::shared_ptr<FlimReaderDataSource> source, bool 
    // clean out threads that are finished
    save_thread.remove_if([](std::thread& t) { return !t.joinable(); });
 
-   QFileInfo fi = QString::fromStdString(source->getReader()->getFilename());
-   QString name = fi.baseName() + suffix_edit->text();
-   std::string filename = workspace->getFileName(name, ".ffh").toStdString();
-   std::string preview_filename = workspace->getFileName(name, ".png").toStdString();
-   QString aligned_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-stack.tif");
-   QString aligned_preserving_movie_filename = workspace->getFileName(fi.baseName(), "-aligned-int-presv-stack.tif");
-   QString unaligned_movie_filename = workspace->getFileName(fi.baseName(), "-unaligned-stack.tif");
-   QString coverage_movie_filename = workspace->getFileName(fi.baseName(), "-coverage-stack.tif");
+   QFileInfo fi = source->getFilename();
+   QString name = fi.absoluteDir().filePath(fi.baseName() + suffix_edit->text());
+   QString preview_filename = name + ".png";
 
    auto task = std::make_shared<TaskProgress>("Saving...");
    TaskRegister::addTask(task);
 
    save_thread.push_back(std::thread([=]()
    {
-      auto reader = source->getReader();
-      auto data = source->getData();
-      auto tags = reader->getTags();
-      auto reader_tags = reader->getReaderTags();
-      auto images = reader->getImageMap();
+      try
+	   {
+         source->saveData(name);
 
-      if (save_preview)
-      {
-         const cv::Mat& intensity = source->getIntensity();
+         if (save_preview)
+            source->savePreview(preview_filename);
 
-         double mn, mx;
-         cv::minMaxLoc(intensity, &mn, &mx);
+         if (save_realignment_info)
+            source->writeRealignmentInfo(name);
 
-         cv::Scalar mean, std;
-         cv::meanStdDev(intensity, mean, std);
-         double i_max = mean[0] + 1.96 * std[0]; // 97.5% 
-
-         cv::Mat output;
-         intensity.convertTo(output, CV_8U, 255.0 / i_max);
-
-#ifndef SUPPRESS_OPENCV_HIGHGUI
-         cv::imwrite(preview_filename, output);
-#endif
-      }
-      
-      if (save_realignment_info)
-	      writeAlignmentInfo(source);
-
-      if (save_movie)
-      {
-         auto& results = reader->getRealignmentResults();
-         RealignmentResultsWriter::exportAlignedMovie(results, aligned_movie_filename);
-         RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(results, aligned_preserving_movie_filename);
-         RealignmentResultsWriter::exportUnalignedMovie(results, unaligned_movie_filename);
-         RealignmentResultsWriter::exportCoverageMovie(results, coverage_movie_filename);
-      }
-
-
-	  try
-	  {
-		  FlimCubeWriter<uint16_t> writer(filename, data, tags, reader_tags, images);
-	  }
-	  catch (std::runtime_error e)
-	  {
-		  displayErrorMessage(e.what());
-	  }
-
+         if (save_movie)
+            source->writeRealignmentMovies(name);
+	   }
+	   catch (std::runtime_error e)
+	   {
+		   emit error(e.what());
+	   }
 
       if (close_after_save || force_close)
-         source->requestDelete();
-
+      {
+         for (auto& w : window_map)
+            if (w.second.lock() == source)
+               QMetaObject::invokeMethod(w.first, "close", Qt::QueuedConnection);
+      }
 
       task->setFinished();
-
    }));
    
 
@@ -417,16 +406,21 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.correlation_threshold = threshold_spin->value();
    params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
+   params.prefer_gpu = use_gpu_check->isChecked();
+   params.default_reference_frame = (DefaultReferenceFrame) default_reference_combo->currentIndex();
 
    return params;
 }
 
 
-void RealignmentStudio::displayErrorMessage(const QString msg)
+void RealignmentStudio::displayErrorMessage(const QString& msg)
 {
    QMessageBox::critical(this, "Error", msg);
 }
 
 RealignmentStudio::~RealignmentStudio()
 {
+   for(auto& thread : save_thread)
+      if(thread.joinable())
+         thread.join();
 }
