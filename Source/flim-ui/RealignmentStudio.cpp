@@ -65,12 +65,17 @@ RealignmentStudio::RealignmentStudio() :
    
    workspace_selection = file_list_view->selectionModel();
 
-   Bind(close_after_save_check, this, &RealignmentStudio::setCloseAfterSave, &RealignmentStudio::getCloseAfterSave);
-   Bind(save_preview_check, this, &RealignmentStudio::setSavePreview, &RealignmentStudio::getSavePreview);
-   Bind(save_realignment_info_check, this, &RealignmentStudio::setSaveRealignmentInfo, &RealignmentStudio::getSaveRealignmentInfo);
-   Bind(save_movie_check, this, &RealignmentStudio::setSaveMovie, &RealignmentStudio::getSaveMovie);
-   Bind(default_reference_combo, this, &RealignmentStudio::setDefaultReference, &RealignmentStudio::getDefaultReference);
-   Bind(use_gpu_check, this, &RealignmentStudio::setUseGpu, &RealignmentStudio::getUseGpu);
+   BindProperty(close_after_save_check, this, close_after_save);
+   BindProperty(save_preview_check, this, save_preview);
+   BindProperty(save_realignment_info_check, this, save_realignment_info);
+   BindProperty(save_movie_check, this, save_movie);
+   BindProperty(default_reference_combo, this, default_reference);
+   BindProperty(use_gpu_check, this, use_gpu);
+   BindProperty(mode_combo, this, mode);
+   BindProperty(realignment_points_spin, this, realignment_points);
+   BindProperty(smoothing_spin, this, smoothing);
+   BindProperty(threshold_spin, this, threshold);
+   BindProperty(coverage_threshold_spin, this, coverage_threshold);
 
    if (GpuFrameWarper::hasSupportedGpu())
       use_gpu_check->setEnabled(true);

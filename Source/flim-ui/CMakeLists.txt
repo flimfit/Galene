@@ -12,6 +12,8 @@ find_package(OMEFiles REQUIRED)
 find_package(BioImage REQUIRED)
 add_definitions(-DBIM_USE_OPENCV)
 
+find_package(dlib REQUIRED)
+
 find_package(CUDA)
 include_directories(${OME_FILES_ROOT}/include)
 
