@@ -4,3 +4,6 @@ Build*/*
 *.log
 *.autosave
 *.dmg
+lib/build/*
+lib/src/*
+lib/stamp/*
