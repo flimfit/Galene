@@ -39,7 +39,7 @@ public:
    void readData(bool realign = true);   
    void waitForComplete();
 
-   void writeRealignmentMovies(const QString& filename_root); 
+   virtual void writeRealignmentMovies(const QString& filename_root); 
    void writeRealignmentInfo(const QString& filename_root);
    
    const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader().getFrameAligner(); }

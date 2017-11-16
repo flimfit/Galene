@@ -19,7 +19,7 @@ public:
    QString getFilename() { return filename; };
    
    void saveData(const QString& filename);
-
+   void writeRealignmentMovies(const QString& filename_root) {} // no point writing these for intensity
    void setupForRead();
    void update();
    void alignFrames();
