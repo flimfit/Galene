@@ -18,6 +18,8 @@ SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
 SET BUILD_FLAGS=-DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE%
 SET CMAKE_PREFIX_PATH=""
 
+mkdir lib\install
+
 cmake -GNinja -Hlib -Blib/build/RelWithDebInfo -DCMAKE_BUILD_TYPE=RelWithDebInfo %BUILD_FLAGS%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 cmake --build lib/build/RelWithDebInfo
