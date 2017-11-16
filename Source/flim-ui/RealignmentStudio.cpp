@@ -85,17 +85,7 @@ RealignmentStudio::RealignmentStudio() :
 
 void RealignmentStudio::updateParameterGroupBox(int index)
 {
-	int page = 0;
-	switch (index)
-	{
-	case 1:
-	case 2:
-		page = 1;
-		break;
-	case 3:
-		page = 2; 
-		break;
-	}
+	int page = index;
 	parameter_stackedwidget->setCurrentIndex(page);
 }
 
@@ -389,6 +379,8 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
 {
    RealignmentParameters params;
 
+
+
    params.type = static_cast<RealignmentType>(mode_combo->currentIndex());
    params.n_resampling_points = realignment_points_spin->value();
    
@@ -396,7 +388,7 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    {
    case RealignmentType::Warp:
       params.frame_binning = 1;
-      params.spatial_binning = 1;
+      params.spatial_binning = 4;
       break;
    default:
       params.frame_binning = frame_binning_combo->value();

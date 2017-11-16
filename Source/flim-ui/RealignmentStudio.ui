@@ -153,11 +153,6 @@
                </item>
                <item>
                 <property name="text">
-                 <string>Rigid Body</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
                  <string>Warp</string>
                 </property>
                </item>
@@ -657,7 +652,7 @@
      <x>0</x>
      <y>0</y>
      <width>1245</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFiles">
