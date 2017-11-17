@@ -22,18 +22,24 @@ SET CMAKE_PREFIX_PATH=""
 
 mkdir lib\install
 
+IF NOT "%1"=="--build-debug" GOTO build_release
+
 cmake -GNinja -Hlib -Blib/build/RelWithDebInfo -DCMAKE_BUILD_TYPE=RelWithDebInfo %BUILD_FLAGS%
+echo %ERRORLEVEL%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 cmake --build lib/build/RelWithDebInfo
-if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
-
-cmake -GNinja -Hlib -Blib/build/Release -DCMAKE_BUILD_TYPE=Release %BUILD_FLAGS%
-if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
-cmake --build lib/build/Release
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 cmake -GNinja -Hlib -Blib/build/Debug -DCMAKE_BUILD_TYPE=Debug %BUILD_FLAGS%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 cmake --build lib/build/Debug
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
+
+:build_release
+
+cmake -GNinja -Hlib -Blib/build/Release -DCMAKE_BUILD_TYPE=Release %BUILD_FLAGS%
+if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
+cmake --build lib/build/Release
+if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
+
 
