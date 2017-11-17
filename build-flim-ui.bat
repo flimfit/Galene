@@ -13,7 +13,7 @@ SET OME_FILES_ROOT=%CMAKE_PREFIX_PATH%
 REM rmdir Build /s /q
 echo Generating CMake Project
 echo Using Generator: "Visual Studio 15 2017 Win64"
-cmake -G "Visual Studio 15 2017 Win64" -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DOME_FILES_ROOT=%OME_FILES_ROOT%
+cmake -G "Visual Studio 15 2017 Win64" -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" -DOME_FILES_ROOT="%OME_FILES_ROOT%"
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 echo Building 64bit Project in Release mode
