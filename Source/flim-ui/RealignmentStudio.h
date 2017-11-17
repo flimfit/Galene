@@ -68,7 +68,7 @@ private:
    bool save_realignment_info = false;
    bool use_gpu = true;
    int default_reference = 0;
-   int mode = 0;
+   int mode = (int) RealignmentType::Warp;
    int realignment_points = 10;
    double smoothing = 2;
    double threshold = 0;
