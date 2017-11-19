@@ -66,7 +66,7 @@ void FlimReaderDataSource::update()
 
       std::lock_guard<std::mutex> lk_im(image_mutex);
 
-      int n_px = reader->numX() * reader->numY();
+      int n_px = reader->numX() * reader->numY() * reader->numZ();
       int n_chan = reader->getNumChannels();
       int n_t = (int)data->timepoints.size();
 

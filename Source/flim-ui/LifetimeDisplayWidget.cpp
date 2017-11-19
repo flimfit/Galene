@@ -26,6 +26,8 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    QueuedBind(intensity_max_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMax, &LifetimeDisplayWidget::getDisplayIntensityMax, &LifetimeDisplayWidget::displayIntensityMaxChanged);
 
    connect(rate_type_combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &LifetimeDisplayWidget::updateCountRates);
+
+   connect(z_scroll, &QScrollBar::valueChanged, this, &LifetimeDisplayWidget::updateLifetimeImage);
 }
 
 void LifetimeDisplayWidget::setFlimDataSource(FlimDataSource* flimage_)
@@ -200,10 +202,10 @@ void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
 
    if (intensity_all.dims > 2) // 3D data
    {
-      z_scroll->setMaximum(intensity.size[0]);
+      z_scroll->setMaximum(intensity_all.size[0] - 1);
       z = z_scroll->value();
 
-      showZscroll(intensity.size[0] > 1);
+      showZscroll(intensity_all.size[0] > 1);
 
       // Pull out required slice
       intensity = extractSlice(intensity_all, z);
