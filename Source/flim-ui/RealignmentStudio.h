@@ -73,7 +73,8 @@ private:
    double smoothing = 2;
    double threshold = 0;
    double coverage_threshold = 0;
-
+   int force_nz = 1;
+   
    Q_PROPERTY(bool close_after_save MEMBER close_after_save);
    Q_PROPERTY(bool save_preview MEMBER save_preview);
    Q_PROPERTY(bool save_movie MEMBER save_movie);
@@ -85,7 +86,8 @@ private:
    Q_PROPERTY(double smoothing MEMBER smoothing);
    Q_PROPERTY(double threshold MEMBER threshold);
    Q_PROPERTY(double coverage_threshold MEMBER coverage_threshold);
-
+   Q_PROPERTY(int force_nz MEMBER force_nz);
+   
 
    void displayErrorMessage(const QString& error);
 

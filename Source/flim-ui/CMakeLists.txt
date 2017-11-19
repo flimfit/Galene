@@ -17,8 +17,10 @@ find_package(dlib REQUIRED)
 find_package(CUDA)
 include_directories(${OME_FILES_ROOT}/include)
 
-find_package(hdf5)
-set_target_properties(${HDF5_LIBRARIES} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+find_package(hdf5 REQUIRED)
+if(WIN32)
+   set_target_properties(${HDF5_LIBRARIES} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+endif()
 
 include("cmake/DeployQt.cmake")
 

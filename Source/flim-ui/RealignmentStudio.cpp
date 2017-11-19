@@ -76,6 +76,7 @@ RealignmentStudio::RealignmentStudio() :
    BindProperty(smoothing_spin, this, smoothing);
    BindProperty(threshold_spin, this, threshold);
    BindProperty(coverage_threshold_spin, this, coverage_threshold);
+   BindProperty(force_nz_spin, this, force_nz);
 
    if (GpuFrameWarper::hasSupportedGpu())
       use_gpu_check->setEnabled(true);
@@ -109,6 +110,8 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
       {
          auto s = std::make_shared<FlimReaderDataSource>(filename);
          connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+         if (force_nz > 0)
+            s->setForceNumZ(force_nz);
          source = s;
       }
 

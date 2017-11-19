@@ -28,6 +28,8 @@ public:
    std::shared_ptr<FlimReader> getReader() { return reader; }
    std::shared_ptr<FlimCube<uint16_t>> getData() { return data; }
 
+   void setForceNumZ(int n_z) { reader->setNumZ(n_z); }
+
    int getNumChannels() { return reader->getNumChannels(); }
    double getTimeResolution() { return reader->getTemporalResolution(); };
 

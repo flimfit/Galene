@@ -116,7 +116,7 @@ void FlimReaderDataSource::setupForRead()
    int n_chan = reader->getNumChannels();
    int n_x = reader->numX();
    int n_y = reader->numY();
-   int n_z = 1;
+   int n_z = reader->numZ();
 
    {
       std::vector<int> dims = {n_z, n_y, n_x};
