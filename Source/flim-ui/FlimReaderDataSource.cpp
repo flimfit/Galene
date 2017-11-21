@@ -64,17 +64,18 @@ void FlimReaderDataSource::update()
       if (!currently_reading) return;
       if (!data || !data->isReady()) return;
 
-      std::lock_guard<std::mutex> lk_im(image_mutex);
-
       int n_px = reader->numX() * reader->numY() * reader->numZ();
       int n_chan = reader->getNumChannels();
       int n_t = (int)data->timepoints.size();
 
       if (area(intensity) < n_px) return;
 
+      cv::Mat intensitybuf = intensity.clone();
+      cv::Mat marbuf = mean_arrival_time.clone();
+
       uint16_t* data_ptr = data->getDataPtr();
-      float* intensity_ptr = (float*) intensity.data;
-      float* mean_arrival_time_ptr = (float*) mean_arrival_time.data;
+      float* intensity_ptr = (float*) intensitybuf.data;
+      float* mean_arrival_time_ptr = (float*) marbuf.data;
       for (int p = 0; p < n_px; p++)
       {
          uint16_t I = 0;
@@ -89,18 +90,23 @@ void FlimReaderDataSource::update()
             }
          intensity_ptr[p] = I;
          mean_arrival_time_ptr[p] = It / I;
-
       }
-
+         
       // Apply intensity normalisation
       cv::Mat intensity_normalisation = reader->getIntensityNormalisation();
       if (!intensity_normalisation.empty())
       {
          cv::Mat norm;
          intensity_normalisation.convertTo(norm, CV_32F);
-         cv::divide(intensity, norm, intensity);
-         intensity *= 100;
+         norm += 0.1;
+         cv::divide(intensitybuf, norm, intensitybuf);
+         intensitybuf *= 100;
+         std::cout << "Performing intensity normalisation\n";
       }
+
+      std::lock_guard<std::mutex> lk_im(image_mutex);
+      intensitybuf.copyTo(intensity);
+      marbuf.copyTo(mean_arrival_time);
    }
 
    emit decayUpdated();
@@ -168,12 +174,16 @@ QWidget* FlimReaderDataSource::getWidget()
 
 void FlimReaderDataSource::saveData(const QString& root_name)
 {
-   QString filename = root_name + ".ffh";
    auto tags = reader->getTags();
    auto reader_tags = reader->getReaderTags();
    auto images = reader->getImageMap();
 
-   FlimCubeWriter<uint16_t> writer(filename.toStdString(), data, tags, reader_tags, images);
+   for (int z = 0; z<reader->numZ(); z++)
+   {
+      QString filename = QString("%1_%2.ffh").arg(root_name).arg(z,3);
+      std::cout << "Filename: " << filename.toStdString() << "\n";
+      FlimCubeWriter<uint16_t> writer(filename.toStdString(), data, z, tags, reader_tags, images);      
+   }
 }
 
 void FlimReaderDataSource::savePreview(const QString& filename)
