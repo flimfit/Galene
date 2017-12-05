@@ -74,7 +74,9 @@ private:
    double threshold = 0;
    double coverage_threshold = 0;
    int force_nz = 1;
-   
+   bool store_frames = false;
+   int spatial_binning = 0;
+
    Q_PROPERTY(bool close_after_save MEMBER close_after_save);
    Q_PROPERTY(bool save_preview MEMBER save_preview);
    Q_PROPERTY(bool save_movie MEMBER save_movie);
@@ -87,7 +89,9 @@ private:
    Q_PROPERTY(double threshold MEMBER threshold);
    Q_PROPERTY(double coverage_threshold MEMBER coverage_threshold);
    Q_PROPERTY(int force_nz MEMBER force_nz);
-   
+   Q_PROPERTY(bool store_frames MEMBER store_frames);
+   Q_PROPERTY(int spatial_binning MEMBER spatial_binning);
+
 
    void displayErrorMessage(const QString& error);
 

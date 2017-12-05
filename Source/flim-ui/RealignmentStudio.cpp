@@ -10,7 +10,6 @@
 #include <fstream>
 #include "ConstrainedMdiSubWindow.h"
 #include "FlimFileReader.h"
-#include "FlimCubeWriter.h"
 #include "ImageRenderWindow.h"
 #include "RealignmentImageSource.h"
 #include "RealignmentDisplayWidget.h"
@@ -77,6 +76,8 @@ RealignmentStudio::RealignmentStudio() :
    BindProperty(threshold_spin, this, threshold);
    BindProperty(coverage_threshold_spin, this, coverage_threshold);
    BindProperty(force_nz_spin, this, force_nz);
+   BindProperty(store_frames_check, this, store_frames);
+   BindProperty(spatial_binning_combo, this, spatial_binning);
 
    if (GpuFrameWarper::hasSupportedGpu())
       use_gpu_check->setEnabled(true);
@@ -391,18 +392,22 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    {
    case RealignmentType::Warp:
       params.frame_binning = 1;
-      params.spatial_binning = 4;
+      params.spatial_binning = 1;
       break;
    default:
       params.frame_binning = frame_binning_combo->value();
       params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
    }
 
+   params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
+
+
    params.correlation_threshold = threshold_spin->value();
    params.coverage_threshold = coverage_threshold_spin->value() / 100.;
    params.smoothing = smoothing_spin->value();
    params.prefer_gpu = use_gpu_check->isChecked();
    params.default_reference_frame = (DefaultReferenceFrame) default_reference_combo->currentIndex();
+   params.store_frames = store_frames_check->isChecked();
 
    return params;
 }

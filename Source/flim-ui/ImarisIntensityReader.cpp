@@ -86,7 +86,7 @@ void ImarisIntensityReader::readMetadata()
    H5Gclose(vDataSetInfoId);
    
    bool bidirectional = false;
-   scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
+   scan_params = ImageScanParameters(100, 101, 101 * (n_y + 1), n_x, n_y, n_z, bidirectional);
 
    //n_t = std::min(n_t, 50);
 

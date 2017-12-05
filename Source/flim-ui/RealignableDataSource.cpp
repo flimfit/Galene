@@ -1,6 +1,8 @@
 #include "RealignableDataSource.h"
 #include "RealignmentResultsWriter.h"
 #include "CustomDialog.h"
+#include <QSettings>
+#include <QBitArray>
 
 DataSourceWorker::DataSourceWorker(RealignableDataSource* source, QObject* parent) :
 ThreadedObject(parent), source(source)

@@ -28,7 +28,7 @@ void BioImageIntensityReader::readMetadata()
    n_chan = image5d->numberC();
    
    setUseAllChannels();   
-   scan_params = ImageScanParameters(100, 100, 0, n_x, n_y, n_z, bidirectional);
+   scan_params = ImageScanParameters(100, 101, 101 * (n_y + 1), n_x, n_y, n_z, bidirectional);
 }
 
 void BioImageIntensityReader::addStack(int chan, int t, cv::Mat& data)

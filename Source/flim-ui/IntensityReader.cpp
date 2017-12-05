@@ -79,15 +79,7 @@ void IntensityReader::loadIntensityFramesImpl()
          if (use_channel[chan])
             addStack(chan, t, cur_frame);
 
-       cv::Mat frame_cpy;
-       cur_frame.copyTo(frame_cpy);
-       
-       {
-          std::lock_guard<std::mutex> lk(frame_mutex);
-          frames[t] = frame_cpy;
-       }
-       frame_cv.notify_all();
-
+      setIntensityFrame(t, cur_frame);
    }
 }
 

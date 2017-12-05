@@ -114,6 +114,8 @@ void FlimReaderDataSource::update()
 
 void FlimReaderDataSource::setupForRead()
 {
+   std::lock_guard<std::mutex> lk(read_mutex);
+
    connect(task.get(), &TaskProgress::cancelRequested, this, &FlimReaderDataSource::cancelRead);
 
    reader->clearStopSignal();
