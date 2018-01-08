@@ -50,8 +50,6 @@ void ImarisIntensityWriter::write(const std::string& filename)
       levels.push_back(H5Gopen(vDataSetId, res_level.c_str(), H5P_DEFAULT));
    }
 
-   lk.unlock();
-
    auto producer = [&](size_t idx)
    {
       int chan = idx % n_chan;
@@ -102,8 +100,12 @@ void ImarisIntensityWriter::write(const std::string& filename)
       }
    };
 
+   lk.unlock();
+
    int n_producer = 3; // to match cuda memory/kernel engines
    ProducerConsumer<cv::Mat>(n_producer, producer, consumer, n_t * n_chan);
+
+   lk.lock();
 
    H5Gclose(vDataSetId);
    for(auto& l : levels)

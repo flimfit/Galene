@@ -114,11 +114,12 @@ void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
       getFrameAligner()->writeRealignmentInfo(info_filename.toStdString());   
 }
 
-std::vector<bool> last_use_chan;
-
 void RealignableDataSource::requestChannelsFromUser()
 {
    int n_chan = aligningReader().getNumChannels();
+
+   QSettings settings;
+   QBitArray last_use_chan = settings.value("realignable_data_source/last_use_chan", QBitArray()).toBitArray();
 
    if (n_chan == 1) return;
 
@@ -140,9 +141,11 @@ void RealignableDataSource::requestChannelsFromUser()
 
    aligningReader().setChannelsToUse(use_chan_v);
 
-   last_use_chan.resize(std::max(last_use_chan.size(), (size_t)n_chan));
+   last_use_chan.resize(std::max(last_use_chan.size(), n_chan));
    for(int i=0; i<n_chan; i++)
       last_use_chan[i] = use_chan[i];
+
+   settings.setValue("realignable_data_source/last_use_chan", last_use_chan);
 
    delete[] use_chan;   
 }

@@ -38,6 +38,7 @@ protected:
    std::shared_ptr<RealignableDataSource> getCurrentSource();
    void realign();
    void reload();
+   void copyImage();
 
    void updateParameterGroupBox(int index);
 

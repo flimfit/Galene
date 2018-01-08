@@ -21,6 +21,7 @@ public:
    void setClosable(bool closable_) { closable = closable_; }
 
    void saveMergedImage();
+   cv::Mat getMergedImage();
 
    void closeEvent(QCloseEvent *event);
 

@@ -88,16 +88,23 @@ void LifetimeDisplayWidget::updateCountRates()
    }
 }
 
-void LifetimeDisplayWidget::saveMergedImage()
+cv::Mat LifetimeDisplayWidget::getMergedImage()
 {
-   QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Tiff (*.tif)");
-   if (file.isEmpty()) return;
-
    // Intensity merge
    cv::Mat merged, alpha3;
    cv::Mat in[] = { alpha, alpha, alpha };
    cv::merge(in, 3, alpha3);
    cv::multiply(mapped_mar, alpha3, merged, 1.0/255);
+   return merged;
+}
+
+
+void LifetimeDisplayWidget::saveMergedImage()
+{
+   QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Tiff (*.tif)");
+   if (file.isEmpty()) return;
+
+   auto merged = getMergedImage();
 #ifndef SUPPRESS_OPENCV_HIGHGUI
    cv::imwrite(file.toStdString(), merged);
 #endif

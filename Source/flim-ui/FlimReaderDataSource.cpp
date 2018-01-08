@@ -182,8 +182,11 @@ void FlimReaderDataSource::saveData(const QString& root_name)
 
    for (int z = 0; z<reader->numZ(); z++)
    {
-      QString filename = QString("%1_%2.ffh").arg(root_name).arg(z,3);
-      std::cout << "Filename: " << filename.toStdString() << "\n";
+      QString filename;
+      if (reader->numZ() > 1)
+         filename = QString("%1_%2.ffh").arg(root_name).arg(z, 3, 10, QChar('0'));
+      else
+         filename = QString("%1.ffh").arg(root_name);
       FlimCubeWriter<uint16_t> writer(filename.toStdString(), data, z, tags, reader_tags, images);      
    }
 }

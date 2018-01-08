@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QClipboard>
 #include <iostream>
 #include <fstream>
 #include "ConstrainedMdiSubWindow.h"
@@ -37,6 +38,7 @@ RealignmentStudio::RealignmentStudio() :
    connect(export_movie_action, &QAction::triggered, this, &RealignmentStudio::exportMovie);
    connect(save_merged_action, &QAction::triggered, this, &RealignmentStudio::saveMergedImage);
    connect(quit_action, &QAction::triggered, this, &RealignmentStudio::close);
+   connect(copy_action, &QAction::triggered, this, &RealignmentStudio::copyImage);
 
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
@@ -116,7 +118,8 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
          source = s;
       }
 
-      source->requestChannelsFromUser();
+      if (mode > 0)
+         source->requestChannelsFromUser();
 
       emit newDataSource(source);
       source->setRealignmentParameters(getRealignmentParameters());
@@ -148,6 +151,29 @@ void RealignmentStudio::showFileInfo(const QString& filename)
    {
       QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
    }
+}
+
+void RealignmentStudio::copyImage()
+{
+   auto active_window = mdi_area->activeSubWindow();
+
+   if (!active_window)
+   {
+      QMessageBox::warning(this, "Warning", "No FLIM image open");
+      return;
+   }
+
+   auto main_w = active_window->widget();
+   if (main_w->inherits("LifetimeDisplayWidget"))
+   {
+      auto w = reinterpret_cast<LifetimeDisplayWidget*>(main_w);
+      cv::Mat im = w->getMergedImage();
+
+      QImage image = CopyToQImage(im, 0);
+      QClipboard *clipboard = QApplication::clipboard();
+      clipboard->setImage(image);
+   }
+
 }
 
 QMdiSubWindow* RealignmentStudio::createSubWindow(QWidget* widget, const QString& title)
@@ -344,13 +370,13 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
    {
       try
 	   {
+         if (save_realignment_info)
+            source->writeRealignmentInfo(name);
+
          source->saveData(name);
 
          if (save_preview)
             source->savePreview(preview_filename);
-
-         if (save_realignment_info)
-            source->writeRealignmentInfo(name);
 
          if (save_movie)
             source->writeRealignmentMovies(name);

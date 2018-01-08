@@ -704,7 +704,14 @@
     </property>
     <addaction name="help_action"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="copy_action"/>
+   </widget>
    <addaction name="menuFiles"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="quit_action">
@@ -783,6 +790,14 @@
   <action name="help_action">
    <property name="text">
     <string>Galene Help...</string>
+   </property>
+  </action>
+  <action name="copy_action">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>
