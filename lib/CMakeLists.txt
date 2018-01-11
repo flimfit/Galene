@@ -18,13 +18,14 @@ ExternalProject_Add(
   PATCH_COMMAND ""
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/bioimageconvert"
   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/bioimageconvert"
-  BUILD_ALWAYS OFF
+  BUILD_ALWAYS ON
   CMAKE_ARGS  -DBIC_ENABLE_FFMPEG=OFF 
               -DBIC_ENABLE_GDCM=OFF 
               -DBIC_ENABLE_GDCM=OFF 
               -DBIC_ENABLE_JXRLIB=OFF 
               -DBIC_ENABLE_LIBJPEG_TURBO=OFF
-              -DBIC_INTERNAL_LIBJPEG=ON
+              -DBIC_INTERNAL_LIBJPEG=OFF
+              -DBIC_INTERNAL_EXIV2=OFF
               -DBIC_ENABLE_LIBWEBP=OFF 
               -DBIC_ENABLE_NIFTI=OFF 
               -DBIC_ENABLE_QT=OFF 
@@ -33,27 +34,6 @@ ExternalProject_Add(
               -DBIC_ENABLE_IMGCNV=OFF 
               -DLIBBIOIMAGE_TRANSFORMS=OFF
               ${EXT_PROJ_ARGS}
-  TEST_COMMAND ""
-)
-
-ExternalProject_Add(
-  dlib
-  GIT_REPOSITORY "https://github.com/seanwarren/dlib.git"
-  GIT_TAG "master"
-  UPDATE_COMMAND ""
-  PATCH_COMMAND ""
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/dlib"
-  STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/dlib"
-  BUILD_ALWAYS ON
-  CMAKE_ARGS  -DDLIB_USE_BLAS=ON 
-              -DDLIB_USE_LAPACK=ON 
-              -DDLIB_USE_CUDA=OFF 
-              -DDLIB_JPEG_SUPPORT=OFF 
-              -DDLIB_LINK_WITH_SQLITE3=OFF 
-              -DDLIB_PNG_SUPPORT=OFF 
-              -DDLIB_GIF_SUPPORT=OFF 
-              -DDLIB_NO_GUI_SUPPORT=ON 
-              ${EXT_PROJ_ARGS}               
   TEST_COMMAND ""
 )
 

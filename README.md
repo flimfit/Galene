@@ -26,14 +26,13 @@ Build steps
 Building on Mac
 -------------------
 Requirements
-- MacOS 10.10 or greater
-- LLVM 4.0 or greater (install via brew, apple supplied version does not support OpenMP)
+- MacOS 10.12 or greater
 - CMake 3.7 or greater (install via brew)
 - Qt 5.7 or greater (install via brew)
 
 Build steps
 - Install LLVM, Qt and cmake using [homebrew](http://brew.sh)
-    - `brew install llvm qt5 cmake` 
+    - `brew install llvm qt5 cmake boost@1.60 exiv2` 
 - Clone the Galene repository 
 - Run script `build-flim-ui.sh`
 

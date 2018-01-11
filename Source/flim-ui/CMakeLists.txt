@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(flim-ui LANGUAGES CXX CUDA) 
+project(flim-ui LANGUAGES CXX) 
 
 find_package(Qt5 COMPONENTS Widgets PrintSupport OpenGL Network)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
@@ -14,7 +14,7 @@ add_definitions(-DBIM_USE_OPENCV)
 
 find_package(dlib REQUIRED)
 
-find_package(CUDA)
+find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
 
 find_package(hdf5 REQUIRED)
