@@ -2,17 +2,12 @@ cmake_minimum_required(VERSION 3.7)
 project(flim-ui LANGUAGES CXX) 
 
 find_package(Qt5 COMPONENTS Widgets PrintSupport OpenGL Network)
-find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs videoio)
-set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
-find_package(dlib REQUIRED)
 find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 find_package(BioImage REQUIRED)
 add_definitions(-DBIM_USE_OPENCV)
-
-find_package(dlib REQUIRED)
 
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
@@ -25,6 +20,7 @@ endif()
 include("cmake/DeployQt.cmake")
 
 set(CMAKE_AUTOMOC ON)
+cmake_policy(SET CMP0071 OLD)
 
 qt5_wrap_ui(UI_HEADERS 
          FlimDisplay.ui
@@ -89,12 +85,7 @@ set(HEADERS
    ImarisIntensityWriter.h
 )
 
-include_directories(${fifo_flim_INCLUDE_DIR}
-                    ${InstrumentControl_INCLUDE_DIR}
-                    ${InstrumentControlUI_INCLUDE_DIR}
-                    ${FlimReader_INCLUDE_DIR}
-                    ${QSimpleUpdater_INCLUDE_DIR}
-                    ${QT_USE_FILE}
+include_directories(${QT_USE_FILE}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${OME_FILES_INCLUDE_DIRS}
@@ -116,22 +107,17 @@ set (Galene_OBJECTS ${SOURCE}
                     ${HEADERS}
                     ${UI_HEADERS} 
                     ${UI_RESOURCES} 
-                    $<TARGET_OBJECTS:InstrumentControl> 
-                    $<TARGET_OBJECTS:InstrumentControlUI> 
-                    $<TARGET_OBJECTS:fifo_flim>
-                    $<TARGET_OBJECTS:FlimReader>
-                    $<TARGET_OBJECTS:QSimpleUpdater>
                     ${RESOURCE_FILES})
 
-set (Galene_LIBS    ${OpenCV_LIBS}
-                    ${fifo_flim_LIBS} 
-                    ${InstrumentControl_LIBRARIES}
-                    ${FlimReader_LIBRARIES}
-                    ${CUDA_LIBRARIES}
+set (Galene_LIBS    ${CUDA_LIBRARIES}
                     ${BIOIMAGE_LIBRARIES}
                     ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
                     ${HDF5_LIBRARIES} 
+                    fifo_flim
+                    FlimReader
+                    InstrumentControlUI
+                    QSimpleUpdater
                     OME::Files)
 
 if (APPLE) # easier debugging through vs code

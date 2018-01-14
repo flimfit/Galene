@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.7) 
 set(CMAKE_CXX_STANDARD 14)
 
+include(CheckLanguage)
+
 if(DEFINED ENV{OME_FILES_ROOT})
     set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
 endif()
@@ -9,22 +11,28 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 
-project (Galene) 
+project (Galene LANGUAGES CXX) 
 
 add_definitions(-DVERSION=${VERSION})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 cmake_policy(SET CMP0071 OLD)
 
-find_package(Boost REQUIRED)
-find_package(OpenCV REQUIRED)
-
-find_package(MATLAB)
-if(MATLAB_FOUND)
-    # Set output directory for FlimReaderMex file.
-    # This will be used for generating the figures,
-    # Matlab is not required for the main application
-    set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
+if(WIN32)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP4")
 endif()
+
+
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+  enable_language(CUDA)
+else()
+  message(STATUS "No CUDA support")
+endif()
+
+# Set output directory for FlimReaderMex file.
+# This will be used for generating the figures,
+# Matlab is not required for the main application
+set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
