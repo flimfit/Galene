@@ -101,7 +101,6 @@ void FlimReaderDataSource::update()
          norm += 0.1;
          cv::divide(intensitybuf, norm, intensitybuf);
          intensitybuf *= 100;
-         std::cout << "Performing intensity normalisation\n";
       }
 
       std::lock_guard<std::mutex> lk_im(image_mutex);

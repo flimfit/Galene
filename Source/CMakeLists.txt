@@ -17,17 +17,32 @@ add_definitions(-DVERSION=${VERSION})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 cmake_policy(SET CMP0071 OLD)
 
-if(WIN32)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP4")
-endif()
-
-
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
 else()
   message(STATUS "No CUDA support")
 endif()
+
+if(MSVC)
+   set(PLATFORM_FLAGS_ALL "/Oi /fp:fast /MP4")
+   set(PLATFORM_FLAGS_RELEASE "/O2 /GL /LTCG /GS-")
+   set(PLATFORM_FLAGS_RELWITHDEBINFO "/O2 /GL /LTCG")
+   set(PLATFORM_FLAGS_DEBUG "/ZI")
+   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+   add_definitions(-D_MSVC)
+endif(MSVC)
+
+if(UNIX)
+   set(PLATFORM_FLAGS_ALL "-msse3 -std=c++11 -fcolor-diagnostics")
+   set(PLATFORM_FLAGS_RELEASE "-O3 -ffast-math -ftree-vectorize")
+   set(PLATFORM_FLAGS_DEBUG "")
+endif(UNIX)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PLATFORM_FLAGS_ALL}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${PLATFORM_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${PLATFORM_FLAGS_DEBUG}")
+
 
 # Set output directory for FlimReaderMex file.
 # This will be used for generating the figures,
