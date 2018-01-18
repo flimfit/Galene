@@ -2,55 +2,40 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include "WriteMultipageTiff.h"
+#include "Cv3dUtils.h"
 
 void RealignmentResultsWriter::exportAlignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
 {
-   std::vector<cv::Mat> images;
-   for (const auto& r : results)
-   {
-      cv::Mat b;
-      r.realigned.convertTo(b, CV_16U);
-      images.push_back(b);
-   }
-
-   writeMovie(filename, images);
+   exportMovie(results, filename, &RealignmentResult::realigned);
 }
 
 void RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(const std::vector<RealignmentResult>& results, const QString& filename)
 {
-   std::vector<cv::Mat> images;
-   for (const auto& r : results)
-   {
-      cv::Mat b;
-      r.realigned_preserving.convertTo(b, CV_16U);
-      images.push_back(b);
-   }
-
-   writeMovie(filename, images);
-}
+   exportMovie(results, filename, &RealignmentResult::realigned_preserving);}
  
 void RealignmentResultsWriter::exportUnalignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
 {
-   std::vector<cv::Mat> images;
-   for (const auto& r : results)
-   {
-      cv::Mat b;
-      r.frame.convertTo(b, CV_16U);
-      images.push_back(b);
-   }
-
-   writeMovie(filename, images);
+   exportMovie(results, filename, &RealignmentResult::frame);
 }
-
 
 void RealignmentResultsWriter::exportCoverageMovie(const std::vector<RealignmentResult>& results, const QString& filename)
 {
+   exportMovie(results, filename, &RealignmentResult::mask);
+}
+
+
+void RealignmentResultsWriter::exportMovie(const std::vector<RealignmentResult>& results, const QString& filename, cv::Mat RealignmentResult::*field)
+{
    std::vector<cv::Mat> images;
-   for (const auto& r : results)
+   for (const RealignmentResult& r : results)
    {
       cv::Mat b;
-      r.mask.convertTo(b, CV_16U);
-      images.push_back(b);
+      const cv::Mat& im = r.*field;
+      for (int z = 0; z < im.size[0]; z++)
+      {
+         extractSlice(im, z).convertTo(b, CV_16U);
+         images.push_back(b);
+      }
    }
 
    writeMovie(filename, images);
