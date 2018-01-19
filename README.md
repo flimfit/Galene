@@ -43,11 +43,11 @@ Requirements
 
 Install the required dependencies using
 ```
-brew install qt cmake opencv boost@1.60 xerces-c xalan-c exiv2 libraw` 
+brew install qt cmake opencv boost@1.55 xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja
+brew link boost@1.55 --force
+pip install genshi 
 ```
 Build steps
-- Install LLVM, Qt and cmake using [homebrew](http://brew.sh)
-    - `brew install qt cmake opencv boost@1.60 xerces-c xalan-c exiv2 libraw` 
 - Clone the Galene repository 
 - Run script `build-flim-ui.sh`
 
