@@ -22,4 +22,4 @@ cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOME_
 cmake --build Build/$BUILD_TYPE  # --clean-first
 
 # sign code (requires that signature is installed in keychain)
-codesign --verbose --deep -s P6MM899VL9 Build/flim-ui/Galene.app/
+codesign --verbose --deep -s P6MM899VL9 Build/$BUILD_TYPE/flim-ui/Galene.app/
