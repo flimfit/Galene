@@ -43,8 +43,9 @@ Requirements
 
 Install the required dependencies using
 ```
-brew install qt cmake opencv boost@1.55 xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja
+brew install qt cmake opencv boost@1.55 xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja npm
 brew link boost@1.55 --force
+sudo npm install -g appdmg
 pip install genshi 
 ```
 Build steps
