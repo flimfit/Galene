@@ -11,3 +11,4 @@ lib/stamp/*
 lib/build/*
 lib/src/*
 lib/stamp/*
+.vscode/*

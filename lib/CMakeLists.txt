@@ -33,6 +33,7 @@ ExternalProject_Add(
               -DBIC_ENABLE_OPENMP=OFF 
               -DBIC_ENABLE_IMGCNV=OFF 
               -DLIBBIOIMAGE_TRANSFORMS=OFF
+              -DZLIB_ROOT=${ZLIB_ROOT}
               ${EXT_PROJ_ARGS}
   TEST_COMMAND ""
 )

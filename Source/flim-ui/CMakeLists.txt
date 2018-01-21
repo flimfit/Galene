@@ -127,33 +127,31 @@ if (APPLE) # easier debugging through vs code
     set_property(TARGET GaleneTest PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
-if (NOT APPLE)
-   add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
-   target_link_libraries(Galene ${Galene_LIBS})
-   qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
+add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
+target_link_libraries(Galene ${Galene_LIBS})
+qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
-   add_custom_command(
-        TARGET Galene POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                  ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
-                  ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
+add_custom_command(
+    TARGET Galene POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/simulated_intensity.png
+                ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png)
 
-    add_custom_command(
-        TARGET Galene POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${OME_FILES_ROOT}/share/
-                    $<TARGET_FILE_DIR:Galene>/share/)
+add_custom_command(
+    TARGET Galene POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${OME_FILES_ROOT}/share/
+                $<TARGET_FILE_DIR:Galene>/share/)
 
-   set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
-                                          MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
+set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+                                        MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-   deployqt(Galene INCLUDE_MODULES ${QTLIBS})
+deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
-   include(InstallRequiredSystemLibraries)
+include(InstallRequiredSystemLibraries)
 
-   install(TARGETS Galene RUNTIME DESTINATION bin 
-                           BUNDLE DESTINATION bundle)
-endif()                           
+install(TARGETS Galene RUNTIME DESTINATION bin 
+                        BUNDLE DESTINATION bundle)                           
 
 if (WIN32)
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)

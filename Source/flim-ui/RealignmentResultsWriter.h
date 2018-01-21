@@ -14,5 +14,6 @@ public:
 
 protected:
 
+   static void exportMovie(const std::vector<RealignmentResult>& results, const QString& filename, cv::Mat RealignmentResult::*field);
    static void writeMovie(const QString& filename, const std::vector<cv::Mat>& images);
 };
