@@ -10,7 +10,7 @@ endif()
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
-
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 project (Galene LANGUAGES CXX) 
 
 add_definitions(-DVERSION=${VERSION})
