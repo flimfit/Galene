@@ -20,6 +20,3 @@ BUILD_TYPE=Release
 #rm -rf Build/$BUILD_TYPE
 cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOME_FILES_ROOT="$OME_FILES_ROOT" 
 cmake --build Build/$BUILD_TYPE  # --clean-first
-
-# sign code (requires that signature is installed in keychain)
-# codesign --verbose --deep -s P6MM899VL9 Build/$BUILD_TYPE/flim-ui/Galene.app/
