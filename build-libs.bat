@@ -39,7 +39,7 @@ if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 cmake -GNinja -Hlib -Blib/build/Release -DCMAKE_BUILD_TYPE=Release %BUILD_FLAGS%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
-cmake --build lib/build/Release
+cmake --build lib/build/Release -- -j 2
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 
