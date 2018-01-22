@@ -5,16 +5,19 @@ Galene is a tool to correct for motion in fluorescence lifetime imaging (FLIM) d
 
 Precompiled applications are available from http://www.flimfit.org/galene.
 
-Instructions to compile from source are provided below 
+For documentation please see http://galene.readthedocs.io.
+
+Instructions to compile from source are provided below, including retrieving the required dependencies.  
 
 Building on Windows
 -------------------
 Requirements
 - Windows 7 or greater
 - Visual Studio 2015 or greater
-- Qt 5.7 or greater, download from https://www.qt.io/download-open-source/
+- Qt 5.7 or greater, install from https://www.qt.io/download-open-source/
 - vcpkg, for installing required dependencies, install from https://github.com/Microsoft/vcpkg
 - choco, for installing required dependencies, install from https://chocolatey.org/
+- Optionally, CUDA to support GPU processing, install from https://developer.nvidia.com/cuda-downloads
 
 Install the required dependencies using
 ```
@@ -25,10 +28,10 @@ pip install genshi
 
 - Add an environment variable to point CMake to Qt, e.g. 
    `CMAKE_PREFIX_PATH = C:\Qt\5.9\msvc2017_64`
-- Add an environment variable `VCPKG_ROOT` to point to the vcpkg install  
+- Add an environment variable `VCPKG_ROOT` to point to the vcpkg folder  
 
 Build steps
-- Clone the Galene repository 
+- Clone the Galene repository from `https://github.com/flimfit/galene`
 - Run script `build-libs.bat` to build `bioimage` and `ome-files`
     - run `build-libs.bat --build-debug` to also build debug and relwithdebinfo libraries
 - Run script `build-flim-ui.bat`
@@ -37,19 +40,25 @@ Build steps
 Building on Mac
 -------------------
 Requirements
-- MacOS 10.12 or greater
-- XCode 8 or greater
+- MacOS 10.11 or greater
+- XCode 8.2 or greater
 - Homebrew, install from https://brew.sh
+- Optionally, CUDA to support GPU processing, install from https://developer.nvidia.com/cuda-downloads
+    - Download CUDA 8 for macOS 10.11 or CUDA 9.1 for macOS 10.12. 
+    - macOS 10.13 is not currently supported for building CUDA applications 
 
 Install the required dependencies using
 ```
-brew install qt cmake opencv boost@1.55 xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja npm
-brew link boost@1.55 --force
-sudo npm install -g appdmg
+brew install qt cmake opencv boost xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja npm
 pip install genshi 
+sudo npm install -g appdmg # to build the disk image
 ```
+
+If you have some of the packages installed already, `brew upgrade` to retrieve the latest packages
+
+
 Build steps
-- Clone the Galene repository 
+- Clone the Galene repository from `https://github.com/flimfit/galene`
 - Run script `build-flim-ui.sh`
 
 Acknowledgements
