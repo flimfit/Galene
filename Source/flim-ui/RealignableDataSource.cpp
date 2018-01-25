@@ -117,11 +117,12 @@ void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
 void RealignableDataSource::requestChannelsFromUser()
 {
    int n_chan = aligningReader().getNumChannels();
+   bool can_read_bidirectional = aligningReader().canReadBidirectionalScan();
 
    QSettings settings;
    QBitArray last_use_chan = settings.value("realignable_data_source/last_use_chan", QBitArray()).toBitArray();
 
-   if (n_chan == 1) return;
+   if (n_chan == 1 && can_read_bidirectional) return;
 
    bool* use_chan = new bool[n_chan];
 
@@ -133,6 +134,16 @@ void RealignableDataSource::requestChannelsFromUser()
       d.addCheckBox("Channel " + QString::number(i), &use_chan[i]);
    }
 
+
+   bool bidirectional = settings.value("realignable_data_source/last_bidirectional", false).toBool();
+   
+   if (!can_read_bidirectional)
+   {
+      d.addVSpacer(10);
+      d.addLabel("Please specify the following scan parameters");
+      d.addCheckBox("Bidirectional scan?", &bidirectional);
+   }
+
    d.exec();
 
    std::vector<bool> use_chan_v(n_chan);
@@ -141,11 +152,15 @@ void RealignableDataSource::requestChannelsFromUser()
 
    aligningReader().setChannelsToUse(use_chan_v);
 
+   if (!can_read_bidirectional)
+      aligningReader().setBidirectionalScan(bidirectional);
+
    last_use_chan.resize(std::max(last_use_chan.size(), n_chan));
    for(int i=0; i<n_chan; i++)
       last_use_chan[i] = use_chan[i];
 
    settings.setValue("realignable_data_source/last_use_chan", last_use_chan);
+   settings.setValue("realignable_data_source/last_bidirectional", bidirectional);
 
    delete[] use_chan;   
 }
