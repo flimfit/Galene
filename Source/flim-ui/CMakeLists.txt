@@ -148,6 +148,8 @@ set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURREN
 
 deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
+set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
+
 include(InstallRequiredSystemLibraries)
 
 install(TARGETS Galene RUNTIME DESTINATION bin 
