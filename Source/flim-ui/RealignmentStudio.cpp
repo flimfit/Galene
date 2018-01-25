@@ -418,14 +418,15 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    {
    case RealignmentType::Warp:
       params.frame_binning = 1;
-      params.spatial_binning = 1;
+      params.spatial_binning = 4;
       break;
    default:
       params.frame_binning = frame_binning_combo->value();
       params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
    }
 
-   params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
+   // Fix spatial binning until we expose GUI properly
+   //params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
 
 
    params.correlation_threshold = threshold_spin->value();
