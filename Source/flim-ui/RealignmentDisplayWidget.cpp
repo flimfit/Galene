@@ -15,18 +15,17 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
    connect(timer, &QTimer::timeout, this, &RealignmentDisplayWidget::update);
    timer->start(2000);
    
-   //connect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update, Qt::QueuedConnection);
    connect(z_scroll, &QScrollBar::valueChanged, this, &RealignmentDisplayWidget::setZ);   
    connect(slider, &QSlider::valueChanged, this, &RealignmentDisplayWidget::setImage);
-   connect(slider, &QSlider::sliderMoved, current_frame_spin, &QSpinBox::setValue);
-   //connect(current_frame_spin, &QSpinBox::editingFinished, [&]() { slider->setValue(current_frame_spin->value()); });
+   connect(slider, &QSlider::valueChanged, current_frame_spin, &QSpinBox::setValue);
+   connect(current_frame_spin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), 
+      [&](int value) { if (slider->value() != value) slider->setValue(value); });
 
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
 
 RealignmentDisplayWidget::~RealignmentDisplayWidget()
 {
-   //disconnect(source.get(), &FlimReaderDataSource::readComplete, this, &RealignmentDisplayWidget::update);
 }
 
 void RealignmentDisplayWidget::referenceButtonPressed()
