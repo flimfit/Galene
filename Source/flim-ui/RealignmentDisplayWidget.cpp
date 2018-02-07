@@ -21,6 +21,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
    connect(current_frame_spin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), 
       [&](int value) { if (slider->value() != value) slider->setValue(value); });
 
+   connect(show_aligned_button, &QPushButton::toggled, this, &RealignmentDisplayWidget::drawImage);
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
 
