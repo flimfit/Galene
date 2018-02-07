@@ -34,6 +34,7 @@ public:
    virtual bool canReadBidirectionalScan() { return false; }
    virtual void setBidirectionalScan(bool bidirectional = true) { scan_params.bidirectional = bidirectional;  };
 
+   virtual bool canReadNumZ() { return true; }
 
    double getProgress();
    

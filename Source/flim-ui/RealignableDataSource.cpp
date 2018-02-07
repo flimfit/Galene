@@ -117,12 +117,13 @@ void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
 void RealignableDataSource::requestChannelsFromUser()
 {
    int n_chan = aligningReader().getNumChannels();
-   bool can_read_bidirectional = aligningReader().canReadBidirectionalScan();
+   bool request_bidirectional = !aligningReader().canReadBidirectionalScan();
+   bool request_num_z = !aligningReader().canReadNumZ(); 
 
    QSettings settings;
    QBitArray last_use_chan = settings.value("realignable_data_source/last_use_chan", QBitArray()).toBitArray();
 
-   if (n_chan == 1 && can_read_bidirectional) return;
+   if (n_chan == 1 && !request_num_z) return;
 
    bool* use_chan = new bool[n_chan];
 
@@ -136,13 +137,18 @@ void RealignableDataSource::requestChannelsFromUser()
 
 
    bool bidirectional = settings.value("realignable_data_source/last_bidirectional", false).toBool();
-   
-   if (!can_read_bidirectional)
+   int n_z = settings.value("realignable_data_source/last_n_z", false).toInt();
+
+   if (request_bidirectional | request_num_z)
    {
       d.addVSpacer(10);
       d.addLabel("Please specify the following scan parameters");
-      d.addCheckBox("Bidirectional scan?", &bidirectional);
    }
+
+   if (request_bidirectional)
+      d.addCheckBox("Bidirectional scan?", &bidirectional);
+   if (request_num_z)
+      d.addSpinBox("Number of frames / stack", 1, 100000, &n_z, 1);
 
    d.exec();
 
@@ -152,8 +158,10 @@ void RealignableDataSource::requestChannelsFromUser()
 
    aligningReader().setChannelsToUse(use_chan_v);
 
-   if (!can_read_bidirectional)
+   if (request_bidirectional)
       aligningReader().setBidirectionalScan(bidirectional);
+   if (request_num_z)
+      aligningReader().setNumZ(n_z);
 
    last_use_chan.resize(std::max(last_use_chan.size(), n_chan));
    for(int i=0; i<n_chan; i++)
@@ -161,6 +169,7 @@ void RealignableDataSource::requestChannelsFromUser()
 
    settings.setValue("realignable_data_source/last_use_chan", last_use_chan);
    settings.setValue("realignable_data_source/last_bidirectional", bidirectional);
+   settings.setValue("realignable_data_source/last_n_z", n_z);
 
    delete[] use_chan;   
 }
