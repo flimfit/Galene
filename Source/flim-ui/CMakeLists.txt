@@ -53,6 +53,7 @@ set(SOURCE
    OmeIntensityWriter.cpp
    ImarisIntensityReader.cpp
    ImarisIntensityWriter.cpp
+   Galene.manifest
 )
 
 set(HEADERS
