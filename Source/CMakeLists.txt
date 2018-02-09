@@ -13,7 +13,7 @@ include ("cmake/GitVersion.cmake") # Get version number from git
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 project (Galene LANGUAGES CXX) 
 
-add_definitions(-DVERSION=${VERSION})
+add_definitions(-DVERSION="${VERSION}")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 add_definitions(-DBOOST_NO_CXX11_SCOPED_ENUMS) # Support older boost
 cmake_policy(SET CMP0071 OLD)

@@ -15,7 +15,7 @@
 #include <boost/filesystem.hpp>
 #include <ome/files/CoreMetadata.h>
 
-const QString update_url = "https://seanwarren.github.io/flim-ui-website/updates.json";
+const QString update_url = "http://galene.flimfit.org/updates.json";
 
 #ifdef WIN32
 int setenv(const char *name, const char *value, int overwrite)
@@ -114,13 +114,11 @@ int main(int argc, char *argv[])
    a.setPalette(darkPalette);
 
    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-   
 
    auto updater = QSimpleUpdater::getInstance();
-   updater->setModuleVersion(update_url, "VERSION"); // from CMake
-   updater->setModuleName(update_url, "flim-ui");
+   updater->setModuleVersion(update_url, VERSION); // from CMake
+   updater->setModuleName(update_url, "Galene");
    updater->checkForUpdates(update_url);
-   
 
    //FlimDisplay display;
    RealignmentStudio display;
