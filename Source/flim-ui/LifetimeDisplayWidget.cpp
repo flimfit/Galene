@@ -254,7 +254,8 @@ void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
    if (autoscale_intensity && rescale)
    {
       cv::Scalar mean, std;
-      cv::meanStdDev(intensity, mean, std);
+      cv::Mat mask = cv::Mat(intensity == intensity); // mask out non-finite values
+      cv::meanStdDev(intensity, mean, std, mask);
       i_max = mean[0] + 1.96 * std[0]; // 97.5% 
       i_min = 0;
 

@@ -11,8 +11,6 @@ FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* pa
    filename = filename_;
    reader = std::shared_ptr<FlimReader>(FlimReader::createReader(filename.toStdString()));
 
-   reader->setTemporalResolution(8); // TODO
-
    worker = new DataSourceWorker(this);
    connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
@@ -93,15 +91,9 @@ void FlimReaderDataSource::update()
       }
          
       // Apply intensity normalisation
-      cv::Mat intensity_normalisation = reader->getIntensityNormalisation();
+      cv::Mat intensity_normalisation = reader->getFloatIntensityNormalisation();
       if (!intensity_normalisation.empty())
-      {
-         cv::Mat norm;
-         intensity_normalisation.convertTo(norm, CV_32F);
-         norm += 0.1;
-         cv::divide(intensitybuf, norm, intensitybuf);
-         intensitybuf *= 100;
-      }
+         cv::divide(intensitybuf, intensity_normalisation, intensitybuf);
 
       std::lock_guard<std::mutex> lk_im(image_mutex);
       intensitybuf.copyTo(intensity);

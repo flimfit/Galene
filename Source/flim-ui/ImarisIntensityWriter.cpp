@@ -53,7 +53,7 @@ void ImarisIntensityWriter::write(const std::string& filename)
    auto producer = [&](size_t idx)
    {
       int chan = idx % n_chan;
-      int t = idx / n_chan;
+      int t = (int) (idx / n_chan);
 
       cv::Mat cvbuf;
       cv::Mat stack = reader->getRealignedStack(chan, t);
