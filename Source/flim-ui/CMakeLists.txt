@@ -13,9 +13,6 @@ find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
 
 find_package(hdf5 REQUIRED)
-if(WIN32)
-   set_target_properties(${HDF5_LIBRARIES} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-endif()
 
 include("cmake/DeployQt.cmake")
 
@@ -96,6 +93,7 @@ include_directories(${QT_USE_FILE}
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)
+   set(${HDF5_LIBRARIES} hdf5::hdf5-shared) # for vcpkg
 elseif(APPLE)
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.icns")
     set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
@@ -114,7 +112,7 @@ set (Galene_LIBS    ${CUDA_LIBRARIES}
                     ${BIOIMAGE_LIBRARIES}
                     ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
-                    hdf5::hdf5-shared
+                    ${HDF5_LIBRARIES}
                     fifo_flim
                     FlimReader
                     InstrumentControlUI
