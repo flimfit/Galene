@@ -114,7 +114,7 @@ set (Galene_LIBS    ${CUDA_LIBRARIES}
                     ${BIOIMAGE_LIBRARIES}
                     ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
-                    ${HDF5_LIBRARIES} 
+                    hdf5::hdf5-shared
                     fifo_flim
                     FlimReader
                     InstrumentControlUI
@@ -147,10 +147,12 @@ add_custom_command(
 set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-deployqt(Galene INCLUDE_MODULES ${QTLIBS})
-
 set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 #set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS TRUE)
+
+
+deployqt(Galene INCLUDE_MODULES ${QTLIBS})
+
 
 include(InstallRequiredSystemLibraries)
 
