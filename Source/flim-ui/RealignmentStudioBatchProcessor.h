@@ -5,7 +5,7 @@
 #include "TaskProgress.h"
 #include <QStringList>
 
-class RealignmentStudioBatchProcessor : public ThreadedObject
+class RealignmentStudioBatchProcessor : public QObject //: public ThreadedObject
 {
    Q_OBJECT
 
@@ -18,32 +18,37 @@ public:
       task = std::make_shared<TaskProgress>("Processing...", true, files.size());
       TaskRegister::addTask(task);
 
-      startThread();
+      processNext();
    }
 
-   void init()
+   void processNext()
    {
-      QMetaObject::invokeMethod(this, "process", Qt::QueuedConnection);
-   }
-
-   Q_INVOKABLE 
-   void process()
-   {
-      for(auto file : files)
+      if (files.isEmpty())
       {
-         auto source = studio->openFile(file);
-         QThread::msleep(1000);
-         source->readData(true);
-         source->waitForComplete();
-         studio->save(source, true);
-         task->incrementStep();
+         task->setFinished();
+         return;
       }
+      
+      auto file = files.first();
+      files.removeFirst();
 
-      task->setFinished();
-      deleteLater();
+      source = studio->openFileWithOptions(file, options);
+      connect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+   }
+
+   void saveCurrent()
+   {
+      disconnect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+      studio->save(source, true);
+      task->incrementStep();
+
+      processNext();
    }
 
 private:
+
+   RealignableDataOptions options; // start uninitialised
+   std::shared_ptr<RealignableDataSource> source;
 
    std::shared_ptr<TaskProgress> task;
    RealignmentStudio* studio;

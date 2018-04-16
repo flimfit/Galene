@@ -27,14 +27,16 @@ public:
    int numY() { return n_y; }
    int numZ() { return n_z; }
    int numT() { return n_t; }
-   int getNumChannels() { return n_chan; }
+   int getNumChannels() const { return n_chan; }
    
    cv::Mat getRealignedStack(int chan, int t);
 
-   virtual bool canReadBidirectionalScan() { return false; }
-   virtual void setBidirectionalScan(bool bidirectional = true) { scan_params.bidirectional = bidirectional;  };
+   virtual bool canReadBidirectionalScan() const { return false; }
+   void setBidirectionalScan(bool bidirectional = true) { scan_params.bidirectional = bidirectional;  };
+   bool getBidirectionalScan() const { return scan_params.bidirectional; }
 
-   virtual bool canReadNumZ() { return true; }
+   bool canReadNumZ() const { return true; }
+   int getNumZ() const { return n_z; }
 
    double getProgress();
    

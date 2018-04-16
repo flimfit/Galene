@@ -66,7 +66,7 @@ void ImarisIntensityWriter::write(const std::string& filename)
       std::lock_guard<std::mutex> lk(hdf5_mutex);
 
       int chan = idx % n_chan;
-      int t = idx / n_chan;
+      int t = (int) (idx / n_chan);
 
       std::string timepoint = "TimePoint " + boost::lexical_cast<std::string>(t);
       std::string channel = "Channel " + boost::lexical_cast<std::string>(chan);

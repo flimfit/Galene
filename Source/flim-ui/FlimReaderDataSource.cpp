@@ -62,7 +62,7 @@ void FlimReaderDataSource::update()
       if (!currently_reading) return;
       if (!data || !data->isReady()) return;
 
-      int n_px = reader->numX() * reader->numY() * reader->numZ();
+      int n_px = reader->getNumX() * reader->getNumY() * reader->getNumZ();
       int n_chan = reader->getNumChannels();
       int n_t = (int)data->timepoints.size();
 
@@ -113,9 +113,9 @@ void FlimReaderDataSource::setupForRead()
    
    int n_px = reader->dataSizePerChannel();
    int n_chan = reader->getNumChannels();
-   int n_x = reader->numX();
-   int n_y = reader->numY();
-   int n_z = reader->numZ();
+   int n_x = reader->getNumX();
+   int n_y = reader->getNumY();
+   int n_z = reader->getNumZ();
 
    {
       std::vector<int> dims = {n_z, n_y, n_x};
@@ -171,10 +171,10 @@ void FlimReaderDataSource::saveData(const QString& root_name)
    auto reader_tags = reader->getReaderTags();
    auto images = reader->getImageMap();
 
-   for (int z = 0; z<reader->numZ(); z++)
+   for (int z = 0; z<reader->getNumZ(); z++)
    {
       QString filename;
-      if (reader->numZ() > 1)
+      if (reader->getNumZ() > 1)
          filename = QString("%1_%2.ffh").arg(root_name).arg(z, 3, 10, QChar('0'));
       else
          filename = QString("%1.ffh").arg(root_name);

@@ -25,6 +25,7 @@ public:
 
    void closeEvent(QCloseEvent* event);
 
+   std::shared_ptr<RealignableDataSource> openFileWithOptions(const QString& filename, RealignableDataOptions& options);
    std::shared_ptr<RealignableDataSource> openFile(const QString& filename);
    void showFileInfo(const QString& filename);
 

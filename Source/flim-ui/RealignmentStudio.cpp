@@ -95,6 +95,12 @@ void RealignmentStudio::updateParameterGroupBox(int index)
 
 std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString& filename)
 {
+   return openFileWithOptions(filename, RealignableDataOptions());
+}
+
+
+std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(const QString& filename, RealignableDataOptions& options)
+{
    std::shared_ptr<RealignableDataSource> source;
 
    QFileInfo file(filename);
@@ -115,8 +121,9 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
          source = s;
       }
 
-      if (mode > 0)
-         source->requestChannelsFromUser();
+      options.requestFromUserIfRequired(source->aligningReader());
+
+      source->setRealignmentOptions(options);
 
       emit newDataSource(source);
       source->setRealignmentParameters(getRealignmentParameters());
