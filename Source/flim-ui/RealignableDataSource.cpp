@@ -133,25 +133,34 @@ void RealignableDataSource::setRealignmentOptions(RealignableDataOptions& option
 
 void RealignableDataOptions::requestFromUserIfRequired(const AligningReader& reader)
 {
-   if (initalised) return;
-
    int n_chan = reader.getNumChannels();
    bool request_bidirectional = !reader.canReadBidirectionalScan();
    bool request_num_z = !reader.canReadNumZ();
 
+   if (!request_bidirectional)
+      bidirectional = reader.getBidirectionalScan();
+   if (!request_num_z)
+      n_z = reader.getNumZ();
+
+   if (initalised) return;
+
    QSettings settings;
    QBitArray last_use_chan = settings.value("realignable_data_source/last_use_chan", QBitArray()).toBitArray();
 
-   if (n_chan == 1 && !request_num_z) return;
+   if (n_chan == 1 && !request_num_z && !request_bidirectional) return;
 
    bool* use_chan = new bool[n_chan];
 
    CustomDialog d("Realignment Options", nullptr, BS_OKAY_ONLY);
-   d.addLabel("Please select channels to use for realignment");
-   for (int i = 0; i<n_chan; i++)
+
+   if (n_chan > 1)
    {
-      use_chan[i] = (i < last_use_chan.size()) ? last_use_chan[i] : true;
-      d.addCheckBox("Channel " + QString::number(i), &use_chan[i]);
+      d.addLabel("Please select channels to use for realignment");
+      for (int i = 0; i<n_chan; i++)
+      {
+         use_chan[i] = (i < last_use_chan.size()) ? last_use_chan[i] : true;
+         d.addCheckBox("Channel " + QString::number(i), &use_chan[i]);
+      }
    }
 
    bidirectional = settings.value("realignable_data_source/last_bidirectional", false).toBool();
@@ -170,18 +179,17 @@ void RealignableDataOptions::requestFromUserIfRequired(const AligningReader& rea
 
    d.exec();
 
-   channels_to_use.resize(n_chan);
-   for (int i = 0; i<n_chan; i++)
-      channels_to_use[i] = use_chan[i];
+   channels_to_use.resize(n_chan, true);
+   if (n_chan > 1)
+   {
+      for (int i = 0; i<n_chan; i++)
+         channels_to_use[i] = use_chan[i];
 
-   if (!request_bidirectional)
-      bidirectional = reader.getBidirectionalScan();
-   if (!request_num_z)
-      n_z = reader.getNumZ();
+      last_use_chan.resize(std::max(last_use_chan.size(), n_chan));
+      for (int i = 0; i<n_chan; i++)
+         last_use_chan[i] = use_chan[i];
+   }
 
-   last_use_chan.resize(std::max(last_use_chan.size(), n_chan));
-   for (int i = 0; i<n_chan; i++)
-      last_use_chan[i] = use_chan[i];
 
    settings.setValue("realignable_data_source/last_use_chan", last_use_chan);
    settings.setValue("realignable_data_source/last_bidirectional", bidirectional);
@@ -195,7 +203,7 @@ void RealignableDataOptions::requestFromUserIfRequired(const AligningReader& rea
 
 std::vector<bool> RealignableDataOptions::getChannelsToUse(size_t n_chan)
 {
-   std::vector<bool> channels_to_use_out(n_chan, false);
+   std::vector<bool> channels_to_use_out(n_chan, true);
    for (size_t i = 0; i < std::min(n_chan, channels_to_use.size()); i++)
       channels_to_use_out[i] = channels_to_use[i];
    return channels_to_use_out;
