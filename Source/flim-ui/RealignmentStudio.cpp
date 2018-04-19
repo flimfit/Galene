@@ -95,7 +95,8 @@ void RealignmentStudio::updateParameterGroupBox(int index)
 
 std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString& filename)
 {
-   return openFileWithOptions(filename, RealignableDataOptions());
+   RealignableDataOptions options;
+   return openFileWithOptions(filename, options);
 }
 
 
