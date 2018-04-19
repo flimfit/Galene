@@ -31,7 +31,7 @@ public:
    void setForceNumZ(int n_z) { reader->setNumZ(n_z); }
 
    int getNumChannels() { return reader->getNumChannels(); }
-   double getTimeResolution() { return reader->getTemporalResolution(); };
+   double getTimeResolution();
 
    cv::Mat getIntensity();
    cv::Mat getMeanArrivalTime();

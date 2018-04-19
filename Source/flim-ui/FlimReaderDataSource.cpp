@@ -44,6 +44,12 @@ cv::Mat FlimReaderDataSource::getMeanArrivalTime()
    return mean_arrival_time;
 };
 
+double FlimReaderDataSource::getTimeResolution()
+{
+   auto& t = reader->getTimepoints();
+   return (t.size() > 0) ? (t[1] - t[0]) : 1;
+}
+
 
 void FlimReaderDataSource::update()
 {
