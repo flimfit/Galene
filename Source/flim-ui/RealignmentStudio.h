@@ -40,6 +40,7 @@ protected:
    void realign();
    void reload();
    void copyImage();
+   void about();
 
    void updateParameterGroupBox(int index);
 

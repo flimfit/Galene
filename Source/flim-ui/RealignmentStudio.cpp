@@ -39,6 +39,7 @@ RealignmentStudio::RealignmentStudio() :
    connect(save_merged_action, &QAction::triggered, this, &RealignmentStudio::saveMergedImage);
    connect(quit_action, &QAction::triggered, this, &RealignmentStudio::close);
    connect(copy_action, &QAction::triggered, this, &RealignmentStudio::copyImage);
+   connect(about_action, &QAction::triggered, this, &RealignmentStudio::about);
 
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
@@ -448,9 +449,20 @@ void RealignmentStudio::displayErrorMessage(const QString& msg)
    QMessageBox::critical(this, "Error", msg);
 }
 
+void RealignmentStudio::about()
+{
+
+   QString text = QString("Galene ").append(VERSION).append("<br><br><a href='http://galene.flimfit.org/'>Galene Website</a>")
+      .append("<br><br><a href='http://galene.flimfit.org/licence.html'>Third party licence Information</a>");
+
+   QMessageBox::about(this, "About Galene", text);
+}
+
+
 RealignmentStudio::~RealignmentStudio()
 {
    for(auto& thread : save_thread)
       if(thread.joinable())
          thread.join();
 }
+
