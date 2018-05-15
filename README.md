@@ -65,13 +65,14 @@ Acknowledgements
 -------------------
 Galene uses the following open source software. 
 
-| Package          |                                              | Licence  |
-| -----------------|----------------------------------------------| ---------|
-| Qt               | http://www.qt.io                             | LGPL v3  |
-| ome-files-cpp	   | https://www.openmicroscopy.org/ome-files/    | MIT      |
-| bioimageconvert  | https://bitbucket.org/dimin/bioimageconvert/ | MIT      |
-| dlib             | http://dlib.net/                             | Boost    |
-| OpenCV           | http://opencv.org/                           | BSD      |
-| boost            | http://www.boost.org/                        | Boost    |
-| fftw3            | http://www.fftw.org/                         | GPL v2   |
-| libhdf5          | https://www.hdfgroup.org/                    | BSD      |
+| Package          |                                                | Licence  |
+| -----------------|------------------------------------------------| ---------|
+| Qt               | http://www.qt.io                               | LGPL v3  |
+| ome-files-cpp	   | https://www.openmicroscopy.org/ome-files/      | MIT      |
+| bioimageconvert  | https://bitbucket.org/dimin/bioimageconvert/   | MIT      |
+| dlib             | http://dlib.net/                               | Boost    |
+| OpenCV           | http://opencv.org/                             | BSD      |
+| boost            | http://www.boost.org/                          | Boost    |
+| fftw3            | http://www.fftw.org/                           | GPL v2   |
+| libhdf5          | https://www.hdfgroup.org/                      | BSD      |
+| QSimpleUpdater   | https://github.com/alex-spataru/QSimpleUpdater | DBAD     |
