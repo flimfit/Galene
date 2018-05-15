@@ -1,15 +1,16 @@
 The following open source third party software is used by Galene.
 
-Qt 				 | http://www.qt.io
-ome-files-cpp	 | https://www.openmicroscopy.org/ome-files/
-bioimageconvert  | https://bitbucket.org/dimin/bioimageconvert
-dlib             | http://dlib.net/
-opencv           | http://opencv.org/
-boost            | http://www.boost.org/
-fftw3            | http://www.fftw.org/
-libhdf5          | https://www.hdfgroup.org/
+| Package          |                                              | Licence  |
+| -----------------|----------------------------------------------| ---------|
+| Qt               | http://www.qt.io                             | LGPL v3  |
+| ome-files-cpp    | https://www.openmicroscopy.org/ome-files/    | MIT      |
+| bioimageconvert  | https://bitbucket.org/dimin/bioimageconvert/ | MIT      |
+| dlib             | http://dlib.net/                             | Boost    |
+| OpenCV           | http://opencv.org/                           | BSD      |
+| boost            | http://www.boost.org/                        | Boost    |
+| fftw3            | http://www.fftw.org/                         | GPL v2   |
+| libhdf5          | https://www.hdfgroup.org/                    | BSD      |
 
-This software is provided under the following licences:
 
 -----------------------------------------------------------------------------
                         The MIT Licence (MIT)
