@@ -145,19 +145,20 @@ add_custom_command(
 set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
-set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
-#set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS TRUE)
-
 
 deployqt(Galene INCLUDE_MODULES ${QTLIBS})
-
-
-include(InstallRequiredSystemLibraries)
 
 install(TARGETS Galene RUNTIME DESTINATION bin 
                         BUNDLE DESTINATION bundle)                           
 
 if (WIN32)
+
+    if (EXISTS "$ENV{MKLROOT}")
+        # install MKL redist's if we used it
+        get_filename_component(INTEL_REDIST "$ENV{MKLROOT}/../redist/intel64_win/compiler/" REALPATH)
+        install(DIRECTORY ${INTEL_REDIST}/ DESTINATION bin FILES_MATCHING PATTERN "*.dll")
+    endif()
+
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/share DESTINATION /)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/simulated_intensity.png DESTINATION /)
