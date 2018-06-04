@@ -1,0 +1,31 @@
+diff --git a/libsrc/libbioimg/formats_api/bim_image.cpp b/libsrc/libbioimg/formats_api/bim_image.cpp
+index 9b0746de..3b551fbf 100644
+--- a/libsrc/libbioimg/formats_api/bim_image.cpp
++++ b/libsrc/libbioimg/formats_api/bim_image.cpp
+@@ -931,9 +931,11 @@ Image Image::ensureTypedDepth( ) const {
+ }
+ 
+ Image Image::ensureColorSpace() const {
++#ifdef BIM_USE_TRANSFORMS
+     if (this->imageMode() == IM_YCbCr) {
+         return this->transform_color(Image::tmcYBRF2RGB);
+     }
++#endif
+     return *this;
+ }
+ 
+diff --git a/libsrc/libbioimg/formats_api/bim_image_5d.h b/libsrc/libbioimg/formats_api/bim_image_5d.h
+index 39fbd015..f89217ac 100644
+--- a/libsrc/libbioimg/formats_api/bim_image_5d.h
++++ b/libsrc/libbioimg/formats_api/bim_image_5d.h
+@@ -68,6 +68,10 @@ class Image5D {
+     unsigned int numberT() const { return image_size[Image5D::t]; }
+     unsigned int numberZ() const { return image_size[Image5D::z]; }
+ 
++    unsigned int numberC() const { return image_size[Image5D::c]; }
++    unsigned int numberX() const { return image_size[Image5D::x]; }
++    unsigned int numberY() const { return image_size[Image5D::y]; }
++
+     bool getTimeLooping() const { return loop_time; }
+     void setTimeLooping( bool v ) { loop_time=v; }
+ 

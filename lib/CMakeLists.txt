@@ -12,15 +12,14 @@ set(EXT_PROJ_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install;
 
 ExternalProject_Add(
   bioimageconvert
-  GIT_REPOSITORY "https://github.com/seanwarren/bioimageconvert.git"
-  GIT_TAG "master"
+  HG_REPOSITORY "https://bitbucket.org/dimin/bioimageconvert/src"
+  HG_TAG "469d87c15a5b24c4881046fa68a43b12acc25639"
   UPDATE_COMMAND ""
-  PATCH_COMMAND ""
+  PATCH_COMMAND hg import ${CMAKE_SOURCE_DIR}/bioimageconvert.patch --no-commit
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/bioimageconvert"
   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/bioimageconvert"
   BUILD_ALWAYS ON
   CMAKE_ARGS  -DBIC_ENABLE_FFMPEG=OFF 
-              -DBIC_ENABLE_GDCM=OFF 
               -DBIC_ENABLE_GDCM=OFF 
               -DBIC_ENABLE_JXRLIB=OFF 
               -DBIC_ENABLE_LIBJPEG_TURBO=OFF
@@ -40,8 +39,8 @@ ExternalProject_Add(
 
 ExternalProject_Add(
    ome-cmake-superbuild
-   GIT_REPOSITORY "https://github.com/seanwarren/ome-cmake-superbuild.git"
-   GIT_TAG "master"
+   GIT_REPOSITORY "https://github.com/ome/ome-cmake-superbuild.git"
+   GIT_TAG "v0.5.0"
    UPDATE_COMMAND ""
    PATCH_COMMAND ""
    SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/ome-cmake-superbuild"
