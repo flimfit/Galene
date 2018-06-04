@@ -1,7 +1,19 @@
 diff -r 469d87c15a5b CMakeLists.txt
 --- a/CMakeLists.txt	Tue May 29 16:53:11 2018 -0700
-+++ b/CMakeLists.txt	Mon Jun 04 16:47:38 2018 +1000
-@@ -124,6 +124,7 @@
++++ b/CMakeLists.txt	Mon Jun 04 17:48:39 2018 +1000
+@@ -67,6 +67,11 @@
+     cmake_policy(SET CMP0060 NEW)
+ endif()
+ 
++# Make IMPORTED_LINK_INTERFACE_LIBRARIES per configuration when exported
++if(POLICY CMP0022)
++   cmake_policy(SET CMP0022 OLD)
++endif()
++
+ 
+ #---------------------------------------------------------------------
+ # Set project information
+@@ -124,6 +129,7 @@
  option(BIC_ENABLE_LIBJPEG_TURBO   "Enable BioImageConvert turbojpeg support instead of standard jpeg (optional)" ON)
  option(BIC_ENABLE_IMGCNV          "Enable BioImageConvert bimread command line program"                          OFF)
  option(BIC_ENABLE_OPENMP          "Enable OpenMP parallelization for release builds (optional)"                  OFF)
@@ -9,7 +21,26 @@ diff -r 469d87c15a5b CMakeLists.txt
  option(BIC_ENABLE_THREADSAFE      "Enable Thread Safety for parallelization usage (optional)"                    ON)
  
  
-@@ -445,8 +446,13 @@
+@@ -395,15 +401,15 @@
+         add_dependencies(bioimage ${NAME})
+     endif()
+ 
+-    target_compile_options(${NAME} PRIVATE "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
+-    target_compile_options(${NAME} PRIVATE "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
++    #target_compile_options(${NAME} PRIVATE "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
++    #target_compile_options(${NAME} PRIVATE "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
+ 
+     # shared libraries need PIC
+     set_property(TARGET ${NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+ 
+     # allow thirdparty libraries to have slightly less strict compiler warnings:
+     if(NOT MSVC)
+-        target_compile_options(${NAME} PUBLIC -Wno-sign-compare -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function)
++    #    target_compile_options(${NAME} PUBLIC -Wno-sign-compare -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function)
+     endif()
+     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+         target_compile_options(${NAME} PUBLIC -Wno-unused-but-set-variable -Wno-misleading-indentation)
+@@ -445,8 +451,13 @@
      if(BIC_ENABLE_QT)
          add_definitions(-DBIM_USE_QT)
      endif()
@@ -24,7 +55,7 @@ diff -r 469d87c15a5b CMakeLists.txt
      #add_definitions(-DBIM_USE_NUMPY)
      # this is automatically set based on BIM_WIN in libsrc/libbioimg/core_lib/xstring.h:
      #add_definitions(-DBIM_USE_CODECVT)
-@@ -1910,7 +1916,7 @@
+@@ -1910,7 +1921,7 @@
          ${BIM_LIB_EXIV2}/exiv2/utilsvideo.hpp)
  
      internal_add_library(exiv2 "${BIC_INTERNAL_EXIV2_SOURCES}" "${BIC_INTERNAL_EXIV2_HEADERS}" "${BIC_INTERNAL_EXIV2_INSTALLHEADERS}" "${BIC_INTERNAL_EXIV2_LINK_LIBRARIES}")
@@ -33,9 +64,50 @@ diff -r 469d87c15a5b CMakeLists.txt
  
      set(EXIV2_LIBRARIES "${LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_LIBRARY_PREFIX}exiv2${CMAKE_LIBRARY_SUFFIX}")
  elseif(LIBBIOIMAGE)
+diff -r 469d87c15a5b libsrc/libbioimg/core_lib/xtypes.h
+--- a/libsrc/libbioimg/core_lib/xtypes.h	Tue May 29 16:53:11 2018 -0700
++++ b/libsrc/libbioimg/core_lib/xtypes.h	Mon Jun 04 17:48:39 2018 +1000
+@@ -46,29 +46,14 @@
+ typedef	unsigned int uint;
+ 
+ // sized types
+-typedef	signed char int8;
+-typedef	unsigned char uint8;
+-typedef	short int16;
+-typedef	unsigned short uint16;
+-
+-#if defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64) || defined(_MSVC)
+-typedef __int32 int32;
+-typedef __int64 int64;
+-typedef unsigned __int32 uint32;
+-typedef unsigned __int64 uint64;
+-// On macOS long long is used for 64-bit types to remain compatible with the
+-// format macros defined in <inttypes.h>
+-#elif defined(__APPLE__)
+-typedef int32_t int32;
+-typedef int64_t int64;
+-typedef uint32_t uint32;
+-typedef unsigned long uint64;
+-#else
+-typedef int32_t int32;
+-typedef int64_t int64;
+-typedef uint32_t uint32;
+-typedef uint64_t uint64;
+-#endif
++typedef	std::int8_t int8;
++typedef	std::uint8_t uint8;
++typedef	std::int16_t int16;
++typedef	std::uint16_t uint16;
++typedef  std::int32_t int32;
++typedef  std::int64_t int64;
++typedef  std::uint32_t uint32;
++typedef  std::uint64_t uint64;
+ 
+ typedef	float float32;
+ typedef	double float64;
 diff -r 469d87c15a5b libsrc/libbioimg/formats/bim_exiv_parse.cpp
 --- a/libsrc/libbioimg/formats/bim_exiv_parse.cpp	Tue May 29 16:53:11 2018 -0700
-+++ b/libsrc/libbioimg/formats/bim_exiv_parse.cpp	Mon Jun 04 16:47:38 2018 +1000
++++ b/libsrc/libbioimg/formats/bim_exiv_parse.cpp	Mon Jun 04 17:48:39 2018 +1000
 @@ -107,13 +107,7 @@
      Exiv2::Image::AutoPtr image;
      if (!fmtHndl->fileName) return image;
@@ -64,9 +136,30 @@ diff -r 469d87c15a5b libsrc/libbioimg/formats/bim_exiv_parse.cpp
          if (image.get() == 0) return;
          image->readMetadata();
          image->setExifData(exifData);
+diff -r 469d87c15a5b libsrc/libbioimg/formats/tiff/bim_stk_format_io.cpp
+--- a/libsrc/libbioimg/formats/tiff/bim_stk_format_io.cpp	Tue May 29 16:53:11 2018 -0700
++++ b/libsrc/libbioimg/formats/tiff/bim_stk_format_io.cpp	Mon Jun 04 17:48:39 2018 +1000
+@@ -496,7 +496,7 @@
+   bim::uint16 tag = 273;
+   if (ifd->tagPresent(tag)) {
+     bim::uint32 *buf=NULL; bim::uint64 size=0; bim::uint16 type=0;
+-    ifd->readTag(tag, size, type, (uchar **) &buf );
++    ifd->readTag(tag, size, type, (bim::uint8 **) &buf );
+     copy_clean_tag_buffer<bim::uint32, tiff_offs_t>( &buf, size, &stkInfo->strip_offsets );
+ 
+   } // strip offsets
+@@ -507,7 +507,7 @@
+   tag = 279;
+   if (ifd->tagPresent(tag)) {
+     bim::uint32 *buf=NULL; bim::uint64 size=0; bim::uint16 type=0;
+-    ifd->readTag(tag, size, type, (uchar **) &buf );
++    ifd->readTag(tag, size, type, (bim::uint8 **) &buf );
+     copy_clean_tag_buffer<bim::uint32, tiff_bcnt_t>( &buf, size, &stkInfo->strip_bytecounts );
+   } // strip_bytecounts
+ }
 diff -r 469d87c15a5b libsrc/libbioimg/formats_api/bim_image.cpp
 --- a/libsrc/libbioimg/formats_api/bim_image.cpp	Tue May 29 16:53:11 2018 -0700
-+++ b/libsrc/libbioimg/formats_api/bim_image.cpp	Mon Jun 04 16:47:38 2018 +1000
++++ b/libsrc/libbioimg/formats_api/bim_image.cpp	Mon Jun 04 17:48:39 2018 +1000
 @@ -931,9 +931,11 @@
  }
  
@@ -81,7 +174,7 @@ diff -r 469d87c15a5b libsrc/libbioimg/formats_api/bim_image.cpp
  
 diff -r 469d87c15a5b libsrc/libbioimg/formats_api/bim_image_5d.h
 --- a/libsrc/libbioimg/formats_api/bim_image_5d.h	Tue May 29 16:53:11 2018 -0700
-+++ b/libsrc/libbioimg/formats_api/bim_image_5d.h	Mon Jun 04 16:47:38 2018 +1000
++++ b/libsrc/libbioimg/formats_api/bim_image_5d.h	Mon Jun 04 17:48:39 2018 +1000
 @@ -68,6 +68,10 @@
      unsigned int numberT() const { return image_size[Image5D::t]; }
      unsigned int numberZ() const { return image_size[Image5D::z]; }
@@ -93,3 +186,24 @@ diff -r 469d87c15a5b libsrc/libbioimg/formats_api/bim_image_5d.h
      bool getTimeLooping() const { return loop_time; }
      void setTimeLooping( bool v ) { loop_time=v; }
  
+diff -r 469d87c15a5b libsrc/libtiff/tiffconf.h
+--- a/libsrc/libtiff/tiffconf.h	Tue May 29 16:53:11 2018 -0700
++++ b/libsrc/libtiff/tiffconf.h	Mon Jun 04 17:48:39 2018 +1000
+@@ -27,8 +27,6 @@
+ /* Signed 64-bit type */
+ #if defined(_WIN64) || defined(WIN64) || defined(_WIN32) || defined(WIN32)
+ #define TIFF_INT64_T signed __int64
+-#elif defined(__x86_64__)
+-#define TIFF_INT64_T signed long
+ #else
+ #define TIFF_INT64_T signed long long
+ #endif
+@@ -51,8 +49,6 @@
+ /* Unsigned 64-bit type */
+ #if defined(_WIN64) || defined(WIN64) || defined(_WIN32) || defined(WIN32)
+ #define TIFF_UINT64_T unsigned __int64
+-#elif defined(__x86_64__)
+-#define TIFF_UINT64_T unsigned long
+ #else
+ #define TIFF_UINT64_T unsigned long long
+ #endif
