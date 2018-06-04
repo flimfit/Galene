@@ -40,7 +40,7 @@ ExternalProject_Add(
 ExternalProject_Add(
    ome-cmake-superbuild
    GIT_REPOSITORY "https://github.com/ome/ome-cmake-superbuild.git"
-   GIT_TAG "v0.5.0"
+   GIT_TAG "9cc778639549dccdb5542740b2db895f9a5b1a12"
    UPDATE_COMMAND ""
    PATCH_COMMAND ""
    SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/ome-cmake-superbuild"
