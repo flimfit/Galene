@@ -6,8 +6,7 @@ find_package(Qt5 COMPONENTS Widgets PrintSupport OpenGL Network)
 find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
-find_package(BioImage REQUIRED)
-add_definitions(-DBIM_USE_OPENCV)
+find_package(bioimage REQUIRED)
 
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
@@ -88,7 +87,6 @@ include_directories(${QT_USE_FILE}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${OME_FILES_INCLUDE_DIRS}
                     ${HDF5_INCLUDE_DIRS}
-                    ${BIOIMAGE_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS})
 
 if(WIN32)
@@ -109,10 +107,10 @@ set (Galene_OBJECTS ${SOURCE}
                     ${RESOURCE_FILES})
 
 set (Galene_LIBS    ${CUDA_LIBRARIES}
-                    ${BIOIMAGE_LIBRARIES}
                     ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
                     ${HDF5_LIBRARIES}
+                    bioimage
                     fifo_flim
                     FlimReader
                     InstrumentControlUI
