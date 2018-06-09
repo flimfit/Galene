@@ -4,6 +4,7 @@ lib/build/*
 lib/install/*
 lib/src/*
 lib/stamp/*
+lib/bftools/*
 *.mex*
 *.log
 *.autosave
