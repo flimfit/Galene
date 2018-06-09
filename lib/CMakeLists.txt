@@ -56,6 +56,18 @@ ExternalProject_Add(
    TEST_COMMAND ""
 )
 
+ExternalProject_Add(
+  libics
+  GIT_REPOSITORY https://github.com/seanwarren/libics
+  GIT_TAG "master"
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/libics"
+  STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/libics"
+  BUILD_ALWAYS ON
+  CMAKE_ARGS  ${EXT_PROJ_ARGS}   
+)
+
 file(DOWNLOAD "http://downloads.openmicroscopy.org/latest/bio-formats5.8/artifacts/bioformats_package.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats_package.jar")
 
 

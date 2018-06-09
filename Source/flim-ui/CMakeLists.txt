@@ -7,6 +7,7 @@ find_package(Boost COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
+find_package(libics REQUIRED)
 
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
@@ -116,7 +117,8 @@ set (Galene_LIBS    ${CUDA_LIBRARIES}
                     FlimReader
                     InstrumentControlUI
                     QSimpleUpdater
-                    OME::Files)
+                    OME::Files
+                    libics)
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
