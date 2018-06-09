@@ -68,6 +68,6 @@ ExternalProject_Add(
   CMAKE_ARGS  ${EXT_PROJ_ARGS}   
 )
 
-file(DOWNLOAD "http://downloads.openmicroscopy.org/latest/bio-formats5.8/artifacts/bioformats_package.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats_package.jar")
+file(DOWNLOAD "https://storage.googleapis.com/flimfit-downloads/bioformats-exporter/bioformats-exporter-1.0.0.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats_exporter.jar")
 
 

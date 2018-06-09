@@ -20,14 +20,13 @@ public:
       dir.cd("bftools");
 
       QString working_directory = QDir::toNativeSeparators(dir.absolutePath());
-      QString bf_package = QDir::toNativeSeparators(dir.absoluteFilePath("bioformats_package.jar"));
-
-      // for testing
-      bf_package = QDir::toNativeSeparators("C:/Users/CIMLab/Documents/bioformats/components/bundles/bioformats_package/target/bioformats_package-5.8.2.jar");
+      QString bf_package = QDir::toNativeSeparators(dir.absoluteFilePath("bioformats_exporter.jar"));
       jar_path = QString("%1;%2").arg(working_directory).arg(bf_package);
       file_arg = QString("%1").arg(file.absoluteFilePath());
 
       initial_args << "-Xmx512m" << "-cp" << jar_path;
+
+      next_series = 0;
    }
 
    void init()
@@ -120,7 +119,7 @@ private:
    QStringList series_names;
 
    int n_series;
-   std::atomic<int> next_series = 0;
+   std::atomic<int> next_series;
 
    std::shared_ptr<TaskProgress> task;
 
