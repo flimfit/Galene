@@ -7,6 +7,10 @@ if(DEFINED ENV{OME_FILES_ROOT})
     set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
 endif()
 
+if(DEFINED ENV{BFTOOLS_DIR})
+    set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}")
+endif()
+
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git

@@ -11,7 +11,11 @@ SET LIB_INSTALL_PATH=%LIB_INSTALL_PATH:\=/%
 SET OME_FILES_ROOT=%LIB_INSTALL_PATH%
 SET CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%LIB_INSTALL_PATH%
 
-REM rmdir Build /s /q
+SET BFTOOLS_DIR=%cd%\lib\bftools
+SET BFTOOLS_DIR=%BFTOOLS_DIR:\=/%
+
+IF "%1"=="--clean" rmdir Build /s /q
+
 echo Generating CMake Project
 echo Using Generator: "Visual Studio 15 2017 Win64"
 cmake -G "Visual Studio 15 2017 Win64" -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" -DOME_FILES_ROOT="%OME_FILES_ROOT%"

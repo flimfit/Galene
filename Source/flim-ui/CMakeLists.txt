@@ -80,6 +80,7 @@ set(HEADERS
    OmeIntensityWriter.h
    ImarisIntensityReader.h
    ImarisIntensityWriter.h
+   BioformatsExporter.h
 )
 
 include_directories(${QT_USE_FILE}
@@ -139,6 +140,14 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory
                 ${OME_FILES_ROOT}/share/
                 $<TARGET_FILE_DIR:Galene>/share/)
+
+
+                
+#add_custom_command(
+#    TARGET Galene POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#                ${BFTOOLS_DIR} $<TARGET_FILE_DIR:Galene>/bftools/)
+
 
 set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)

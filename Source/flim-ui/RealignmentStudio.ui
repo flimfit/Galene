@@ -703,9 +703,16 @@
     </property>
     <addaction name="copy_action"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="bioformats_action"/>
+   </widget>
    <addaction name="menuFiles"/>
    <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuTools"/>
   </widget>
   <action name="quit_action">
    <property name="text">
@@ -796,6 +803,11 @@
   <action name="about_action">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="bioformats_action">
+   <property name="text">
+    <string>Export series from file using bioformats...</string>
    </property>
   </action>
  </widget>

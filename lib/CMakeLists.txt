@@ -18,7 +18,7 @@ ExternalProject_Add(
   PATCH_COMMAND hg revert --all && hg import ${CMAKE_SOURCE_DIR}/bioimageconvert.patch --partial --no-commit
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/bioimageconvert"
   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/bioimageconvert"
-  BUILD_ALWAYS ON
+  BUILD_ALWAYS OFF
   CMAKE_ARGS  -DBIC_ENABLE_FFMPEG=OFF 
               -DBIC_ENABLE_GDCM=OFF 
               -DBIC_ENABLE_JXRLIB=OFF 
@@ -55,5 +55,7 @@ ExternalProject_Add(
                ${EXT_PROJ_ARGS}               
    TEST_COMMAND ""
 )
+
+file(DOWNLOAD "http://downloads.openmicroscopy.org/latest/bio-formats5.8/artifacts/bioformats_package.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats_package.jar")
 
 

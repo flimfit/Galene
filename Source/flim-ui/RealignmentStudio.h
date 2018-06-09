@@ -41,6 +41,7 @@ protected:
    void reload();
    void copyImage();
    void about();
+   void exportBioformatsSeries();
 
    void updateParameterGroupBox(int index);
 

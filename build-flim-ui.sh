@@ -14,6 +14,7 @@ export OME_FILES_ROOT=$(pwd)/lib/install
 export PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 export CMAKE_PREFIX_PATH=$(pwd)/lib/install
+export BFTOOLS_DIR=$(pwd)/lib/bftools
 
 # Generate make files and build 
 BUILD_TYPE=Release

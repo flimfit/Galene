@@ -43,7 +43,8 @@ public:
 
    QString getNextFileName();
    QString getFileName(const QString& filename, const QString& ext = "");
-   
+   QString getWorkspace() { return workspace.absolutePath(); }
+
    QStringList getSelectedFiles(const QModelIndexList& indexes);
 
    void setFilePrefix(const QString& prefix_);

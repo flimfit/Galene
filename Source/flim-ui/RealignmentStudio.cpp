@@ -17,6 +17,8 @@
 #include "RealignmentResultsWriter.h"
 #include "IntensityDataSource.h"
 #include "GpuFrameWarper.h"
+#include "BioformatsExporter.h"
+
 #include <functional>
 #include <thread>
 
@@ -40,6 +42,7 @@ RealignmentStudio::RealignmentStudio() :
    connect(quit_action, &QAction::triggered, this, &RealignmentStudio::close);
    connect(copy_action, &QAction::triggered, this, &RealignmentStudio::copyImage);
    connect(about_action, &QAction::triggered, this, &RealignmentStudio::about);
+   connect(bioformats_action, &QAction::triggered, this, &RealignmentStudio::exportBioformatsSeries);
 
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
@@ -443,6 +446,12 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    return params;
 }
 
+void RealignmentStudio::exportBioformatsSeries()
+{
+   QFileInfo file = QFileDialog::getOpenFileName(this, "Choose file", workspace->getWorkspace());
+   BioformatsExporter* exporter = new BioformatsExporter(file);
+   exporter->startThread();
+}
 
 void RealignmentStudio::displayErrorMessage(const QString& msg)
 {
