@@ -50,6 +50,7 @@ set(SOURCE
    OmeIntensityWriter.cpp
    ImarisIntensityReader.cpp
    ImarisIntensityWriter.cpp
+   IcsIntensityReader.cpp
    Galene.manifest
 )
 
@@ -82,6 +83,7 @@ set(HEADERS
    ImarisIntensityReader.h
    ImarisIntensityWriter.h
    BioformatsExporter.h
+   IcsIntensityReader.h
 )
 
 include_directories(${QT_USE_FILE}

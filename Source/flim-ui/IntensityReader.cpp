@@ -5,6 +5,7 @@
 #include "OmeIntensityReader.h"
 #include "BioImageIntensityReader.h"
 #include "ImarisIntensityReader.h"
+#include "IcsIntensityReader.h"
 
 IntensityReader::IntensityReader(const std::string& filename) : 
    filename(filename)
@@ -25,6 +26,9 @@ std::shared_ptr<IntensityReader> IntensityReader::getReader(const std::string& f
 
    if (ImarisIntensityReader::supportedExtensions().contains(ext))
       return std::make_shared<ImarisIntensityReader>(filename);
+
+   if (IcsIntensityReader::supportedExtensions().contains(ext))
+      return std::make_shared<IcsIntensityReader>(filename);
 
    throw std::runtime_error("Unsupported file type");
 }
