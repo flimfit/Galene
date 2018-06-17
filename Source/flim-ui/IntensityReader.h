@@ -40,6 +40,8 @@ public:
 
    double getProgress();
    
+   static QStringList supportedExtensions();
+
 protected:
 
    virtual void addStack(int chan, int t, cv::Mat& data) = 0;

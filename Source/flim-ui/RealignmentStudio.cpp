@@ -107,13 +107,13 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFile(const QString
 std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(const QString& filename, RealignableDataOptions& options)
 {
    std::shared_ptr<RealignableDataSource> source;
-
    QFileInfo file(filename);
-   auto ext = file.completeSuffix();
 
    try
    {
-      if (ext == "ome.tif" || ext == "lsm" || ext == "ims")
+      QStringList supported_extensions = IntensityReader::supportedExtensions();
+
+      if (supported_extensions.contains(file.completeSuffix()))
       {
          auto s = std::make_shared<IntensityDataSource>(filename);
          connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);

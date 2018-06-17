@@ -13,6 +13,17 @@ IntensityReader::IntensityReader(const std::string& filename) :
       async_load_intensity_frames = true;
 }
 
+QStringList IntensityReader::supportedExtensions()
+{
+   QStringList exts;
+   exts.append(OmeIntensityReader::supportedExtensions());
+   exts.append(BioImageIntensityReader::supportedExtensions());
+   exts.append(ImarisIntensityReader::supportedExtensions());
+   exts.append(IcsIntensityReader::supportedExtensions());
+   return exts;
+}
+
+
 std::shared_ptr<IntensityReader> IntensityReader::getReader(const std::string& filename)
 {
    QFileInfo file(QString::fromStdString(filename));
@@ -32,7 +43,6 @@ std::shared_ptr<IntensityReader> IntensityReader::getReader(const std::string& f
 
    throw std::runtime_error("Unsupported file type");
 }
-
 
 void IntensityReader::read()
 {

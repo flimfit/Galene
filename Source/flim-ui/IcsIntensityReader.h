@@ -3,6 +3,15 @@
 #include "IntensityReader.h"
 #include <libics.h>
 
+struct DimensionOrder
+{
+   int x = 0;
+   int y = 1;
+   int z = 2;
+   int c = 3;
+   int t = 4;
+};
+
 class IcsIntensityReader : public IntensityReader
 {
 public:
@@ -18,4 +27,6 @@ protected:
    void addStack(int chan, int t, cv::Mat& data);
 
    ICS* ics = nullptr;
+   DimensionOrder dim_order;
+   int cv_type = CV_8U;
 };
