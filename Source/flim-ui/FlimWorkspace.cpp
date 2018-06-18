@@ -37,11 +37,12 @@ void FlimWorkspace::update()
            QString("*.tif"),
            QString("*.lsm"),
            QString("*.ims"),
-           QString("*.ics")}, 
+           QString("*.ics"),
+           QString("*.lif")}, 
          QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)
-         files.append(info.fileName());
+         files.append(info);
       endResetModel();
    }
 }
@@ -54,12 +55,22 @@ int FlimWorkspace::rowCount(const QModelIndex & parent) const
 
 QVariant FlimWorkspace::data(const QModelIndex & index, int role) const
 {
+   if (index.row() >= files.size()) return QVariant();
+   QFileInfo file = files[index.row()];
+
    if (role == Qt::DisplayRole || role == Qt::EditRole)
    {
-      if (index.row() < files.size())
-         return files[index.row()];
+      return file.fileName();
    }
-
+   else if (role == Qt::FontRole)
+   {
+      if (file.completeSuffix() == "lif") // TODO: generalise this
+      {
+         QFont italic;
+         italic.setItalic(true);
+         return italic;
+      }
+   }
    return QVariant();
 }
 

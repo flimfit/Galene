@@ -70,7 +70,7 @@ protected:
    QString file_extension = ".ffd";
 
    int n_files;
-   QStringList files;
+   QList<QFileInfo> files;
 
    QFileSystemWatcher* folder_watcher;
 };

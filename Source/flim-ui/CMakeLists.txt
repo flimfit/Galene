@@ -145,12 +145,11 @@ add_custom_command(
                 ${OME_FILES_ROOT}/share/
                 $<TARGET_FILE_DIR:Galene>/share/)
 
-
-                
-#add_custom_command(
-#    TARGET Galene POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_directory
-#                ${BFTOOLS_DIR} $<TARGET_FILE_DIR:Galene>/bftools/)
+               
+add_custom_command(
+    TARGET Galene POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${BFTOOLS_DIR}/bioformats-exporter.jar $<TARGET_FILE_DIR:Galene>/bioformats-exporter.jar)
 
 
 set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"

@@ -108,32 +108,40 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
 {
    std::shared_ptr<RealignableDataSource> source;
    QFileInfo file(filename);
+   QString ext = file.completeSuffix();
 
    try
    {
       QStringList supported_extensions = IntensityReader::supportedExtensions();
 
-      if (supported_extensions.contains(file.completeSuffix()))
+      if (BioformatsExporter::supportedExtensions().contains(ext))
       {
-         auto s = std::make_shared<IntensityDataSource>(filename);
-         connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);
-         source = s;
+         BioformatsExporter* exporter = new BioformatsExporter(file);
+         exporter->startThread();
       }
       else
       {
-         auto s = std::make_shared<FlimReaderDataSource>(filename);
-         connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
-         source = s;
+         if (IntensityReader::supportedExtensions().contains(ext))
+         {
+            auto s = std::make_shared<IntensityDataSource>(filename);
+            connect(s.get(), &IntensityDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+            source = s;
+         }
+         else
+         {
+            auto s = std::make_shared<FlimReaderDataSource>(filename);
+            connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+            source = s;
+         }
+
+         options.requestFromUserIfRequired(source->aligningReader());
+
+         source->setRealignmentOptions(options);
+
+         emit newDataSource(source);
+         source->setRealignmentParameters(getRealignmentParameters());
+         source->readData();
       }
-
-      options.requestFromUserIfRequired(source->aligningReader());
-
-      source->setRealignmentOptions(options);
-
-      emit newDataSource(source);
-      source->setRealignmentParameters(getRealignmentParameters());
-      source->readData();
-
    }
    catch (std::runtime_error e)
    {
