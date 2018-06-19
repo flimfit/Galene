@@ -51,6 +51,7 @@ set(SOURCE
    ImarisIntensityReader.cpp
    ImarisIntensityWriter.cpp
    IcsIntensityReader.cpp
+   BioformatsExporter.cpp
    Galene.manifest
 )
 

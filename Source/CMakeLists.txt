@@ -4,11 +4,11 @@ set(CMAKE_CXX_STANDARD 14)
 include(CheckLanguage)
 
 if(DEFINED ENV{OME_FILES_ROOT})
-    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}")
+    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}" CACHE PATH "OME root file directory")
 endif()
 
 if(DEFINED ENV{BFTOOLS_DIR})
-    set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}")
+    set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}" CACHE PATH "Bioformats tools directory")
 endif()
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})

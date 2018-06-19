@@ -42,7 +42,6 @@ RealignmentStudio::RealignmentStudio() :
    connect(quit_action, &QAction::triggered, this, &RealignmentStudio::close);
    connect(copy_action, &QAction::triggered, this, &RealignmentStudio::copyImage);
    connect(about_action, &QAction::triggered, this, &RealignmentStudio::about);
-   connect(bioformats_action, &QAction::triggered, this, &RealignmentStudio::exportBioformatsSeries);
 
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
@@ -419,7 +418,14 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
 void RealignmentStudio::processSelected()
 {
    QStringList files = workspace->getSelectedFiles(workspace_selection->selectedRows());
-   new RealignmentStudioBatchProcessor(this, files); // deletes itself
+
+   // Don't process lif files    TODO: generalise this
+   for (auto f = files.begin(); f < files.end(); f++)
+      if ((*f).endsWith(".lif"))
+         files.erase(f);
+
+   if (!files.isEmpty())
+      new RealignmentStudioBatchProcessor(this, files); // deletes itself
 }
 
 RealignmentParameters RealignmentStudio::getRealignmentParameters()
@@ -452,13 +458,6 @@ RealignmentParameters RealignmentStudio::getRealignmentParameters()
    params.store_frames = store_frames_check->isChecked();
 
    return params;
-}
-
-void RealignmentStudio::exportBioformatsSeries()
-{
-   QFileInfo file = QFileDialog::getOpenFileName(this, "Choose file", workspace->getWorkspace());
-   BioformatsExporter* exporter = new BioformatsExporter(file);
-   exporter->startThread();
 }
 
 void RealignmentStudio::displayErrorMessage(const QString& msg)
