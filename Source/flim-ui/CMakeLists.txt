@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(flim-ui LANGUAGES CXX) 
 
-find_package(Qt5 COMPONENTS Widgets PrintSupport OpenGL Network)
-
-find_package(Boost COMPONENTS log iostreams)
+find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialPort)
+find_package(Boost REQUIRED COMPONENTS log iostreams)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
@@ -121,18 +120,20 @@ set (Galene_LIBS    ${CUDA_LIBRARIES}
                     InstrumentControlUI
                     QSimpleUpdater
                     OME::Files
-                    libics)
+                    libics
+                    Qt5::Widgets 
+                    Qt5::PrintSupport 
+                    Qt5::SerialPort 
+                    Qt5::Network)
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
     target_link_libraries(GaleneTest ${Galene_LIBS})
-    qt5_use_modules(GaleneTest Widgets PrintSupport SerialPort Network)
     set_property(TARGET GaleneTest PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
 add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
 target_link_libraries(Galene ${Galene_LIBS})
-qt5_use_modules(Galene Widgets PrintSupport SerialPort Network)
 
 add_custom_command(
     TARGET Galene POST_BUILD

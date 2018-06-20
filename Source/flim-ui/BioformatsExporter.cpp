@@ -1,5 +1,3 @@
-#pragma once
-
 #include "BioformatsExporter.h"
 #include <QApplication>
 #include <QJsonDocument>
