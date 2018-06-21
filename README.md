@@ -15,7 +15,7 @@ Requirements
 - Windows 7 or greater
 - Visual Studio 2015 or greater
 - Qt 5.7 or greater, install from https://www.qt.io/download-open-source/
-- vcpkg, for installing required dependencies, install from https://github.com/Microsoft/vcpkg
+- vcpkg, for installing required dependencies, install from https://github.com/seanwarren/vcpkg
 - choco, for installing required dependencies, install from https://chocolatey.org/
 - Optionally, CUDA to support GPU processing, install from https://developer.nvidia.com/cuda-downloads
 
@@ -44,12 +44,11 @@ Requirements
 - XCode 8.2 or greater
 - Homebrew, install from https://brew.sh
 - Optionally, CUDA to support GPU processing, install from https://developer.nvidia.com/cuda-downloads
-    - Download CUDA 8 for macOS 10.11 or CUDA 9.1 for macOS 10.12. 
-    - macOS 10.13 is not currently supported for building CUDA applications 
+    - Download CUDA 8 for macOS 10.11 or CUDA 9.2 for macOS 10.12 or CUDA 9.2 for macOS 10.13. 
 
 Install the required dependencies using
 ```
-brew install qt cmake opencv boost xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja npm
+brew install qt cmake opencv boost xerces-c xalan-c exiv2 libraw eigen libpng libtiff proj hdf5 fftw dlib zlib python ninja npm hg
 pip install genshi 
 sudo npm install -g appdmg # to build the disk image
 ```
