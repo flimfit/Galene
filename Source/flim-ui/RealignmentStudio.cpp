@@ -83,10 +83,13 @@ RealignmentStudio::RealignmentStudio() :
    BindProperty(store_frames_check, this, store_frames);
    BindProperty(spatial_binning_combo, this, spatial_binning);
 
-   if (GpuFrameWarper::hasSupportedGpu())
-      use_gpu_check->setEnabled(true);
-   else
-      use_gpu_check->setChecked(false);
+   auto support_info = GpuFrameWarper::getGpuSupportInformation();
+   use_gpu_check->setEnabled(support_info.supported);
+   gpu_stacked_widget->setCurrentIndex(support_info.supported);
+   gpu_info_label->setText(QString::fromStdString(support_info.message));
+
+   if (support_info.remedy_message != "")
+      QMessageBox::information(this, "GPU Support", QString::fromStdString(support_info.remedy_message));
 }
 
 void RealignmentStudio::updateParameterGroupBox(int index)

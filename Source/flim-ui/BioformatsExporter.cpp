@@ -118,7 +118,7 @@ QProcess* BioformatsExporter::runProcess(const QStringList& args, QProcess::Proc
    if (e != QProcess::UnknownError)
    {
       if (e == QProcess::FailedToStart)
-         throw std::runtime_error("Could not find Java - please install the JRE from https://java.com/download");
+         throw std::runtime_error("Could not find Java - please install the JRE from <a href='https://java.com/download'>https://java.com/download</a>");
       else
          throw std::runtime_error(process->errorString().toStdString());
    }
