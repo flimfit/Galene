@@ -87,23 +87,21 @@ void BioformatsExporter::getSeriesInformation()
 
    bool* export_series = new bool[series_desc.size()];
 
-   if (series_desc.size() > 1)
+   d.addLabel("Please select series to export");
+   for (int i = 0; i < series_desc.size(); i++)
    {
-      d.addLabel("Please select series to export");
-      for (int i = 0; i<series_desc.size(); i++)
-      {
-         export_series[i] = true;
-         d.addCheckBox(QString("[%1] %2").arg(i).arg(series_desc[i]), &export_series[i]);
-      }
-      int result = d.exec();
-
-      series.clear();
-
-      if (!d.wasCancelled())
-         for (int i = 0; i < series_desc.size(); i++)
-            if (export_series[i])
-               series.push_back(QPair<int, QString>(i, series_name[i]));
+      export_series[i] = true;
+      d.addCheckBox(QString("[%1] %2").arg(i).arg(series_desc[i]), &export_series[i]);
    }
+   int result = d.exec();
+
+   series.clear();
+
+   if (!d.wasCancelled())
+      for (int i = 0; i < series_desc.size(); i++)
+         if (export_series[i])
+            series.push_back(QPair<int, QString>(i, series_name[i]));
+
 
 }
 
