@@ -28,8 +28,9 @@ public:
    int numZ() { return n_z; }
    int numT() { return n_t; }
    int getNumChannels() const { return n_chan; }
+   int getCvType() { return cv_type; }
    
-   cv::Mat getRealignedStack(int chan, int t);
+   cv::Mat getRealignedStack(int chan, int t, bool interpolate);
 
    virtual bool canReadBidirectionalScan() const { return false; }
    void setBidirectionalScan(bool bidirectional = true) { scan_params.bidirectional = bidirectional;  };
@@ -57,7 +58,7 @@ protected:
 
    std::mutex read_mutex;
 
-   int n_x, n_y, n_z, n_t, n_chan;
+   int n_x, n_y, n_z, n_t, n_chan, cv_type;
 
    bool swap_zt = false;
 };

@@ -34,6 +34,9 @@ void BioImageIntensityReader::readMetadata()
       n_z = nb;
       std::cout << "Swapping z and t\n";
    }
+
+   // Get underlying cv type
+   cv_type = image5d->imageAt(0, 0)->asCVMat(0).type();
    
    setUseAllChannels();   
    scan_params = ImageScanParameters(100, 101, 101 * (n_y + 1), n_x, n_y, n_z, bidirectional);

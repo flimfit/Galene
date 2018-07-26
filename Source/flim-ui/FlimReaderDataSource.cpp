@@ -171,7 +171,7 @@ QWidget* FlimReaderDataSource::getWidget()
    return widget;
 }
 
-void FlimReaderDataSource::saveData(const QString& root_name)
+void FlimReaderDataSource::saveData(const QString& root_name, bool interpolate)
 {
    auto tags = reader->getTags();
    auto reader_tags = reader->getReaderTags();

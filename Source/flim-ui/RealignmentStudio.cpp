@@ -385,6 +385,8 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
    auto task = std::make_shared<TaskProgress>("Saving...");
    TaskRegister::addTask(task);
 
+   bool interpolate = interpolate_missing_check->isChecked();
+
    save_thread.push_back(std::thread([=]()
    {
       try
@@ -392,7 +394,7 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
          if (save_realignment_info)
             source->writeRealignmentInfo(name);
 
-         source->saveData(name);
+         source->saveData(name, interpolate);
 
          if (save_preview)
             source->savePreview(preview_filename);

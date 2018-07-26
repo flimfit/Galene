@@ -28,5 +28,4 @@ protected:
 
    ICS* ics = nullptr;
    DimensionOrder dim_order;
-   int cv_type = CV_8U;
 };

@@ -88,7 +88,18 @@ void ImarisIntensityReader::readMetadata()
    bool bidirectional = false;
    scan_params = ImageScanParameters(1000, 1000, 1000 * n_y, n_x, n_y, n_z, bidirectional);
 
-   //n_t = std::min(n_t, 50);
+   hid_t vTimePointId = H5Gopen(level0, "TimePoint 0", H5P_DEFAULT);
+   hid_t vChannelId = H5Gopen(vTimePointId, "Channel 0", H5P_DEFAULT);
+   hid_t vDataId = H5Dopen(vChannelId, "Data", H5P_DEFAULT);
+   hid_t type = H5Dget_type(vDataId);
+   hid_t type_id = H5Tget_native_type(type, H5T_DIR_ASCEND);
+   cv_type = getCvTypeFromH5T(type);
+
+   H5Tclose(type_id);
+   H5Tclose(type);
+   H5Dclose(vDataId);
+   H5Gclose(vTimePointId);
+   H5Gclose(vChannelId);
 
    setUseAllChannels();
 }

@@ -18,7 +18,7 @@ public:
    
    QString getFilename() { return filename; };
    
-   void saveData(const QString& filename);
+   void saveData(const QString& filename, bool interpolate = false);
    void writeRealignmentMovies(const QString& filename_root) {} // no point writing these for intensity
    void setupForRead();
    void update();

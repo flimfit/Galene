@@ -7,20 +7,22 @@
 #include <ome/files/out/OMETIFFWriter.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
-int getCvPixelType(ome::xml::model::enums::PixelType pixel_type)
+using ome::xml::model::enums::PixelType;
+
+int getCvPixelType(PixelType pixel_type)
 {
    switch (pixel_type)
    {
-   case ome::xml::model::enums::PixelType::INT8: return CV_8S;
-   case ome::xml::model::enums::PixelType::INT16: return CV_16S;
-   case ome::xml::model::enums::PixelType::INT32: return CV_32S;
-   case ome::xml::model::enums::PixelType::UINT8: return CV_8U;
-   case ome::xml::model::enums::PixelType::UINT16: return CV_16U;
-   case ome::xml::model::enums::PixelType::UINT32: return CV_32S; // OpenCV doesn't have CV_32U type
-   case ome::xml::model::enums::PixelType::FLOAT: return CV_32F;
-   case ome::xml::model::enums::PixelType::DOUBLE: return CV_64F;
-   case ome::xml::model::enums::PixelType::COMPLEXFLOAT: return CV_32FC2;
-   case ome::xml::model::enums::PixelType::COMPLEXDOUBLE: return CV_64FC2;
+   case PixelType::INT8: return CV_8S;
+   case PixelType::INT16: return CV_16S;
+   case PixelType::INT32: return CV_32S;
+   case PixelType::UINT8: return CV_8U;
+   case PixelType::UINT16: return CV_16U;
+   case PixelType::UINT32: return CV_32S; // OpenCV doesn't have CV_32U type
+   case PixelType::FLOAT: return CV_32F;
+   case PixelType::DOUBLE: return CV_64F;
+   case PixelType::COMPLEXFLOAT: return CV_32FC2;
+   case PixelType::COMPLEXDOUBLE: return CV_64FC2;
    default: throw std::runtime_error("unsupported data format");
    }
    return CV_8S;
@@ -80,6 +82,10 @@ void OmeIntensityReader::readMetadata()
 
    setUseAllChannels();
    
+   ome::files::VariantPixelBuffer buf;
+   reader->openBytes(0, buf);
+   cv_type = getCvPixelType(buf.pixelType());
+
    scan_params = ImageScanParameters(100, 101, 101 * (n_y + 1), n_x, n_y, n_z, bidirectional);
 }
 

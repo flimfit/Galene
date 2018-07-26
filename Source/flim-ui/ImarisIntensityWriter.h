@@ -4,6 +4,6 @@
 class ImarisIntensityWriter : public IntensityWriter
 {
 public:
-   ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader);
+   ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader, bool interpolate = false);
    void write(const std::string& filename);
 };

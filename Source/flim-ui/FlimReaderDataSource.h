@@ -41,7 +41,7 @@ public:
 
    QString getFilename() { return QString::fromStdString(reader->getFilename()); }
    
-   void saveData(const QString& filename);
+   void saveData(const QString& filename, bool interpolate = false);
    void savePreview(const QString& filename);
    
    QWidget* getWidget();

@@ -7,7 +7,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
 {
    setupUi(this);
    setupPlots();
-   z_scroll->setVisible(false);
+   z_scroll_frame->setVisible(false);
 
    connect(image_widget, &ImageRenderWidget::ConstrainWidth, this, &RealignmentDisplayWidget::setMaximumWidth);
 
@@ -21,7 +21,7 @@ RealignmentDisplayWidget::RealignmentDisplayWidget(std::shared_ptr<RealignableDa
    connect(current_frame_spin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), 
       [&](int value) { if (slider->value() != value) slider->setValue(value); });
 
-   connect(show_aligned_button, &QPushButton::toggled, this, &RealignmentDisplayWidget::drawImage);
+   connect(display_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentDisplayWidget::drawImage);
    connect(set_reference_button, &QPushButton::pressed, this, &RealignmentDisplayWidget::referenceButtonPressed);
 }
 
@@ -46,12 +46,15 @@ void RealignmentDisplayWidget::exportMovie()
    QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "AVI (*.avi);; Tiff Stack (*.tif)");
    if (file.isEmpty()) return;
 
-   bool use_aligned = show_aligned_button->isChecked();
-   if (use_aligned)
-      RealignmentResultsWriter::exportAlignedMovie(results, file);
-   else
-      RealignmentResultsWriter::exportUnalignedMovie(results, file);
-
+   cv::Mat RealignmentResult::*field;
+   switch (display_combo->currentIndex())
+   {
+   case 0: field = &RealignmentResult::frame; break;
+   case 1: field = &RealignmentResult::realigned_preserving; break;
+   case 2: field = &RealignmentResult::realigned; break;
+   }
+   
+   RealignmentResultsWriter::exportMovie(results, file, field);
 }
 
 
@@ -107,15 +110,20 @@ void RealignmentDisplayWidget::setImage(int image)
 
 void RealignmentDisplayWidget::drawImage()
 {
-   bool use_aligned = show_aligned_button->isChecked();
-
    if (cur_image < results.size())
    {
-      cv::Mat sel_image = (use_aligned) ? results[cur_image].realigned : results[cur_image].frame;
+
+      cv::Mat sel_image;
+      switch (display_combo->currentIndex())
+      {
+      case 0: sel_image = results[cur_image].frame; break;
+      case 1: sel_image = results[cur_image].realigned_preserving; break;
+      case 2: sel_image = results[cur_image].realigned; break;
+      }
 
       if (sel_image.dims > 2)
       {
-         z_scroll->setVisible(sel_image.size[0] > 1);
+         z_scroll_frame->setVisible(sel_image.size[0] > 1);
          z_scroll->setMaximum(sel_image.size[0] - 1);
          int z = z_scroll->value();
          sel_image = extractSlice(sel_image, z);
@@ -152,8 +160,10 @@ void RealignmentDisplayWidget::setupPlots()
 {
    correlation_plot->addGraph();
    correlation_plot->graph(0)->setPen(QPen(Qt::black));
+   correlation_plot->graph(0)->setName("Aligned");
    correlation_plot->addGraph();
    correlation_plot->graph(1)->setPen(QPen(Qt::red));
+   correlation_plot->graph(1)->setName("Unaligned");
 
    correlation_plot->xAxis->setLabel("Frame");
    correlation_plot->yAxis->setLabel("Correlation");
@@ -161,6 +171,19 @@ void RealignmentDisplayWidget::setupPlots()
    correlation_plot->addGraph();
    correlation_plot->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 7));
    correlation_plot->graph(2)->setPen(QPen(Qt::red));
+   correlation_plot->graph(2)->removeFromLegend();
+
+   /*
+   QFont legendFont = font();
+   legendFont.setPointSize(8);
+   correlation_plot->legend->setFont(legendFont);
+   correlation_plot->legend->setSelectedFont(legendFont);
+   correlation_plot->legend->setBorderPen(Qt::PenStyle::NoPen);
+   correlation_plot->legend->setRowSpacing(2);
+   correlation_plot->legend->setMargins(QMargins(0, 0, 0, 0));
+   correlation_plot->legend->setBrush(Qt::BrushStyle::NoBrush);
+   correlation_plot->legend->setVisible(true);
+   */
 
    connect(correlation_plot, &QCustomPlot::axisClick, this, &RealignmentDisplayWidget::axisClicked);
 }

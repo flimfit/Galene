@@ -74,7 +74,7 @@ public:
    void setRealignmentOptions(RealignableDataOptions& options);
 
    virtual void savePreview(const QString& filename) {};
-   virtual void saveData(const QString& filename) = 0;   
+   virtual void saveData(const QString& filename, bool interpolate = false) = 0;   
    virtual QString getFilename() = 0;
    virtual void requestDelete() = 0;
    virtual QWidget* getWidget() { return nullptr; }

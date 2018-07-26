@@ -108,14 +108,14 @@ cv::Mat IntensityReader::getIntensityFrameImmediately(int t)
 }
 
 
-cv::Mat IntensityReader::getRealignedStack(int chan, int t)
+cv::Mat IntensityReader::getRealignedStack(int chan, int t, bool interpolate)
 {
    cv::Mat realigned;
    cv::Mat stack = getStack(chan, t);
    stack.convertTo(stack, CV_32F);
    
    if (frame_aligner)
-      realigned = frame_aligner->realignAsFrame(t, stack);
+      realigned = frame_aligner->realignAsFrame(t, stack, interpolate);
    else
       realigned = stack;
 

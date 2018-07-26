@@ -62,20 +62,20 @@ void IntensityDataSource::cancelRead()
 }
 
 
-void IntensityDataSource::saveData(const QString& root_name)
+void IntensityDataSource::saveData(const QString& root_name, bool interpolate)
 {
    auto imaris_writer = std::dynamic_pointer_cast<ImarisIntensityReader>(reader);
 
    if (imaris_writer)
    {
       QString filename = root_name + ".ims";
-      ImarisIntensityWriter writer(imaris_writer);
+      ImarisIntensityWriter writer(imaris_writer, interpolate);
       writer.write(filename.toStdString());
    }
    else
    {
       QString filename = root_name + ".ome.tif";
-      OmeIntensityWriter writer(reader);
+      OmeIntensityWriter writer(reader, interpolate);
       writer.write(filename.toStdString());
    }
 }

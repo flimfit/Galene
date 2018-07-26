@@ -22,8 +22,8 @@ void pyrDown3d(const cv::Mat& m, cv::Mat& out)
 }
 
 
-ImarisIntensityWriter::ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader) : 
-   IntensityWriter(reader)
+ImarisIntensityWriter::ImarisIntensityWriter(std::shared_ptr<ImarisIntensityReader> reader, bool interpolate) :
+   IntensityWriter(reader, interpolate)
 {
 
 }
@@ -56,7 +56,7 @@ void ImarisIntensityWriter::write(const std::string& filename)
       int t = (int) (idx / n_chan);
 
       cv::Mat cvbuf;
-      cv::Mat stack = reader->getRealignedStack(chan, t);
+      cv::Mat stack = reader->getRealignedStack(chan, t, interpolate);
       stack.convertTo(cvbuf, CV_8U);
       return cvbuf;
    };
