@@ -27,12 +27,14 @@ protected:
 
       QVector<double> corr;
       corr.reserve((int) results.size());
-      for (auto& r : results)
+      for (auto& p : results)
       {
+         auto& r = p.second;
          cv::Mat H;
-         cv::hconcat(r.frame, r.realigned, H);
+         cv::hconcat(r.frame.get(), r.realigned.get(), H);
          w->AddImage(H);
          corr.push_back(r.correlation);
+
       }
    }
 

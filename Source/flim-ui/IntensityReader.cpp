@@ -7,6 +7,8 @@
 #include "ImarisIntensityReader.h"
 #include "IcsIntensityReader.h"
 
+#include "Cache_impl.h"
+
 IntensityReader::IntensityReader(const std::string& filename) : 
    filename(filename)
 {
@@ -72,28 +74,11 @@ cv::Mat IntensityReader::getStack(int chan, int t)
 
 void IntensityReader::loadIntensityFramesImpl()
 {
-   std::vector<int> dims = { n_z, n_y, n_x };
-
-   cv::Mat cur_frame(dims, CV_16U, cv::Scalar(0));
-
+   auto cache = Cache<cv::Mat>::getInstance();
+   for (int t = 0; t < n_t; t++)
    {
-      std::lock_guard<std::mutex> lk(frame_mutex);
-      frames.resize(n_t);
-   }
-
-   // Loop over planes (for this image index)
-   for (int t = 0; t < n_t; ++t)
-   {
-      if (terminate)
-         return;
-
-      cur_frame.setTo(cv::Scalar(0));
-      if (terminate) break;
-      for(int chan = 0; chan < n_chan; chan++)
-         if (use_channel[chan])
-            addStack(chan, t, cur_frame);
-
-      setIntensityFrame(t, cur_frame);
+      auto fcn = std::bind(&IntensityReader::getIntensityFrameImmediately, this, t);
+      frames[t] = cache->add(fcn);
    }
 }
 

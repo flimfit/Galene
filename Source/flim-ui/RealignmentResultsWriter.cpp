@@ -4,31 +4,32 @@
 #include "WriteMultipageTiff.h"
 #include "Cv3dUtils.h"
 
-void RealignmentResultsWriter::exportAlignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+void RealignmentResultsWriter::exportAlignedMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename)
 {
    exportMovie(results, filename, &RealignmentResult::realigned);
 }
 
-void RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+void RealignmentResultsWriter::exportAlignedIntensityPreservingMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename)
 {
    exportMovie(results, filename, &RealignmentResult::realigned_preserving);}
  
-void RealignmentResultsWriter::exportUnalignedMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+void RealignmentResultsWriter::exportUnalignedMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename)
 {
    exportMovie(results, filename, &RealignmentResult::frame);
 }
 
-void RealignmentResultsWriter::exportCoverageMovie(const std::vector<RealignmentResult>& results, const QString& filename)
+void RealignmentResultsWriter::exportCoverageMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename)
 {
    exportMovie(results, filename, &RealignmentResult::mask);
 }
 
 
-void RealignmentResultsWriter::exportMovie(const std::vector<RealignmentResult>& results, const QString& filename, cv::Mat RealignmentResult::*field)
+void RealignmentResultsWriter::exportMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename, CachedObject<cv::Mat> RealignmentResult::*field)
 {
    std::vector<cv::Mat> images;
-   for (const RealignmentResult& r : results)
+   for (auto& p : results)
    {
+      auto& r = p.second;
       cv::Mat b;
       const cv::Mat& im = r.*field;
       for (int z = 0; z < im.size[0]; z++)

@@ -68,7 +68,7 @@ public:
    const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader().getFrameAligner(); }
    void setReferenceIndex(int index) { aligningReader().setReferenceIndex(index); }
    void setRealignmentParameters(const RealignmentParameters& params) { aligningReader().setRealignmentParameters(params); }
-   const std::vector<RealignmentResult>& getRealignmentResults() { return aligningReader().getRealignmentResults(); }
+   const std::map<size_t,RealignmentResult>& getRealignmentResults() { return aligningReader().getRealignmentResults(); }
    virtual AligningReader& aligningReader() = 0;
 
    void setRealignmentOptions(RealignableDataOptions& options);

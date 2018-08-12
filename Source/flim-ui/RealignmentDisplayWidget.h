@@ -43,7 +43,7 @@ protected:
    std::vector<QColor> line_colors;
    std::vector<QLabel*> rate_labels;
 
-   std::vector<RealignmentResult> results;
+   std::map<size_t,RealignmentResult> results;
 
    QTimer* timer;
 

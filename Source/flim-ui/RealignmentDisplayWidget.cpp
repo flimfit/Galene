@@ -46,7 +46,7 @@ void RealignmentDisplayWidget::exportMovie()
    QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "AVI (*.avi);; Tiff Stack (*.tif)");
    if (file.isEmpty()) return;
 
-   cv::Mat RealignmentResult::*field;
+   CachedObject<cv::Mat> RealignmentResult::*field;
    switch (display_combo->currentIndex())
    {
    case 0: field = &RealignmentResult::frame; break;
@@ -69,16 +69,20 @@ void RealignmentDisplayWidget::update()
    QVector<double> x(n);
    QVector<double> y1(n), y2(n);
 
-   for (int i = 0; i < n; i++)
+   for (auto it = results.begin(); it != results.end(); it++)
    {
-      x[i] = i;
-      y1[i] = results[i].correlation;
-      y2[i] = results[i].unaligned_correlation;
+      int i = (int) it->first;
+      if (i >= n) continue;
 
-      if (results[i].correlation < minc)
-         minc = results[i].correlation;
-      if (results[i].correlation > maxc)
-         maxc = results[i].correlation;
+      auto& r = it->second;
+      x[i] = i;
+      y1[i] = r.correlation;
+      y2[i] = r.unaligned_correlation;
+
+      if (r.correlation < minc)
+         minc = r.correlation;
+      if (r.correlation > maxc)
+         maxc = r.correlation;
    }
    correlation_plot->graph(0)->setData(x, y1);
    correlation_plot->graph(1)->setData(x, y2);
@@ -110,15 +114,17 @@ void RealignmentDisplayWidget::setImage(int image)
 
 void RealignmentDisplayWidget::drawImage()
 {
-   if (cur_image < results.size())
+   auto it = results.find(cur_image);
+   if (it != results.end())
    {
+      auto& r = it->second;
 
       cv::Mat sel_image;
       switch (display_combo->currentIndex())
       {
-      case 0: sel_image = results[cur_image].frame; break;
-      case 1: sel_image = results[cur_image].realigned_preserving; break;
-      case 2: sel_image = results[cur_image].realigned; break;
+      case 0: sel_image = r.frame; break;
+      case 1: sel_image = r.realigned_preserving; break;
+      case 2: sel_image = r.realigned; break;
       }
 
       if (sel_image.dims > 2)
@@ -131,7 +137,7 @@ void RealignmentDisplayWidget::drawImage()
 
       image_widget->SetImage(sel_image);
       
-      correlation_plot->graph(2)->setData({ (double)cur_image }, { results[cur_image].correlation });
+      correlation_plot->graph(2)->setData({ (double)cur_image }, { r.correlation });
       correlation_plot->yAxis->setRange(0, 1.2);
       correlation_plot->replot();
    }

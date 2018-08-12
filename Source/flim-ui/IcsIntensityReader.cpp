@@ -70,27 +70,27 @@ void IcsIntensityReader::readMetadata()
       if (strcmp(order, "x") == 0)
       {
          dim_order.x = d;
-         n_x = dims[d];
+         n_x = (int) dims[d];
       }
       else if (strcmp(order, "y") == 0)
       {
          dim_order.y = d;
-         n_y = dims[d];
+         n_y = (int) dims[d];
       }
       else if (strcmp(order, "z") == 0)
       {
          dim_order.z = d;
-         n_z = dims[d];
+         n_z = (int) dims[d];
       }
       else if (strcmp(order, "t") == 0)
       {
          dim_order.t = d;
-         n_t = dims[d];
+         n_t = (int) dims[d];
       }
       else
       {
          dim_order.c = d;
-         n_chan = dims[d];
+         n_chan = (int) dims[d];
       }
    }
 
