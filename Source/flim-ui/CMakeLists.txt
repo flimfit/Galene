@@ -67,7 +67,6 @@ set(HEADERS
    IntensityDataSource.h
    RealignmentStudio.h
    RealignmentDisplayWidget.h
-   RealignmentImageSource.h
    RealignmentStudioBatchProcessor.h
    CronologicControlDisplay.h
    SimTcspcControlDisplay.h
@@ -168,7 +167,7 @@ if (WIN32)
     if (EXISTS "$ENV{MKLROOT}")
         # install MKL redist's if we used it
         get_filename_component(INTEL_REDIST "$ENV{MKLROOT}/../redist/intel64_win/compiler/" REALPATH)
-        install(DIRECTORY ${INTEL_REDIST}/ DESTINATION bin FILES_MATCHING PATTERN "*.dll")
+        install(DIRECTORY "${INTEL_REDIST}/" DESTINATION bin FILES_MATCHING PATTERN "*.dll")
     endif()
 
     install(DIRECTORY $<TARGET_FILE_DIR:Galene>/ DESTINATION bin)

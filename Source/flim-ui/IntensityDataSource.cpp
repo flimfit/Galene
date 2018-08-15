@@ -16,7 +16,7 @@ void IntensityDataSource::update()
 {
    if (terminate)
       return;
-
+     
    if (task)
    {
       double progress = reader->getProgress();

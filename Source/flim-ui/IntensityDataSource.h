@@ -31,7 +31,9 @@ public:
 
 protected:
 
-   AligningReader& aligningReader() { return *reader; };
+   std::shared_ptr<AligningReader> aligningReader() { 
+      return reader;
+   };
    
 
 private:

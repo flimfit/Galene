@@ -126,21 +126,22 @@ void RealignableDataSource::writeRealignmentInfo(const QString& filename_root)
 
 void RealignableDataSource::setRealignmentOptions(RealignableDataOptions& options)
 {
-   aligningReader().setChannelsToUse(options.getChannelsToUse(aligningReader().getNumChannels()));
-   aligningReader().setBidirectionalScan(options.getBidirectional());
-   aligningReader().setNumZ(options.getNumZ());
+   auto reader = aligningReader();
+   reader->setChannelsToUse(options.getChannelsToUse(reader->getNumChannels()));
+   reader->setBidirectionalScan(options.getBidirectional());
+   reader->setNumZ(options.getNumZ());
 }
 
-void RealignableDataOptions::requestFromUserIfRequired(const AligningReader& reader)
+void RealignableDataOptions::requestFromUserIfRequired(std::shared_ptr<AligningReader> reader)
 {
-   int n_chan = reader.getNumChannels();
-   bool request_bidirectional = !reader.canReadBidirectionalScan();
-   bool request_num_z = !reader.canReadNumZ();
+   int n_chan = reader->getNumChannels();
+   bool request_bidirectional = !reader->canReadBidirectionalScan();
+   bool request_num_z = !reader->canReadNumZ();
 
    if (!request_bidirectional)
-      bidirectional = reader.getBidirectionalScan();
+      bidirectional = reader->getBidirectionalScan();
    if (!request_num_z)
-      n_z = reader.getNumZ();
+      n_z = reader->getNumZ();
 
    if (initalised) return;
 

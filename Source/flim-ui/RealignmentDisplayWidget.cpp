@@ -46,7 +46,7 @@ void RealignmentDisplayWidget::exportMovie()
    QString file = QFileDialog::getSaveFileName(this, "Choose file name", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "AVI (*.avi);; Tiff Stack (*.tif)");
    if (file.isEmpty()) return;
 
-   CachedObject<cv::Mat> RealignmentResult::*field;
+   CachedMat RealignmentResult::*field;
    switch (display_combo->currentIndex())
    {
    case 0: field = &RealignmentResult::frame; break;
@@ -119,12 +119,14 @@ void RealignmentDisplayWidget::drawImage()
    {
       auto& r = it->second;
 
+      if (!r.done) return;
+
       cv::Mat sel_image;
       switch (display_combo->currentIndex())
       {
-      case 0: sel_image = r.frame; break;
-      case 1: sel_image = r.realigned_preserving; break;
-      case 2: sel_image = r.realigned; break;
+      case 0: sel_image = r.frame->get(); break;
+      case 1: sel_image = r.realigned_preserving->get(); break;
+      case 2: sel_image = r.realigned->get(); break;
       }
 
       if (sel_image.dims > 2)

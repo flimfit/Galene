@@ -63,7 +63,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
-
    QFileInfo file(argv[0]);
    setenv("OME_HOME", qPrintable(file.absolutePath()), true);
 

@@ -60,7 +60,7 @@ protected:
 
    void cancelRead();
 
-   AligningReader& aligningReader() { return *reader; }
+   std::shared_ptr<AligningReader> aligningReader() { return reader; }
    
    std::shared_ptr<FlimReader> reader;
    QString filename;

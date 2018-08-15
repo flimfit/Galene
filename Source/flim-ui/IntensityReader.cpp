@@ -10,7 +10,7 @@
 #include "Cache_impl.h"
 
 IntensityReader::IntensityReader(const std::string& filename) : 
-   filename(filename)
+   AligningReader(), filename(filename)
 {
       async_load_intensity_frames = true;
 }
@@ -53,13 +53,16 @@ void IntensityReader::read()
 
 double IntensityReader::getProgress()
 {
+   return 0; //TODO
+   /*
    if (realignment.empty()) return 0;
 
    int n_done = 0;
    for (int i = 0; i < realignment.size(); i++)
       n_done += realignment[i].done;
 
-   return static_cast<double>(n_done) / realignment.size();
+   return static_cast<double>(n_done) / frames.size();
+   */
 }
 
 
@@ -79,6 +82,7 @@ void IntensityReader::loadIntensityFramesImpl()
    {
       auto fcn = std::bind(&IntensityReader::getIntensityFrameImmediately, this, t);
       frames[t] = cache->add(fcn);
+      frames[t].get(); // preload into cache
    }
 }
 

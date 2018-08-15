@@ -12,7 +12,6 @@
 #include "ConstrainedMdiSubWindow.h"
 #include "FlimFileReader.h"
 #include "ImageRenderWindow.h"
-#include "RealignmentImageSource.h"
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
 #include "IntensityDataSource.h"

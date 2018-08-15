@@ -11,7 +11,7 @@ public:
    static void exportAlignedIntensityPreservingMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename);
    static void exportUnalignedMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename);
    static void exportCoverageMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename);
-   static void exportMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename, CachedObject<cv::Mat> RealignmentResult::*field);
+   static void exportMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename, CachedMat RealignmentResult::*field);
 
 protected:
 

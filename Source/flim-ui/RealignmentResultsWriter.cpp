@@ -24,14 +24,14 @@ void RealignmentResultsWriter::exportCoverageMovie(const std::map<size_t,Realign
 }
 
 
-void RealignmentResultsWriter::exportMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename, CachedObject<cv::Mat> RealignmentResult::*field)
+void RealignmentResultsWriter::exportMovie(const std::map<size_t,RealignmentResult>& results, const QString& filename, CachedMat RealignmentResult::*field)
 {
    std::vector<cv::Mat> images;
    for (auto& p : results)
    {
       auto& r = p.second;
       cv::Mat b;
-      const cv::Mat& im = r.*field;
+      const cv::Mat& im = (r.*field)->get();
       for (int z = 0; z < im.size[0]; z++)
       {
          extractSlice(im, z).convertTo(b, CV_16U);

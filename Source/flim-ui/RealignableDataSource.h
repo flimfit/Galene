@@ -17,7 +17,7 @@ class RealignableDataOptions
 {
 public:
 
-   void requestFromUserIfRequired(const AligningReader& reader);
+   void requestFromUserIfRequired(std::shared_ptr<AligningReader> reader);
    std::vector<bool> getChannelsToUse(size_t n_chan);
 
    bool getBidirectional() { return bidirectional; }
@@ -65,11 +65,11 @@ public:
    virtual void writeRealignmentMovies(const QString& filename_root); 
    void writeRealignmentInfo(const QString& filename_root);
    
-   const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader().getFrameAligner(); }
-   void setReferenceIndex(int index) { aligningReader().setReferenceIndex(index); }
-   void setRealignmentParameters(const RealignmentParameters& params) { aligningReader().setRealignmentParameters(params); }
-   const std::map<size_t,RealignmentResult>& getRealignmentResults() { return aligningReader().getRealignmentResults(); }
-   virtual AligningReader& aligningReader() = 0;
+   const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader()->getFrameAligner(); }
+   void setReferenceIndex(int index) { aligningReader()->setReferenceIndex(index); }
+   void setRealignmentParameters(const RealignmentParameters& params) { aligningReader()->setRealignmentParameters(params); }
+   const std::map<size_t,RealignmentResult>& getRealignmentResults() { return aligningReader()->getRealignmentResults(); }
+   virtual std::shared_ptr<AligningReader> aligningReader() = 0;
 
    void setRealignmentOptions(RealignableDataOptions& options);
 
