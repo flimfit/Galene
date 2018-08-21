@@ -53,16 +53,9 @@ void IntensityReader::read()
 
 double IntensityReader::getProgress()
 {
-   return 0; //TODO
-   /*
-   if (realignment.empty()) return 0;
-
    int n_done = 0;
-   for (int i = 0; i < realignment.size(); i++)
-      n_done += realignment[i].done;
-
-   return static_cast<double>(n_done) / frames.size();
-   */
+   auto& results = frame_aligner->getRealignmentResults();
+   return static_cast<double>(results.size()) / frames.size();
 }
 
 
