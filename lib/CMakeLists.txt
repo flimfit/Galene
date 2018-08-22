@@ -12,8 +12,8 @@ set(EXT_PROJ_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install;
 
 ExternalProject_Add(
   bioimageconvert
-  HG_REPOSITORY "https://bitbucket.org/dimin/bioimageconvert/src"
-  HG_TAG "6a9599d65fa28557c0724088c42b7c3d1232f2f5"
+  HG_REPOSITORY "https://bitbucket.org/dimin/bioimageconvert"
+  HG_TAG "c36e55573b7c771d90f3e0bb200b3df16ced0a4b"
   UPDATE_COMMAND ""
   PATCH_COMMAND hg revert -a && hg --config extensions.purge= purge && hg import ${CMAKE_SOURCE_DIR}/bioimageconvert.patch --partial --no-commit
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/bioimageconvert"
