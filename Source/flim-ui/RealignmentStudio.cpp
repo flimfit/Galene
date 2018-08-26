@@ -1,4 +1,3 @@
-
 #include "RealignmentStudio.h"
 #include "RealignmentStudioBatchProcessor.h"
 #include "MetaDataDialog.h"
@@ -89,6 +88,14 @@ RealignmentStudio::RealignmentStudio() :
 
    if (support_info.remedy_message != "")
       QMessageBox::information(this, "GPU Support", QString::fromStdString(support_info.remedy_message));
+
+   spectral_correction_files = new SpectralCorrectionListModel(this);
+   spectral_correction_list_view->setModel(spectral_correction_files);
+
+   connect(spectral_correction_add_pushbutton, &QPushButton::clicked, this, &RealignmentStudio::addSpectralCorrectionFile);
+   connect(spectral_correction_remove_pushbutton, &QPushButton::clicked, this, &RealignmentStudio::removeSelectedSpectralCorrectionFiles);
+   
+   connect(spectral_correction_group, &QGroupBox::toggled, spectral_correction_frame, &QFrame::setVisible);
 }
 
 void RealignmentStudio::updateParameterGroupBox(int index)
@@ -131,6 +138,10 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
          else
          {
             auto s = std::make_shared<FlimReaderDataSource>(filename);
+
+            auto spectral_correction = spectral_correction_files->getMatching(filename);
+            s->getReader()->setSpectralCorrection(spectral_correction);
+
             connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
             source = s;
          }
@@ -486,3 +497,16 @@ RealignmentStudio::~RealignmentStudio()
          thread.join();
 }
 
+void RealignmentStudio::removeSelectedSpectralCorrectionFiles()
+{
+
+   QModelIndexList selection = spectral_correction_list_view->selectionModel()->selectedRows();
+   spectral_correction_files->remove(selection);
+
+}
+
+void RealignmentStudio::addSpectralCorrectionFile()
+{
+   QStringList files = QFileDialog::getOpenFileNames(this, "Choose file names", workspace->getWorkspace(), "tif file (*.tif)");
+   spectral_correction_files->add(files);
+}

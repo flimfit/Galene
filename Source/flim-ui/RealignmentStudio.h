@@ -10,11 +10,14 @@
 #include "LifetimeDisplayWidget.h"
 #include "FlimWorkspace.h"
 #include "FlimReaderDataSource.h"
+#include "SpectralCorrectionListModel.h"
 
 #include "ui_RealignmentStudio.h"
 #include <map>
 #include <list>
+#include <vector>
 
+   
 class RealignmentStudio : public QMainWindow, private ControlBinder, private Ui::RealignmentStudio
 {
    Q_OBJECT
@@ -62,7 +65,8 @@ protected:
 
    RealignmentParameters getRealignmentParameters();
 
-
+   void removeSelectedSpectralCorrectionFiles();
+   void addSpectralCorrectionFile();
 
 private:
 
@@ -94,6 +98,7 @@ private:
    Q_PROPERTY(bool store_frames MEMBER store_frames);
    Q_PROPERTY(int spatial_binning MEMBER spatial_binning);
 
+   SpectralCorrectionListModel* spectral_correction_files;
 
    void displayErrorMessage(const QString& error);
 

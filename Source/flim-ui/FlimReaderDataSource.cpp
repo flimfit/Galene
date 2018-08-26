@@ -68,33 +68,11 @@ void FlimReaderDataSource::update()
       if (!currently_reading) return;
       if (!data || !data->isReady()) return;
 
-      int n_px = reader->getNumX() * reader->getNumY() * reader->getNumZ();
-      int n_chan = reader->getNumChannels();
-      int n_t = (int)data->timepoints.size();
+      cv::Mat intensitybuf, marbuf;
+      data->getIntensityAndMeanArrival(intensitybuf, marbuf);
 
-      if (area(intensity) < n_px) return;
-
-      cv::Mat intensitybuf = intensity.clone();
-      cv::Mat marbuf = mean_arrival_time.clone();
-
-      uint16_t* data_ptr = data->getDataPtr();
-      float* intensity_ptr = (float*) intensitybuf.data;
-      float* mean_arrival_time_ptr = (float*) marbuf.data;
-      for (int p = 0; p < n_px; p++)
-      {
-         uint16_t I = 0;
-         float It = 0;
-         for (int c = 0; c < n_chan; c++)
-            for (int t = 0; t < n_t; t++)
-            {
-               I += *data_ptr;
-               It += (*data_ptr) * data->timepoints[t];
-
-               data_ptr++;
-            }
-         intensity_ptr[p] = I;
-         mean_arrival_time_ptr[p] = It / I;
-      }
+      intensity = intensitybuf;
+      mean_arrival_time = marbuf;
          
       // Apply intensity normalisation
       cv::Mat intensity_normalisation = reader->getFloatIntensityNormalisation();
@@ -130,7 +108,7 @@ void FlimReaderDataSource::setupForRead()
       mean_arrival_time = cv::Mat(dims, CV_32F, cv::Scalar(0));
    }
 
-   data = std::make_shared<FlimCube<uint16_t>>();
+   data = std::make_shared<FlimCube>();
 }
 
 void FlimReaderDataSource::alignFrames()
@@ -184,7 +162,7 @@ void FlimReaderDataSource::saveData(const QString& root_name, bool interpolate)
          filename = QString("%1_%2.ffh").arg(root_name).arg(z, 3, 10, QChar('0'));
       else
          filename = QString("%1.ffh").arg(root_name);
-      FlimCubeWriter<uint16_t> writer(filename.toStdString(), data, z, tags, reader_tags, images);      
+      FlimCubeWriter writer(filename.toStdString(), data, z, tags, reader_tags, images);      
    }
 }
 

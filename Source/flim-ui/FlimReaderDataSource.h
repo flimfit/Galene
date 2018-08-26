@@ -26,7 +26,7 @@ public:
    ~FlimReaderDataSource();
 
    std::shared_ptr<FlimReader> getReader() { return reader; }
-   std::shared_ptr<FlimCube<uint16_t>> getData() { return data; }
+   std::shared_ptr<FlimCube> getData() { return data; }
 
    void setForceNumZ(int n_z) { reader->setNumZ(n_z); }
 
@@ -71,7 +71,7 @@ protected:
    cv::Mat intensity;
    cv::Mat mean_arrival_time;
 
-   std::shared_ptr<FlimCube<uint16_t>> data;
+   std::shared_ptr<FlimCube> data;
 
    std::mutex image_mutex;
    std::mutex read_mutex;
