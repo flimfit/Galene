@@ -1,4 +1,5 @@
 #include "IntensityWriter.h"
+#include "ProducerConsumer.h"
 
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/MetadataTools.h>
@@ -56,7 +57,7 @@ private:
       writer->setId(output_filename);
       writer->setSeries(0);
       auto order = writer->getDimensionOrder();
-      typedef PixelProperties<pixel_type>::std_type stdtype;
+      typedef typename PixelProperties<pixel_type>::std_type stdtype;
       typedef PixelBuffer<stdtype> pxbuffer;
       auto extents = boost::extents[n_x][n_y][1][1][1][1][1][1][1];
       auto storage_order = PixelBufferBase::make_storage_order(dim_order, false);

@@ -6,7 +6,7 @@
 #include "BioImageIntensityReader.h"
 #include "ImarisIntensityReader.h"
 #include "IcsIntensityReader.h"
-
+#include "CvCache.h"
 #include "Cache_impl.h"
 
 IntensityReader::IntensityReader(const std::string& filename) : 
