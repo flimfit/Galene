@@ -18,6 +18,6 @@ export BFTOOLS_DIR=$(pwd)/lib/bftools
 
 # Generate make files and build 
 BUILD_TYPE=Release
-[ "$1" == "--clean" ] && rmdir Build/$BUILD_TYPE /s /q
+[ "$1" == "--clean" ] && rm -rf Build/$BUILD_TYPE
 cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOME_FILES_ROOT="$OME_FILES_ROOT" 
 cmake --build Build/$BUILD_TYPE  # --clean-first
