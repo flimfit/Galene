@@ -23,8 +23,9 @@ public:
 
    void processNext()
    {
-      if (files.isEmpty())
+      if (files.isEmpty() || task->wasCancelRequested())
       {
+         source = nullptr;
          task->setFinished();
          return;
       }
@@ -33,7 +34,15 @@ public:
       files.removeFirst();
 
       source = studio->openFileWithOptions(file, options);
-      connect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+      if (source)
+      {
+         connect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+      }
+      else
+      {
+         task->incrementStep();
+         processNext();
+      }
    }
 
    void saveCurrent()
@@ -41,7 +50,6 @@ public:
       disconnect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
       studio->save(source, true);
       task->incrementStep();
-
       processNext();
    }
 

@@ -157,11 +157,11 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
    }
    catch (std::runtime_error e)
    {
-      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
+      QMessageBox::warning(nullptr, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
    }
    catch (std::exception e)
    {
-      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
+      QMessageBox::warning(nullptr, "Error loading file", QString("Could not load file '%1', %2").arg(filename).arg(e.what()));
    }
 
 
