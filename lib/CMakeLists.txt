@@ -24,7 +24,7 @@ ExternalProject_Add(
               -DBIC_ENABLE_JXRLIB=OFF 
               -DBIC_ENABLE_LIBJPEG_TURBO=OFF
               -DBIC_INTERNAL_LIBJPEG=OFF
-              -DBIC_INTERNAL_EXIV2=OFF
+              -DBIC_INTERNAL_EXIV2=ON
               -DBIC_ENABLE_LIBWEBP=OFF 
               -DBIC_ENABLE_NIFTI=OFF 
               -DBIC_ENABLE_QT=OFF 
