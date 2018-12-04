@@ -64,6 +64,13 @@ public:
       for (auto it = correction.begin(); it != correction.end(); it++)
          if (filename.contains(it->first))
             return it->second;
+
+      // If we only have one loaded, use that
+      if (correction.size() == 1)
+         return correction.begin()->second;
+      if (correction.size() > 1)
+         QMessageBox::warning(nullptr, "Warning", "No spectral correction file matched");
+
       return std::vector<cv::Mat>();
    }
 
