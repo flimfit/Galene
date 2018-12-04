@@ -76,7 +76,7 @@ void FlimReaderDataSource::update()
          
       // Apply intensity normalisation
       cv::Mat intensity_normalisation = reader->getFloatIntensityNormalisation();
-      if (!intensity_normalisation.empty())
+      if (matsSameSizeType(intensity_normalisation, intensitybuf))
          cv::divide(intensitybuf, intensity_normalisation, intensitybuf);
 
       std::lock_guard<std::mutex> lk_im(image_mutex);
