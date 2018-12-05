@@ -43,12 +43,13 @@ public:
    
    static QStringList supportedExtensions();
 
+   cv::Mat getStack(int chan, int t);
+
 protected:
 
    virtual void addStack(int chan, int t, cv::Mat& data) = 0;
 
    void loadIntensityFramesImpl();
-   cv::Mat getStack(int chan, int t);
    cv::Mat getIntensityFrameImmediately(int frame);
 
    ImageScanParameters scan_params;
