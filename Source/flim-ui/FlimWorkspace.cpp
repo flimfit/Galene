@@ -34,6 +34,7 @@ void FlimWorkspace::update()
            QString("*.ptu"), 
            QString("*.spc"),
            QString("*.ome.tif"),
+           QString("*.sdt"),
            QString("*.tif"),
            QString("*.lsm"),
            QString("*.ims"),
