@@ -23,7 +23,10 @@ SpectralCorrectionListModel::SpectralCorrectionListModel(QObject* parent) :
          rows[i] = indexes[i].row();
       std::sort(rows.rbegin(), rows.rend());
       for (auto r : rows)
+      {
+         correction.erase(files[r]);
          files.removeAt(r);
+      }
       emit dataChanged(index(0, 0), index(files.size(), 0));
    }
 
