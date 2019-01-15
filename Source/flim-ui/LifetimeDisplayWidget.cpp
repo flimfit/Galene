@@ -201,11 +201,12 @@ void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
 {
    cv::Mat intensity, mar;
 
-   if (flimage == nullptr)
-      return;
+   if (flimage == nullptr) return;
 
    cv::Mat intensity_all = flimage->getIntensity();
    cv::Mat mar_all = flimage->getMeanArrivalTime();
+
+   if (mar_all.empty()) return;
 
    if (intensity_all.dims > 2) // 3D data
    {
