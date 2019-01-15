@@ -52,14 +52,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${PLATFORM_FLAGS_DEBUG}")
 # Set output directory for FlimReaderMex file.
 # This will be used for generating the figures,
 # Matlab is not required for the main application
-set(FlimReaderMEX_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
+set(FrameAlignerMex_OUT_DIR ${CMAKE_SOURCE_DIR}/../Matlab)
 
 add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FlimReader/frame-aligner/FrameAligner)
+add_subdirectory(FlimReader/frame-aligner/FrameAlignerMex)
 add_subdirectory(FlimReader/FlimReader)
-#add_subdirectory(FlimReader/FlimReaderTest)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 
