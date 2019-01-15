@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
-project(flim-ui LANGUAGES CXX) 
+project(flim-ui LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialPort)
-find_package(Boost REQUIRED COMPONENTS log iostreams)
+find_package(Boost REQUIRED COMPONENTS log iostreams thread)
 find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
@@ -11,14 +11,14 @@ find_package(libics REQUIRED)
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
 
-find_package(hdf5 REQUIRED)
+find_package(HDF5 REQUIRED)
 
 include("cmake/DeployQt.cmake")
 
 set(CMAKE_AUTOMOC ON)
 cmake_policy(SET CMP0071 OLD)
 
-qt5_wrap_ui(UI_HEADERS 
+qt5_wrap_ui(UI_HEADERS
          FlimDisplay.ui
          BHRatesWidget.ui
          LifetimeDisplayWidget.ui
@@ -36,7 +36,7 @@ set(SOURCE
    RealignmentStudio.cpp
    LifetimeDisplayWidget.cpp
    FlimReaderDataSource.cpp
-   FlimWorkspace.cpp   
+   FlimWorkspace.cpp
    CronologicControlDisplay.cpp
    SimTcspcControlDisplay.cpp
    RealignmentDisplayWidget.cpp
@@ -104,13 +104,13 @@ endif()
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
-set (Galene_OBJECTS ${SOURCE} 
+set (Galene_OBJECTS ${SOURCE}
                     ${HEADERS}
-                    ${UI_HEADERS} 
-                    ${UI_RESOURCES} 
+                    ${UI_HEADERS}
+                    ${UI_RESOURCES}
                     ${RESOURCE_FILES})
 
-set (Galene_LIBS    ${CUDA_LIBRARIES}
+set (Galene_LIBS    #${CUDA_LIBRARIES}
                     ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
                     ${HDF5_LIBRARIES}
@@ -121,9 +121,9 @@ set (Galene_LIBS    ${CUDA_LIBRARIES}
                     QSimpleUpdater
                     OME::Files
                     libics
-                    Qt5::Widgets 
-                    Qt5::PrintSupport 
-                    Qt5::SerialPort 
+                    Qt5::Widgets
+                    Qt5::PrintSupport
+                    Qt5::SerialPort
                     Qt5::Network)
 
 if (APPLE) # easier debugging through vs code
@@ -147,7 +147,7 @@ add_custom_command(
                 ${OME_FILES_ROOT}/share/
                 $<TARGET_FILE_DIR:Galene>/share/)
 
-               
+
 add_custom_command(
     TARGET Galene POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -160,8 +160,8 @@ set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURREN
 
 deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
-install(TARGETS Galene RUNTIME DESTINATION bin 
-                        BUNDLE DESTINATION bundle)                           
+install(TARGETS Galene RUNTIME DESTINATION bin
+                        BUNDLE DESTINATION bundle)
 
 if (WIN32)
 
