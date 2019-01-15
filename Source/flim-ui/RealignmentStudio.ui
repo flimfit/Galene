@@ -878,6 +878,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="process_selected_group_button">
+            <property name="text">
+             <string>Process all selected as group</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>

@@ -47,8 +47,9 @@ RealignmentStudio::RealignmentStudio() :
    connect(realign_button, &QPushButton::pressed, this, &RealignmentStudio::realign);
    connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
-   connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelected);
-   
+   connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelectedIndividually);
+   connect(process_selected_group_button, &QPushButton::pressed, this, &RealignmentStudio::processSelectedAsGroup);
+
    connect(this, &RealignmentStudio::error, this, &RealignmentStudio::displayErrorMessage, Qt::QueuedConnection);
 
    connect(mode_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentStudio::updateParameterGroupBox);
@@ -60,7 +61,8 @@ RealignmentStudio::RealignmentStudio() :
    file_list_view->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
    auto event_filter = new WorkspaceEventFilter(workspace, true);
-   connect(event_filter, &WorkspaceEventFilter::requestProcessSelected, this, &RealignmentStudio::processSelected);
+   connect(event_filter, &WorkspaceEventFilter::requestProcessSelected, this, &RealignmentStudio::processSelectedIndividually);
+   connect(event_filter, &WorkspaceEventFilter::requestProcessSelectedAsGroup, this, &RealignmentStudio::processSelectedAsGroup);
 
    file_list_view->installEventFilter(event_filter);
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
@@ -430,7 +432,7 @@ void RealignmentStudio::save(std::shared_ptr<RealignableDataSource> source, bool
 
 }
 
-void RealignmentStudio::processSelected()
+void RealignmentStudio::processSelected(bool as_group)
 {
    QStringList files = workspace->getSelectedFiles(workspace_selection->selectedRows());
 
@@ -440,7 +442,7 @@ void RealignmentStudio::processSelected()
          files.erase(f);
 
    if (!files.isEmpty())
-      new RealignmentStudioBatchProcessor(this, files); // deletes itself
+      new RealignmentStudioBatchProcessor(this, files, as_group); // deletes itself
 }
 
 RealignmentParameters RealignmentStudio::getRealignmentParameters()

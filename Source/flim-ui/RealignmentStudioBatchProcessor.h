@@ -10,50 +10,15 @@ class RealignmentStudioBatchProcessor : public QObject //: public ThreadedObject
    Q_OBJECT
 
 public:
-   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_)
-   {
-      studio = studio_;
-      files = files_;
+   RealignmentStudioBatchProcessor(RealignmentStudio* studio_, QStringList files_, bool align_together = false);
 
-      task = std::make_shared<TaskProgress>("Processing...", true, files.size());
-      TaskRegister::addTask(task);
-
-      processNext();
-   }
-
-   void processNext()
-   {
-      if (files.isEmpty() || task->wasCancelRequested())
-      {
-         source = nullptr;
-         task->setFinished();
-         return;
-      }
-      
-      auto file = files.first();
-      files.removeFirst();
-
-      source = studio->openFileWithOptions(file, options);
-      if (source)
-      {
-         connect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
-      }
-      else
-      {
-         task->incrementStep();
-         processNext();
-      }
-   }
-
-   void saveCurrent()
-   {
-      disconnect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
-      studio->save(source, true);
-      task->incrementStep();
-      processNext();
-   }
+   void processNext();
+   void saveCurrent();
 
 private:
+
+   bool align_together;
+   cv::Mat reference_frame;
 
    RealignableDataOptions options; // start uninitialised
    std::shared_ptr<RealignableDataSource> source;

@@ -66,6 +66,8 @@ public:
    void writeRealignmentInfo(const QString& filename_root);
    
    const std::unique_ptr<AbstractFrameAligner>& getFrameAligner() { return aligningReader()->getFrameAligner(); }
+   cv::Mat getReferenceFrame() { return aligningReader()->getReferenceFrame(); }
+   void setReferenceFrame(cv::Mat reference) { aligningReader()->setReferenceFrame(reference); }
    void setReferenceIndex(int index) { aligningReader()->setReferenceIndex(index); }
    void setRealignmentParameters(const RealignmentParameters& params) { aligningReader()->setRealignmentParameters(params); }
    const std::map<size_t,RealignmentResult>& getRealignmentResults() { return aligningReader()->getRealignmentResults(); }

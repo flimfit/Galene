@@ -59,7 +59,10 @@ protected:
 
    QMdiSubWindow* createSubWindow(QWidget* widget, const QString& title);
 
-   void processSelected();
+   void processSelectedIndividually() { processSelected(false); }
+   void processSelectedAsGroup() { processSelected(true); }
+   void processSelected(bool as_group);
+
    void exportMovie();
    void saveMergedImage();
 

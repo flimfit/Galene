@@ -52,6 +52,7 @@ set(SOURCE
    IcsIntensityReader.cpp
    BioformatsExporter.cpp
    SpectralCorrectionListModel.cpp
+   RealignmentStudioBatchProcessor.cpp
    Galene.manifest
 )
 

@@ -90,6 +90,7 @@ public:
 signals:
 
    void requestProcessSelected();
+   void requestProcessSelectedAsGroup();
 
 protected: 
    bool eventFilter(QObject *obj, QEvent* event)
@@ -122,7 +123,11 @@ protected:
          menu.addAction("Info", [this, obj]() { requestInfoSelected(obj); });
 
          if (can_process)
+         {
             menu.addAction("Process", [this, obj]() { emit requestProcessSelected(); });
+            menu.addAction("Process as group", [this, obj]() { emit requestProcessSelectedAsGroup(); });
+
+         }
 
 
          menu.addAction("Delete...", [this, obj]() { deleteSelected(obj); }, QKeySequence::StandardKey::Delete);
