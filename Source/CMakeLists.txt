@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7) 
+cmake_minimum_required (VERSION 3.7)
 set(CMAKE_CXX_STANDARD 14)
 
 include(CheckLanguage)
@@ -15,7 +15,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
-project (Galene LANGUAGES CXX) 
+project (Galene LANGUAGES CXX)
 
 add_definitions(-DVERSION="${VERSION}")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
@@ -39,7 +39,7 @@ if(MSVC)
 endif(MSVC)
 
 if(UNIX)
-   set(PLATFORM_FLAGS_ALL "-msse3 -std=c++11 -fcolor-diagnostics")
+   set(PLATFORM_FLAGS_ALL "-msse3 -std=c++11 -fPIC")
    set(PLATFORM_FLAGS_RELEASE "-O3 -ffast-math -ftree-vectorize")
    set(PLATFORM_FLAGS_DEBUG "")
 endif(UNIX)

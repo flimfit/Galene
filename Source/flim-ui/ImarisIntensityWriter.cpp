@@ -79,15 +79,15 @@ void ImarisIntensityWriter::write(const std::string& filename)
          hid_t type = H5Dget_type(vDataId);
          hid_t type_id = H5Tget_native_type(type, H5T_DIR_ASCEND);
 
-         cvbuf.convertTo(cvbuf, getCvTypeFromH5T(type));  
-         cv::Mat temp;       
+         cvbuf.convertTo(cvbuf, getCvTypeFromH5T(type));
+         cv::Mat temp;
          if (i > 0)
          {
             pyrDown3d(cvbuf, temp);
-            cvbuf = temp;            
+            cvbuf = temp;
          }
 
-         std::vector<uint64_t> dims = { (uint64_t) cvbuf.size[0], (uint64_t) cvbuf.size[1], (uint64_t) cvbuf.size[2] };
+         std::vector<hsize_t> dims = { (hsize_t) cvbuf.size[0], (hsize_t) cvbuf.size[1], (hsize_t) cvbuf.size[2] };
          hid_t vFileSpaceId = H5Screate_simple(3, dims.data(), NULL);
          H5Dwrite(vDataId, type_id, H5S_ALL, vFileSpaceId, H5P_DEFAULT, cvbuf.data);
 

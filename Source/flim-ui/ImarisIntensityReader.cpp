@@ -51,7 +51,7 @@ int getCvTypeFromH5T(hid_t type)
    else if (H5Tequal(type, H5T_NATIVE_UINT32))
       cv_type = CV_32S;
    else if (H5Tequal(type, H5T_NATIVE_FLOAT))
-      cv_type = CV_32F;   
+      cv_type = CV_32F;
    else
       throw std::runtime_error("Unrecognised type");
 
@@ -68,23 +68,23 @@ void ImarisIntensityReader::readMetadata()
    n_z = readAttribute<int>(vImageId, "Z");
    //n_chan = readAttribute<int>(vImageId, "NumberOfChannels");
    H5Gclose(vImageId);
- 
-   n_chan = 0; 
-   hid_t h = -1; 
-   do 
-   { 
-      std::string name = "Channel " + boost::lexical_cast<std::string>(++n_chan); 
-      h = H5Gopen(vDataSetInfoId, name.c_str(), H5P_DEFAULT); 
-      if (h >= 0) H5Gclose(h); 
-      std::cout << h << "\n"; 
-   } while (h >= 0); 
+
+   n_chan = 0;
+   hid_t h = -1;
+   do
+   {
+      std::string name = "Channel " + boost::lexical_cast<std::string>(++n_chan);
+      h = H5Gopen(vDataSetInfoId, name.c_str(), H5P_DEFAULT);
+      if (h >= 0) H5Gclose(h);
+      std::cout << h << "\n";
+   } while (h >= 0);
 
    hid_t vTimeInfo = H5Gopen(vDataSetInfoId, "TimeInfo", H5P_DEFAULT);
    n_t = readAttribute<int>(vTimeInfo, "FileTimePoints");
    H5Gclose(vTimeInfo);
 
    H5Gclose(vDataSetInfoId);
-   
+
    bool bidirectional = false;
    scan_params = ImageScanParameters(1000, 1000, 1000 * n_y, n_x, n_y, n_z, bidirectional);
 
@@ -108,7 +108,7 @@ void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
 {
    std::lock_guard<std::mutex> lk(read_mutex);
    std::lock_guard<std::mutex> hdf5_lk(hdf5_mutex);
-   
+
    std::string timepoint = "TimePoint " + boost::lexical_cast<std::string>(t);
    std::string channel = "Channel " + boost::lexical_cast<std::string>(chan);
 
@@ -119,7 +119,7 @@ void ImarisIntensityReader::addStack(int chan, int t, cv::Mat& data)
    hid_t type_id = H5Tget_native_type(type, H5T_DIR_ASCEND);
    int cv_type = getCvTypeFromH5T(type);
 
-   std::vector<uint64_t> dims = {(uint64_t) n_z, (uint64_t) n_y, (uint64_t) n_x};
+   std::vector<hsize_t> dims = {(hsize_t) n_z, (hsize_t) n_y, (hsize_t) n_x};
    hid_t vFileSpaceId = H5Screate_simple(3, dims.data(), NULL);
 
    std::vector<int> cv_dims = {n_z, n_y, n_x};
