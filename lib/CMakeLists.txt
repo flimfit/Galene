@@ -4,11 +4,11 @@ project(ThirdParty)
 
 include(ExternalProject)
 
-set(EXT_PROJ_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install;
-                  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE};
-                  -DCMAKE_DEBUG_POSTFIX=d; 
-                  -DCMAKE_RELWITHDEBINFO_POSTFIX=rd;
-                  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+set(EXT_PROJ_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                  -DCMAKE_DEBUG_POSTFIX=d
+                  -DCMAKE_RELWITHDEBINFO_POSTFIX=rd
+                  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+                  -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install )
 
 ExternalProject_Add(
   bioimageconvert
@@ -19,18 +19,18 @@ ExternalProject_Add(
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/bioimageconvert"
   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/bioimageconvert"
   BUILD_ALWAYS OFF
-  CMAKE_ARGS  -DBIC_ENABLE_FFMPEG=OFF 
-              -DBIC_ENABLE_GDCM=OFF 
-              -DBIC_ENABLE_JXRLIB=OFF 
+  CMAKE_ARGS  -DBIC_ENABLE_FFMPEG=OFF
+              -DBIC_ENABLE_GDCM=OFF
+              -DBIC_ENABLE_JXRLIB=OFF
               -DBIC_ENABLE_LIBJPEG_TURBO=OFF
               -DBIC_INTERNAL_LIBJPEG=OFF
               -DBIC_INTERNAL_EXIV2=ON
-              -DBIC_ENABLE_LIBWEBP=OFF 
-              -DBIC_ENABLE_NIFTI=OFF 
-              -DBIC_ENABLE_QT=OFF 
+              -DBIC_ENABLE_LIBWEBP=OFF
+              -DBIC_ENABLE_NIFTI=OFF
+              -DBIC_ENABLE_QT=OFF
               -DBIC_ENABLE_OPENCV=ON
-              -DBIC_ENABLE_OPENMP=OFF 
-              -DBIC_ENABLE_IMGCNV=OFF 
+              -DBIC_ENABLE_OPENMP=OFF
+              -DBIC_ENABLE_IMGCNV=OFF
               -DLIBBIOIMAGE_TRANSFORMS=OFF
               -DZLIB_ROOT=${ZLIB_ROOT}
               ${EXT_PROJ_ARGS}
@@ -43,16 +43,17 @@ ExternalProject_Add(
    GIT_TAG "9cc778639549dccdb5542740b2db895f9a5b1a12"
    UPDATE_COMMAND ""
    PATCH_COMMAND ""
+   BUILD_ALWAYS OFF
    SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/ome-cmake-superbuild"
-   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/ome-cmake-superbuild"  
-   CMAKE_ARGS  -Dsource-cache=${CMAKE_SOURCE_DIR}/cache/source/ 
-               -Dhead:BOOL=ON 
-               -Dtest:BOOL=OFF 
-               -Dextended-tests:BOOL=OFF 
-               -Dqtgui:BOOL=OFF 
-               -Dbuild-prerequisites:BOOL=OFF 
+   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/ome-cmake-superbuild"
+   CMAKE_ARGS  -Dsource-cache=${CMAKE_SOURCE_DIR}/cache/source/
+               -Dhead:BOOL=OFF
+               -Dtest:BOOL=OFF
+               -Dextended-tests:BOOL=OFF
+               -Dqtgui:BOOL=OFF
+               -Dbuild-prerequisites:BOOL=OFF
                -Dbuild-packages=ome-common$<SEMICOLON>ome-model$<SEMICOLON>ome-files
-               ${EXT_PROJ_ARGS}               
+               ${EXT_PROJ_ARG}
    TEST_COMMAND ""
 )
 
@@ -64,8 +65,8 @@ ExternalProject_Add(
   PATCH_COMMAND ""
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/libics"
   STAMP_DIR "${CMAKE_SOURCE_DIR}/stamp/libics"
-  BUILD_ALWAYS ON
-  CMAKE_ARGS  ${EXT_PROJ_ARGS}   
+  BUILD_ALWAYS OFF
+  CMAKE_ARGS  ${EXT_PROJ_ARGS}
 )
 
 file(DOWNLOAD "https://storage.googleapis.com/flimfit-downloads/bioformats-exporter/bioformats-exporter-1.1.0.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats-exporter.jar")
