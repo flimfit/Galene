@@ -145,9 +145,14 @@ add_custom_command(
 add_custom_command(
     TARGET Galene POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${OME_FILES_ROOT}/share/
-                $<TARGET_FILE_DIR:Galene>/share/)
+                ${OME_FILES_ROOT}/share/xml
+                $<TARGET_FILE_DIR:Galene>/share/xml)
 
+add_custom_command(
+    TARGET Galene POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${OME_FILES_ROOT}/share/xsl
+                $<TARGET_FILE_DIR:Galene>/share/xsl)
 
 add_custom_command(
     TARGET Galene POST_BUILD
