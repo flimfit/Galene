@@ -3,7 +3,6 @@ project(flim-ui LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialPort)
 find_package(Boost REQUIRED COMPONENTS log iostreams thread)
-find_package(OMEXML REQUIRED)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
 find_package(libics REQUIRED)
