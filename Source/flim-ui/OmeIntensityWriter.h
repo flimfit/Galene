@@ -59,7 +59,7 @@ private:
       auto order = writer->getDimensionOrder();
       typedef typename PixelProperties<pixel_type>::std_type stdtype;
       typedef PixelBuffer<stdtype> pxbuffer;
-      auto extents = boost::extents[n_x][n_y][1][1][1][1][1][1][1];
+      auto extents = boost::extents[n_x][n_y][1][1];
       auto storage_order = PixelBufferBase::make_storage_order(dim_order, false);
 
       VariantPixelBuffer lut;
@@ -80,7 +80,7 @@ private:
          for (int z = 0; z < n_z; z++)
          {
             auto zbuf = std::make_shared<pxbuffer>(&cvbuf.at<stdtype>(z, 0, 0),
-               extents, pixel_type_, ENDIAN_NATIVE, storage_order);
+               extents, pixel_type_, storage_order);
             VariantPixelBuffer vbuf(zbuf);
             writer->saveBytes(idx*n_z + z, vbuf);
          }
