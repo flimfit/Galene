@@ -28,18 +28,25 @@ get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
 find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+find_file(VCPKGDEPLOYQT_EXECUTABLE qtdeploy.ps1 HINTS "${_qt_bin_dir}")
+
+if (${CMAKE_TOOLCHAIN_FILE} MATCHES "vcpkg")
+    find_program(WINDEPLOYQT_EXECUTABLE qtdeploy.ps1 HINTS "${_qt_bin_dir}")
+endif ()
 
 # Add commands that copy the required Qt files to the same directory as the
 # target after being built, including the system libraries
 function(windeployqt target)
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E
-            env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
-                --verbose 0
-                --no-compiler-runtime
-                "$<TARGET_FILE:${target}>"
-        COMMENT "Deploying Qt..."
-    )
+    if(NOT ${VCPKG_TOOLCHAIN}) # vcpkg handles this for us
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E
+                env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+                    --verbose 0
+                    --no-compiler-runtime
+                    "$<TARGET_FILE:${target}>"
+            COMMENT "Deploying Qt..."
+        )
+    endif()
 
     # windeployqt doesn't work correctly with the system runtime libraries,
     # so we fall back to one of CMake's own modules for copying them over
@@ -61,6 +68,7 @@ function(windeployqt target)
             COMMENT "Copying ${filename}..."
         )
     endforeach()
+
 endfunction()
 
 # Add commands that copy the required Qt files to the application bundle
