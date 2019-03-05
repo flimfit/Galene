@@ -102,12 +102,13 @@ include_directories(${QT_USE_FILE}
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)
-   set(HDF5_LIBRARIES hdf5::hdf5-shared) # for vcpkg
 elseif(APPLE)
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.icns")
     set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(RESOURCE_FILES ${ICON_FILE})
 endif()
+
+set(HDF5_LIBRARIES hdf5::hdf5-shared) # for vcpkg
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
