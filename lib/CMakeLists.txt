@@ -4,6 +4,7 @@ project(ThirdParty)
 
 include(ExternalProject)
 
+
 find_package(OMEFiles QUIET)
 find_package(bioimage QUIET)
 find_package(libics QUIET)
@@ -42,7 +43,7 @@ if(NOT bioimage_FOUND)
     TEST_COMMAND ""
   )
 else()
-  message("Bioimage found, build skipped")
+  message("bioimage found, build skipped")
 endif()
 
 if(NOT OMEFiles_FOUND)

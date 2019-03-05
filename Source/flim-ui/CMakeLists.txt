@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
+
 project(flim-ui LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialPort)
@@ -6,6 +7,12 @@ find_package(Boost REQUIRED COMPONENTS log iostreams thread)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
 find_package(libics REQUIRED)
+
+set_target_properties(OME::Files OME::XML OME::Common 
+                      OME::Compat OME::XalanUtil OME::XercesUtil 
+                      bioimage jzon pole pugixml
+                      PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+
 
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
