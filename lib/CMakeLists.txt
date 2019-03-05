@@ -29,7 +29,7 @@ if(NOT bioimage_FOUND)
                 -DBIC_ENABLE_JXRLIB=OFF
                 -DBIC_ENABLE_LIBJPEG_TURBO=OFF
                 -DBIC_INTERNAL_LIBJPEG=OFF
-                -DBIC_INTERNAL_EXIV2=ON
+                -DBIC_INTERNAL_EXIV2=OFF
                 -DBIC_ENABLE_LIBWEBP=OFF
                 -DBIC_ENABLE_NIFTI=OFF
                 -DBIC_ENABLE_QT=OFF
@@ -42,7 +42,7 @@ if(NOT bioimage_FOUND)
     TEST_COMMAND ""
   )
 else()
-  message("Bioimage found, build skipped")
+  message("-- bioimage found, build skipped")
 endif()
 
 if(NOT OMEFiles_FOUND)
@@ -66,7 +66,7 @@ if(NOT OMEFiles_FOUND)
     TEST_COMMAND ""
   )
 else()
-  message("ome-files found, build skipped")
+  message("-- ome-files found, build skipped")
 endif()
 
 if(NOT libics_FOUND)
@@ -82,7 +82,7 @@ if(NOT libics_FOUND)
     CMAKE_ARGS  ${EXT_PROJ_ARGS}
   )
 else()
-  message("libics found, build skipped")
+  message("-- libics found, build skipped")
 endif()
 
 file(DOWNLOAD "https://storage.googleapis.com/flimfit-downloads/bioformats-exporter/bioformats-exporter-1.1.0.jar" "${CMAKE_SOURCE_DIR}/bftools/bioformats-exporter.jar")
