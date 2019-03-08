@@ -128,10 +128,16 @@ set (Galene_LIBS    #${CUDA_LIBRARIES}
                     QSimpleUpdater
                     OME::Files
                     libics
+                    Qt5::Core
                     Qt5::Widgets
                     Qt5::PrintSupport
                     Qt5::SerialPort
                     Qt5::Network)
+
+if(WIN32)
+    list(APPEND Galene_LIBS Qt5::WinMain
+                            Qt5::QWindowsIntegrationPlugin)
+endif()
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})

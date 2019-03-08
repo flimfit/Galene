@@ -18,6 +18,7 @@
 const QString update_url = "http://galene.flimfit.org/updates.json";
 
 #ifdef WIN32
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 int setenv(const char *name, const char *value, int overwrite)
 {
    int errcode = 0;
