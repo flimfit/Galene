@@ -102,12 +102,13 @@ include_directories(${QT_USE_FILE}
 
 if(WIN32)
    set(RESOURCE_FILES icon.rc)
-   set(HDF5_LIBRARIES hdf5::hdf5-shared) # for vcpkg
 elseif(APPLE)
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/flim-ui.icns")
     set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(RESOURCE_FILES ${ICON_FILE})
 endif()
+
+set(HDF5_LIBRARIES hdf5::hdf5-shared) # for vcpkg
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
@@ -117,8 +118,7 @@ set (Galene_OBJECTS ${SOURCE}
                     ${UI_RESOURCES}
                     ${RESOURCE_FILES})
 
-set (Galene_LIBS    #${CUDA_LIBRARIES}
-                    ${LAPACK_LIBRARIES}
+set (Galene_LIBS    ${LAPACK_LIBRARIES}
                     ${BLAS_LIBRARIES}
                     ${HDF5_LIBRARIES}
                     bioimage
@@ -137,6 +137,8 @@ set (Galene_LIBS    #${CUDA_LIBRARIES}
 if(WIN32)
     list(APPEND Galene_LIBS Qt5::WinMain
                             Qt5::QWindowsIntegrationPlugin)
+elseif (APPLE)
+    list(APPEND Galene_LIBS Qt5::QCocoaIntegrationPlugin)
 endif()
 
 if (APPLE) # easier debugging through vs code
@@ -176,7 +178,7 @@ set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURREN
                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
 
-deployqt(Galene INCLUDE_MODULES ${QTLIBS})
+#deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
 install(TARGETS Galene RUNTIME DESTINATION bin
                         BUNDLE DESTINATION bundle)

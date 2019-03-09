@@ -1,21 +1,32 @@
 cmake_minimum_required (VERSION 3.7)
-set(CMAKE_CXX_STANDARD 14)
+
+# For MSVC and FindThreads, respectively.
+enable_language(CXX C)
+
+# Prefer C++17 support
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
+endif()
 
 include(CheckLanguage)
 
 if(DEFINED ENV{OME_FILES_ROOT})
-    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}" CACHE PATH "OME root file directory")
+   set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}" CACHE PATH "OME root file directory")
 endif()
 
 if(DEFINED ENV{BFTOOLS_DIR})
-    set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}" CACHE PATH "Bioformats tools directory")
+   set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}" CACHE PATH "Bioformats tools directory")
 endif()
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
-project (Galene LANGUAGES CXX)
+project (Galene LANGUAGES CXX CUDA)
+
+include("cmake/ConfigureMSVCRuntime.cmake")
+configure_msvc_runtime("static")
 
 add_definitions(-DVERSION="${VERSION}")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
@@ -24,9 +35,9 @@ cmake_policy(SET CMP0071 OLD)
 
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
-  enable_language(CUDA)
+   enable_language(CUDA)
 else()
-  message(STATUS "No CUDA support")
+   message(STATUS "No CUDA support")
 endif()
 
 if(MSVC)

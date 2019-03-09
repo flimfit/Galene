@@ -10,14 +10,19 @@
 
 # Set manual locations for clang, Qt. 
 # Override these if not installed via brew
-export OME_FILES_ROOT=$(pwd)/lib/install
-export PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
-export DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
-export CMAKE_PREFIX_PATH=$(pwd)/lib/install
-export BFTOOLS_DIR=$(pwd)/lib/bftools
+VCPKGROOT=~/vcpkg
+OME_FILES_ROOT=$VCPKG_ROOT/installed/x64-osx
+PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
+DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
+CMAKE_PREFIX_PATH=$(pwd)/lib/install
+BFTOOLS_DIR=$(pwd)/lib/bftools
 
 # Generate make files and build 
 BUILD_TYPE=Release
 [ "$1" == "--clean" ] && rm -rf Build/$BUILD_TYPE
-cmake -GNinja -HSource -BBuild/$BUILD_TYPE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOME_FILES_ROOT="$OME_FILES_ROOT" 
+cmake -GNinja -HSource -BBuild/$BUILD_TYPE \
+   -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+   -DOME_FILES_ROOT="$OME_FILES_ROOT" \
+   -DCMAKE_TOOLCHAIN_FILE=$VCPKGROOT/scripts/buildsystems/vcpkg.cmake 
+
 cmake --build Build/$BUILD_TYPE  # --clean-first
