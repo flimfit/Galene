@@ -129,10 +129,17 @@ set (Galene_LIBS    #${CUDA_LIBRARIES}
                     QSimpleUpdater
                     OME::Files
                     libics
+                    Qt5::Core
                     Qt5::Widgets
                     Qt5::PrintSupport
                     Qt5::SerialPort
                     Qt5::Network)
+
+if (WIN32)
+    list(APPEND Galene_LIBS Qt5::QWindowsIntegrationPlugin)
+elseif (APPLE)
+    list(APPEND Galene_LIBS Qt5::QCocoaIntegrationPlugin)
+endif()
 
 if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
@@ -171,7 +178,7 @@ set_target_properties(Galene PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURREN
                                         MACOSX_BUNDLE_ICON_FILE flim-ui.icns)
 
 
-deployqt(Galene INCLUDE_MODULES ${QTLIBS})
+#deployqt(Galene INCLUDE_MODULES ${QTLIBS})
 
 install(TARGETS Galene RUNTIME DESTINATION bin
                         BUNDLE DESTINATION bundle)

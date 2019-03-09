@@ -12,7 +12,7 @@ set(EXT_PROJ_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                   -DCMAKE_DEBUG_POSTFIX=d
                   -DCMAKE_RELWITHDEBINFO_POSTFIX=rd
                   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-                  -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install )
+                  -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/install)
 
 if(NOT bioimage_FOUND)
   ExternalProject_Add(

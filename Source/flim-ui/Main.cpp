@@ -17,6 +17,10 @@
 
 const QString update_url = "http://galene.flimfit.org/updates.json";
 
+#ifdef __APPLE__
+   Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
+#endif
+ 
 #ifdef WIN32
 int setenv(const char *name, const char *value, int overwrite)
 {

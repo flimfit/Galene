@@ -11,7 +11,7 @@
 # Set manual locations for clang, Qt. 
 # Override these if not installed via brew
 VCPKGROOT=~/vcpkg
-OME_FILES_ROOT=$VCPKG_ROOT/installed/x64-os-x
+OME_FILES_ROOT=$VCPKG_ROOT/installed/x64-osx
 PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 CMAKE_PREFIX_PATH=$(pwd)/lib/install
