@@ -145,10 +145,16 @@ if (APPLE) # easier debugging through vs code
     add_executable(GaleneTest ${Galene_OBJECTS})
     target_link_libraries(GaleneTest ${Galene_LIBS})
     set_property(TARGET GaleneTest PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    target_link_options(GaleneTest PUBLIC -fvisibility=default)
 endif()
 
 add_executable(Galene MACOSX_BUNDLE ${Galene_OBJECTS})
 target_link_libraries(Galene ${Galene_LIBS})
+
+
+if (APPLE)
+    target_link_options(Galene PUBLIC -fvisibility=default)
+endif()
 
 add_custom_command(
     TARGET Galene POST_BUILD

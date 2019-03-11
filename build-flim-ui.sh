@@ -11,11 +11,10 @@
 # Set manual locations for clang, Qt. 
 # Override these if not installed via brew
 VCPKGROOT=~/vcpkg
-OME_FILES_ROOT=$VCPKG_ROOT/installed/x64-osx
-PATH="$OME_FILES_ROOT/lib:/usr/local/opt/qt5/bin:$PATH"
 DYLIB_LIBRARY_PATH="$OME_FILES_ROOT/lib"
 CMAKE_PREFIX_PATH=$(pwd)/lib/install
-BFTOOLS_DIR=$(pwd)/lib/bftools
+export OME_FILES_ROOT=$VCPKG_ROOT/installed/x64-osx
+export BFTOOLS_DIR=$(pwd)/lib/bftools
 
 # Generate make files and build 
 BUILD_TYPE=Release
