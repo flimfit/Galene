@@ -17,7 +17,7 @@ set_target_properties(OME::Files OME::XML OME::Common
 find_package(CUDA QUIET)
 include_directories(${OME_FILES_ROOT}/include)
 
-find_package(HDF5 REQUIRED)
+find_package(HDF5 CONFIG REQUIRED)
 
 include("cmake/DeployQt.cmake")
 
@@ -108,7 +108,7 @@ elseif(APPLE)
     set(RESOURCE_FILES ${ICON_FILE})
 endif()
 
-set(HDF5_LIBRARIES hdf5::hdf5-shared) # for vcpkg
+set(HDF5_LIBRARIES hdf5::hdf5-static) # for vcpkg
 
 add_definitions(${fifo_flim_DEFINITIONS})
 
