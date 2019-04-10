@@ -10,7 +10,7 @@ find_package(libics REQUIRED)
 
 set_target_properties(OME::Files OME::XML OME::Common 
                       OME::Compat OME::XalanUtil OME::XercesUtil 
-                      bioimage jzon pole pugixml
+                      bioimage jzon pole pugixml exiv2lib xmp double-conversion::double-conversion
                       PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 include_directories(${OME_FILES_ROOT}/include)

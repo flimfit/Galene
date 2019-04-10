@@ -4,7 +4,16 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui.hpp>
 
-extern cv::Mat extractSlice(const cv::Mat& m, int slice);
+cv::Mat getSlice(const cv::Mat& m, int slice)
+{
+   if (!((m.dims == 3) && (slice < m.size[0])))
+      return cv::Mat();
+
+   CV_Assert((m.dims == 3) && slice < m.size[0]);
+   size_t offset = slice * (m.size[2] * m.size[1]) * m.elemSize();
+   cv::Mat out(m.size[1], m.size[2], m.type(), m.data + offset);
+   return out;
+}
 
 LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
   ControlBinder(this, "LifetimeDisplayWidget")
@@ -216,8 +225,8 @@ void LifetimeDisplayWidget::updateLifetimeImageImpl(bool rescale)
       showZscroll(intensity_all.size[0] > 1);
 
       // Pull out required slice
-      intensity = extractSlice(intensity_all, z);
-      mar = extractSlice(mar_all, z);
+      intensity = getSlice(intensity_all, z);
+      mar = getSlice(mar_all, z);
    }
    else
    {
