@@ -26,7 +26,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
 include ("cmake/GitVersion.cmake") # Get version number from git
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
-project (Galene LANGUAGES CXX CUDA)
+project (Galene LANGUAGES CXX)
 
 include("cmake/ConfigureMSVCRuntime.cmake")
 configure_msvc_runtime("static")
@@ -74,7 +74,7 @@ add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FlimReader/frame-aligner/FrameAligner)
 add_subdirectory(FlimReader/frame-aligner/FrameAlignerMex)
 add_subdirectory(FlimReader/FlimReader)
-add_subdirectory(common_ui)
+add_subdirectory(common-ui)
 add_subdirectory(fifo-flim)
 add_subdirectory(flim-ui)
 add_subdirectory(Galene)

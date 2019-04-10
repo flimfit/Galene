@@ -15,11 +15,19 @@ set(SOURCE
    FlimDisplay.cpp
    FlimServer.cpp
    Main.cpp
+   CronologicControlDisplay.cpp
+   FlimServer.cpp
+   SimulatedTcspcControlDisplay.cpp
 )
 
 set(HEADERS
    BHRatesWidget.h
    FlimDisplay.h
+   CronologicControlDisplay.h
+   FifoTcpscControlDisplayFactory.h
+   FlimServer.h
+   FlimServerInterface.h
+   SimTcspcControlDisplay.h
 )
 
 include_directories(${QT_USE_FILE}

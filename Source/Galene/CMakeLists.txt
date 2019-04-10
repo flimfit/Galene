@@ -23,18 +23,14 @@ cmake_policy(SET CMP0071 OLD)
 qt5_wrap_ui(UI_HEADERS
          RealignmentStudio.ui
          RealignmentDisplayWidget.ui
-         MetaDataDialog.ui)
+)
 
 qt5_add_resources(UI_RESOURCES Resources.qrc)
 
 set(SOURCE
    Main.cpp
-   qcustomplot.cpp
    RealignmentStudio.cpp
    FlimReaderDataSource.cpp
-   FlimWorkspace.cpp
-   CronologicControlDisplay.cpp
-   SimTcspcControlDisplay.cpp
    RealignmentDisplayWidget.cpp
    RealignmentResultsWriter.cpp
    IntensityReader.cpp
@@ -53,17 +49,12 @@ set(SOURCE
 )
 
 set(HEADERS
-   FifoTcspcControlDisplayFactory.h
-   FlimServer.h
    FlimReaderDataSource.h
    IntensityDataSource.h
    RealignmentStudio.h
    RealignmentDisplayWidget.h
    RealignmentStudioBatchProcessor.h
-   CronologicControlDisplay.h
-   SimTcspcControlDisplay.h
    RealignmentResultsWriter.h
-   MetaDataDialog.h
    RealignableDataSource.h
    IntensityReader.h
    IntensityDataSource.h

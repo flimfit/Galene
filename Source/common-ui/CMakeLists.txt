@@ -8,17 +8,21 @@ set(CMAKE_AUTOMOC ON)
 cmake_policy(SET CMP0071 OLD)
 
 qt5_wrap_ui(UI_HEADERS
-         LifetimeDisplayWidget.ui)
+         LifetimeDisplayWidget.ui
+         MetaDataDialog.ui)
 
 set(SOURCE
    FlimWorkspace.cpp
    LifetimeDisplayWidget.cpp
+   qcustomplot.cpp
 )
 
 set(HEADERS
     ControlLayout.h
     FlimWorkspace.h
     LifetimeDisplayWidget.h
+    qcustomplot.h
+    MetaDataDialog.h
 )
 
 include_directories(${QT_USE_FILE}
