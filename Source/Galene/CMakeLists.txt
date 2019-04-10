@@ -25,8 +25,6 @@ qt5_wrap_ui(UI_HEADERS
          RealignmentDisplayWidget.ui
 )
 
-qt5_add_resources(UI_RESOURCES Resources.qrc)
-
 set(SOURCE
    Main.cpp
    RealignmentStudio.cpp
@@ -85,17 +83,15 @@ endif()
 
 set(HDF5_LIBRARIES hdf5::hdf5-static) # for vcpkg
 
-add_definitions(${fifo_flim_DEFINITIONS})
-
 set (Galene_OBJECTS ${SOURCE}
                     ${HEADERS}
                     ${UI_HEADERS}
-                    ${UI_RESOURCES}
                     ${RESOURCE_FILES})
 
 set (Galene_LIBS    ${HDF5_LIBRARIES}
                     bioimage
-                    fifo_flim
+                    fifo-flim
+                    common-ui
                     FlimReader
                     InstrumentControlUI
                     QSimpleUpdater

@@ -9,7 +9,6 @@
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
 #include "FlimFileReader.h"
-#include "RealignmentStudio.h"
 #include <functional>
 
 #define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
@@ -62,7 +61,7 @@ ControlBinder(this, "FLIMDisplay")
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
 
    connect(realignment_action, &QAction::triggered, [&]() {
-      auto m = new RealignmentStudio(); 
+      auto m = new FlimDisplay(); 
       m->showMaximized();
    });
 

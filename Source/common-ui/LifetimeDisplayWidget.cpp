@@ -1,10 +1,10 @@
 #include "LifetimeDisplayWidget.h"
-#include "Cv3dUtils.h"
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui.hpp>
 
+extern cv::Mat extractSlice(const cv::Mat& m, int slice);
 
 LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
   ControlBinder(this, "LifetimeDisplayWidget")
