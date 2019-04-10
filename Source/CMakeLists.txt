@@ -15,9 +15,12 @@ if(DEFINED ENV{OME_FILES_ROOT})
    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}" CACHE PATH "OME root file directory")
 endif()
 
-if(DEFINED ENV{BFTOOLS_DIR})
-   set(BFTOOLS_DIR "$ENV{BFTOOLS_DIR}" CACHE PATH "Bioformats tools directory")
+# Download bioformats exporter tool
+set(BFTOOLS_JAR "${CMAKE_SOURCE_DIR}/../bftools/bioformats-exporter.jar")
+if(NOT EXISTS ${BFTOOLS_JAR})
+   file(DOWNLOAD "https://storage.googleapis.com/flimfit-downloads/bioformats-exporter/bioformats-exporter-1.1.0.jar" ${BFTOOLS_JAR})
 endif()
+
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OME_FILES_ROOT})
 
