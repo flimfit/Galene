@@ -17,14 +17,14 @@ set(SOURCE
    Main.cpp
    CronologicControlDisplay.cpp
    FlimServer.cpp
-   SimulatedTcspcControlDisplay.cpp
+   SimTcspcControlDisplay.cpp
 )
 
 set(HEADERS
    BHRatesWidget.h
    FlimDisplay.h
    CronologicControlDisplay.h
-   FifoTcpscControlDisplayFactory.h
+   FifoTcspcControlDisplayFactory.h
    FlimServer.h
    FlimServerInterface.h
    SimTcspcControlDisplay.h

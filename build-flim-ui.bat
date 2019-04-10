@@ -17,9 +17,8 @@ SET TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
 SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
 SET OME_FILES_ROOT=%VCPKG_ROOT%\installed\%TRIPLET%
 
-
-SET BFTOOLS_DIR=%cd%\lib\bftools
-SET BFTOOLS_DIR=%BFTOOLS_DIR:\=/%
+:: Override CMAKE_PREFIX_PATH
+SET CMAKE_PREFIX_PATH=
 
 IF "%1"=="--clean" rmdir Build /s /q
 
