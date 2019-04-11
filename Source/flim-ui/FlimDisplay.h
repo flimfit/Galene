@@ -59,6 +59,8 @@ private:
 
    void displayErrorMessage(const QString error);
 
+   void updateFlimStatus();
+
    ImageRenderWindow* flim_display = nullptr;
 
    QWidget* tcspc_control = nullptr;
@@ -71,4 +73,5 @@ private:
    FlimServer* server;
 
    QTimer* status_timer;
+   QTimer* update_timer; 
 };

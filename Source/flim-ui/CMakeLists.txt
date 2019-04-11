@@ -11,8 +11,7 @@ set_target_properties(double-conversion::double-conversion
                       PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 qt5_wrap_ui(UI_HEADERS
-         FlimDisplay.ui
-         BHRatesWidget.ui)
+         FlimDisplay.ui)
 
 set(SOURCE
    FlimDisplay.cpp

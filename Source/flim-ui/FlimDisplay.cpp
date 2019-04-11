@@ -36,11 +36,13 @@ ControlBinder(this, "FLIMDisplay")
 
    server = new FlimServer(this);
    status_timer = new QTimer(this);
+   update_timer = new QTimer(this);
 
    connect(server, &FlimServer::measurementRequest, this, &FlimDisplay::processMeasurementRequest);
    connect(server, &FlimServer::clientError, this, &FlimDisplay::processClientError);
    connect(server, &FlimServer::userBreakRequest, this, &FlimDisplay::processUserBreakRequest);
    connect(status_timer, &QTimer::timeout, this, &FlimDisplay::sendStatusUpdate);
+   connect(update_timer, &QTimer::timeout, this, &FlimDisplay::updateFlimStatus);
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
    connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
 
@@ -86,6 +88,8 @@ ControlBinder(this, "FLIMDisplay")
          QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1': %2").arg(filename).arg(e.what()));
       }
    });
+
+   update_timer->start(100);
 
 }
 
@@ -184,6 +188,11 @@ void FlimDisplay::sendStatusUpdate()
    emit statusUpdate(type, data);
 }
 
+void FlimDisplay::updateFlimStatus()
+{
+   auto status = tcspc->getStatus();
+   bh_rates_widget->setStatus(status);
+}
 
 
 void FlimDisplay::setupTCSPC()

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FifoTcspc.h"
-#include "ui_BHRatesWidget.h"
 
 #include <QWidget>
 #include <QVBoxLayout>
