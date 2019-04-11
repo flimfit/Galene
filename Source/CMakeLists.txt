@@ -31,6 +31,7 @@ project (Galene LANGUAGES CXX)
 include("cmake/ConfigureMSVCRuntime.cmake")
 configure_msvc_runtime("static")
 
+
 add_definitions(-DVERSION="${VERSION}")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 add_definitions(-DBOOST_NO_CXX11_SCOPED_ENUMS) # Support older boost
@@ -72,7 +73,7 @@ add_subdirectory(QSimpleUpdater)
 add_subdirectory(QtInstrumentControl/InstrumentControl)
 add_subdirectory(QtInstrumentControl/InstrumentControlUI)
 add_subdirectory(FlimReader/frame-aligner/FrameAligner)
-add_subdirectory(FlimReader/frame-aligner/FrameAlignerMex)
+#add_subdirectory(FlimReader/frame-aligner/FrameAlignerMex)
 add_subdirectory(FlimReader/FlimReader)
 add_subdirectory(common-ui)
 add_subdirectory(fifo-flim)

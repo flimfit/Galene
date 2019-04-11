@@ -8,23 +8,20 @@ set(CMAKE_AUTOMOC ON)
 cmake_policy(SET CMP0071 OLD)
 
 qt5_wrap_ui(UI_HEADERS
-         LifetimeDisplayWidget.ui
-         MetaDataDialog.ui)
+            LifetimeDisplayWidget.ui
+            MetaDataDialog.ui)
 
-set(SOURCE
-   FlimWorkspace.cpp
-   LifetimeDisplayWidget.cpp
-   qcustomplot.cpp
-   UiUtils.cpp
+set(SOURCE FlimWorkspace.cpp
+           LifetimeDisplayWidget.cpp
+           qcustomplot.cpp
+           UiUtils.cpp
 )
 
-set(HEADERS
-    ControlLayout.h
-    FlimWorkspace.h
-    LifetimeDisplayWidget.h
-    qcustomplot.h
-    MetaDataDialog.h
-    UiUtils.cpp
+set(HEADERS FlimWorkspace.h
+            LifetimeDisplayWidget.h
+            qcustomplot.h
+            MetaDataDialog.h
+            UiUtils.cpp
 )
 
 set (LIBS InstrumentControlUI

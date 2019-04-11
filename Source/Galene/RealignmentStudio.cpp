@@ -30,7 +30,21 @@ RealignmentStudio::RealignmentStudio() :
 {
    setupUi(this);
 
-   workspace = new FlimWorkspace(this);
+   QStringList types = {
+	   "*.ffd",
+	   "*.pt3",
+	   "*.ffh",
+	   "*.ptu",
+	   "*.spc",
+	   "*.ome.tif",
+	   "*.sdt",
+	   "*.tif",
+	   "*.lsm",
+	   "*.ims",
+	   "*.ics",
+	   "*.lif"};
+
+   workspace = new FlimWorkspace(this, types);
 
    connect(help_action, &QAction::triggered, []() {  QDesktopServices::openUrl(QUrl("http://galene.readthedocs.io")); });
 

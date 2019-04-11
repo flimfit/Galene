@@ -16,7 +16,7 @@ class FlimWorkspace : public QAbstractListModel
    Q_OBJECT
 
 public:
-   FlimWorkspace(QObject* parent = 0, const QString& dir = "");
+   FlimWorkspace(QObject* parent, const QStringList& valid_file_types, const QString& dir = "");
 
    void update();
 
@@ -71,6 +71,7 @@ protected:
 
    int n_files;
    QList<QFileInfo> files;
+   QStringList valid_file_types;
 
    QFileSystemWatcher* folder_watcher;
 };

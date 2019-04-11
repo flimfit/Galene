@@ -11,7 +11,7 @@ const QString update_url = "http://galene.flimfit.org/updates.json";
 
 int main(int argc, char *argv[])
 {
-   qRegisterMetaType<FlimRates>("FlimRates");
+   qRegisterMetaType<FlimStatus>("FlimStatus");
    qRegisterMetaType<T_DATAFRAME_SRVREQUEST>("T_DATAFRAME_SRVREQUEST");
    qRegisterMetaType<E_ERROR_CODES>("E_ERROR_CODES");
    qRegisterMetaType<E_PQ_MEAS_TYPE>("E_PQ_MEAS_TYPE");

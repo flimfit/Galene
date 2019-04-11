@@ -7,6 +7,9 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialP
 set(CMAKE_AUTOMOC ON)
 cmake_policy(SET CMP0071 OLD)
 
+set_target_properties(double-conversion::double-conversion
+                      PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+
 qt5_wrap_ui(UI_HEADERS
          FlimDisplay.ui
          BHRatesWidget.ui)

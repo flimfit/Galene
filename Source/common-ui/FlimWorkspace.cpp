@@ -3,8 +3,8 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 
-FlimWorkspace::FlimWorkspace(QObject* parent, const QString& dir) :
-   QAbstractListModel(parent)
+FlimWorkspace::FlimWorkspace(QObject* parent, const QStringList& valid_file_types, const QString& dir) :
+   QAbstractListModel(parent), valid_file_types(valid_file_types)
 {
    folder_watcher = new QFileSystemWatcher(this);
    connect(folder_watcher, &QFileSystemWatcher::directoryChanged, this, &FlimWorkspace::update);
@@ -28,19 +28,7 @@ void FlimWorkspace::update()
    {
       beginResetModel();
       auto file_info = workspace.entryInfoList(
-         { QString("*.ffd"), 
-           QString("*.pt3"), 
-           QString("*.ffh"), 
-           QString("*.ptu"), 
-           QString("*.spc"),
-           QString("*.ome.tif"),
-           QString("*.sdt"),
-           QString("*.tif"),
-           QString("*.lsm"),
-           QString("*.ims"),
-           QString("*.ics"),
-           QString("*.lif")}, 
-         QDir::NoFilter, QDir::Time | QDir::Reversed);
+         valid_file_types, QDir::NoFilter, QDir::Time | QDir::Reversed);
       files.clear();
       for (auto& info : file_info)
          files.append(info);

@@ -20,7 +20,9 @@ ControlBinder(this, "FLIMDisplay")
 {
    setupUi(this);
 
-   workspace = new FlimWorkspace(this);
+   QStringList file_types = { ".ffd" };
+
+   workspace = new FlimWorkspace(this, file_types);
 
    connect(new_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::makeNew);
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
@@ -204,9 +206,11 @@ void FlimDisplay::setupTCSPC()
 
    tcspc_control->setWindowTitle("TCSPC Settings");
 
+   bh_rates_widget->update(tcspc->getStatus());
+
    connect(tcspc, &FifoTcspc::acquisitionStatusChanged, this, &FlimDisplay::acquisitionStatusChanged);
-   connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
-   connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+   //connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
+   //connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
    connect(tcspc, &FifoTcspc::progressUpdated, this, &FlimDisplay::updateProgress);
 
    tcspc->addTcspcEventConsumer(file_writer);
