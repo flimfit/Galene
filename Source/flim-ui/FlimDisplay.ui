@@ -235,7 +235,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="BHRatesWidget" name="bh_rates_widget" native="true">
+        <widget class="FlimStatusWidget" name="bh_rates_widget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -245,7 +245,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>200</height>
+           <height>20</height>
           </size>
          </property>
         </widget>
@@ -350,9 +350,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>BHRatesWidget</class>
+   <class>FlimStatusWidget</class>
    <extends>QWidget</extends>
-   <header>BHRatesWidget.h</header>
+   <header>FlimStatusWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

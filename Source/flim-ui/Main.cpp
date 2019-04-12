@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 #include "QSimpleUpdater.h"
 #include "FlimDisplay.h"
-#include "BHRatesWidget.h"
+#include "FlimStatusWidget.h"
 
 const QString update_url = "http://galene.flimfit.org/updates.json";
 

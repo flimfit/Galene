@@ -215,11 +215,11 @@ void FlimDisplay::setupTCSPC()
 
    tcspc_control->setWindowTitle("TCSPC Settings");
 
-   bh_rates_widget->update(tcspc->getStatus());
+   bh_rates_widget->setStatus(tcspc->getStatus());
 
    connect(tcspc, &FifoTcspc::acquisitionStatusChanged, this, &FlimDisplay::acquisitionStatusChanged);
-   //connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &BHRatesWidget::SetRates, Qt::QueuedConnection);
-   //connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &BHRatesWidget::SetFifoUsage);
+   //connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &FlimStatusWidget::SetRates, Qt::QueuedConnection);
+   //connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &FlimStatusWidget::SetFifoUsage);
    connect(tcspc, &FifoTcspc::progressUpdated, this, &FlimDisplay::updateProgress);
 
    tcspc->addTcspcEventConsumer(file_writer);

@@ -14,6 +14,7 @@ qt5_wrap_ui(UI_HEADERS
          FlimDisplay.ui)
 
 set(SOURCE
+   FlimStatusWidget.cpp
    FlimDisplay.cpp
    FlimServer.cpp
    Main.cpp
@@ -23,7 +24,7 @@ set(SOURCE
 )
 
 set(HEADERS
-   BHRatesWidget.h
+   FlimStatusWidget.h
    FlimDisplay.h
    CronologicControlDisplay.h
    FifoTcspcControlDisplayFactory.h
