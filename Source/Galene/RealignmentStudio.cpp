@@ -153,9 +153,10 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
          else
          {
             auto s = std::make_shared<FlimDataSource>(filename);
-
             auto spectral_correction = spectral_correction_files->getMatching(filename);
-            s->getReader()->setSpectralCorrection(spectral_correction);
+            auto reader = s->getReader();
+            reader->setSpectralCorrection(spectral_correction);
+            reader->setRetainData(true);
 
             connect(s.get(), &FlimDataSource::error, this, &RealignmentStudio::displayErrorMessage);
             source = s;
