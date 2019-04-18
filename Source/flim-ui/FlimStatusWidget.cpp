@@ -18,20 +18,20 @@ void RateWidget::setupUi(QWidget* parent)
    setMinimumSize(50, 100);
    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
 
-   name_label = new QLabel(parent);
+   name_label = new QLabel();
    name_label->setText(name);
    name_label->setAlignment(Qt::AlignCenter);
 
-   rate_label = new QLabel(parent);
+   rate_label = new QLabel();
    rate_label->setText(0);
    rate_label->setAlignment(Qt::AlignCenter);
 
-   rate_bar = new QProgressBar(parent);
+   rate_bar = new QProgressBar();
    rate_bar->setOrientation(Qt::Vertical);
    rate_bar->setValue(0);
    rate_bar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-   auto layout = new QVBoxLayout(parent);
+   auto layout = new QVBoxLayout();
    layout->setContentsMargins(0, 0, 0, 0);
    layout->setSpacing(6);
 
@@ -73,13 +73,13 @@ void WarningWidget::setStatus(FlimWarningStatus status)
 
 void WarningWidget::setupUi(QWidget* parent)
 {
-   name_label = new QLabel(parent);
+   name_label = new QLabel();
    name_label->setText(name);
    name_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-   led = new QLedIndicator(parent);
+   led = new QLedIndicator();
 
-   auto layout = new QHBoxLayout(parent);
+   auto layout = new QHBoxLayout();
    layout->setContentsMargins(0, 0, 0, 0);
    layout->setSpacing(12);
    layout->addWidget(led);
@@ -111,20 +111,22 @@ void FlimStatusWidget::setStatus(const FlimStatus& flim_status)
 
 void FlimStatusWidget::setupUi()
 {
-   main_layout = new QVBoxLayout(this);
-   warnings_layout = new QVBoxLayout(this);
-   rates_layout = new QVBoxLayout(this);
+   main_layout = new QVBoxLayout();
+   warnings_layout = new QVBoxLayout();
+   rates_layout = new QVBoxLayout();
 
-   QGroupBox* warnings_box = new QGroupBox(this);
+   QGroupBox* warnings_box = new QGroupBox();
    warnings_box->setLayout(warnings_layout);
    warnings_box->setTitle("Status");
 
-   QGroupBox* rates_box = new QGroupBox(this);
+   QGroupBox* rates_box = new QGroupBox();
    rates_box->setLayout(rates_layout);
    rates_box->setTitle("Rates");
 
    main_layout->addWidget(warnings_box);
    main_layout->addWidget(rates_box);
+
+   setLayout(main_layout);
 }
 
 RateWidget* FlimStatusWidget::getRateWidget(const QString& name)
