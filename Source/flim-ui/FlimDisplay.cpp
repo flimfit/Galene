@@ -8,10 +8,7 @@
 #include "FifoTcspcFactory.h"
 #include "ConstrainedMdiSubWindow.h"
 #include "FifoTcspcControlDisplayFactory.h"
-#include "FlimFileReader.h"
 #include <functional>
-
-#define Signal(object, function, type) static_cast<void (object::*)(type)>(&object::function)
 
 using namespace std;
 
@@ -20,18 +17,19 @@ ControlBinder(this, "FLIMDisplay")
 {
    setupUi(this);
 
-   QStringList file_types = { ".ffd" };
+   QStringList file_types = { "*.ffd" };
 
    workspace = new FlimWorkspace(this, file_types);
-
-   connect(new_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::makeNew);
    connect(open_workspace_action, &QAction::triggered, workspace, &FlimWorkspace::open);
+   connect(workspace, &FlimWorkspace::workspaceOpened, this, &FlimDisplay::workspaceOpened);
+   workspaceOpened(workspace->getWorkspace());
 
    connect(acquire_sequence_button, &QPushButton::pressed, this, &FlimDisplay::acquireSequence);
    connect(stop_button, &QPushButton::pressed, this, &FlimDisplay::stopSequence);
    connect(generate_simulated_dataset_action, &QAction::triggered, this, &FlimDisplay::generateSimulatedDataset);
 
    file_writer = std::make_shared<FlimFileWriter>();
+   connect(file_writer.get(), &FlimFileWriter::error, this, &FlimDisplay::stopSequence);
    connect(file_writer.get(), &FlimFileWriter::error, this, &FlimDisplay::displayErrorMessage);
 
    server = new FlimServer(this);
@@ -64,33 +62,38 @@ ControlBinder(this, "FLIMDisplay")
    file_list_view->installEventFilter(new WorkspaceEventFilter(workspace));
    connect(file_list_view, &QListView::doubleClicked, workspace, &FlimWorkspace::requestOpenFile);
 
-   connect(realignment_action, &QAction::triggered, [&]() {
-      auto m = new FlimDisplay(); 
-      m->showMaximized();
-   });
-
-   connect(workspace, &FlimWorkspace::openRequest, [&](const QString& filename) {
-      try
-      {
-         FlimFileReader* reader = new FlimFileReader(filename);
-
-         LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
-         ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
-         sub->setWidget(widget);
-         sub->setAttribute(Qt::WA_DeleteOnClose);
-         mdi_area->addSubWindow(sub);
-         widget->setFlimDataSource(reader->getFLIMage().get());
-         widget->show();
-         widget->setWindowTitle(QFileInfo(filename).baseName());
-      }
-      catch (std::runtime_error e)
-      {
-         QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1': %2").arg(filename).arg(e.what()));
-      }
-   });
+   connect(workspace, &FlimWorkspace::openRequest, this, &FlimDisplay::openFile);
 
    update_timer->start(100);
 
+}
+
+void FlimDisplay::openFile(const QString& filename)
+{
+   try
+   {
+      LifetimeDisplayWidget* widget = new LifetimeDisplayWidget;
+      ConstrainedMdiSubWindow* sub = new ConstrainedMdiSubWindow();
+      FlimDataSource* source = new FlimDataSource(filename, widget);
+
+      sub->setWidget(widget);
+      sub->setAttribute(Qt::WA_DeleteOnClose);
+      mdi_area->addSubWindow(sub);
+      widget->setFlimDataSource(source);
+      widget->show();
+      widget->setWindowTitle(QFileInfo(filename).baseName());
+
+      source->readData();
+   }
+   catch (std::runtime_error e)
+   {
+      QMessageBox::warning(this, "Error loading file", QString("Could not load file '%1': %2").arg(filename).arg(e.what()));
+   }
+}
+
+void FlimDisplay::workspaceOpened(const QString& workspace)
+{
+   setWindowTitle("Flim Acquisition - " + QDir::toNativeSeparators(workspace));
 }
 
 void FlimDisplay::displayErrorMessage(const QString msg)
@@ -110,9 +113,10 @@ void FlimDisplay::processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std:
 
    if (code == PQ_ERRCODE_NO_ERROR)
    {
-      auto flimage = tcspc->getPreviewFLIMage();
-      flimage->setImageSize(request.n_x, request.n_y);
-      flimage->setBidirectional(request.scanning_pattern);
+      //auto flimage = tcspc->getPreviewFLIMage();
+      auto reader = flim_data_source->getLiveReader();
+      reader->setImageSize(request.n_x, request.n_y);
+      reader->setBidirectionalScan(request.scanning_pattern);
 
       if (request.measurement_type == PQ_MEASTYPE_TEST_IMAGESCAN)
       {
@@ -171,9 +175,8 @@ void FlimDisplay::sendStatusUpdate()
    E_PQ_MEAS_TYPE type = (tcspc->isLive()) ? PQ_MEASTYPE_TEST_IMAGESCAN : PQ_MEASTYPE_IMAGESCAN;
    std::vector<std::pair<QString, QVariant>> data;
 
-   auto flimage = tcspc->getPreviewFLIMage();
-   auto rates = flimage->getCountRates();
-   uint32_t maxcps = flimage->getMaxCountInPixel();
+   auto rates = flim_data_source->getCountRates();
+   uint32_t maxcps = 0; //TODO flim_data_source->getMaxCountInPixel();
 
    auto add = [&](QString a, QVariant b) { data.push_back(std::make_pair(a, b)); };
 
@@ -211,6 +214,8 @@ void FlimDisplay::setupTCSPC()
       return;
    }
 
+   flim_data_source = new LiveFlimDataSource(tcspc, this);
+
    file_writer->setFifoTcspc(tcspc);
 
    tcspc_control->setWindowTitle("TCSPC Settings");
@@ -233,7 +238,7 @@ void FlimDisplay::setupTCSPC()
    sub->setAttribute(Qt::WA_DeleteOnClose);
    mdi_area->addSubWindow(sub);
 
-   preview_widget->setFlimDataSource(tcspc->getPreviewFLIMage().get());
+   preview_widget->setFlimDataSource(flim_data_source);
 }
 
 void FlimDisplay::showTcspcSettings()
@@ -264,6 +269,9 @@ void FlimDisplay::setLive(bool scanning)
 {
    live_button->setChecked(scanning);
    acquire_sequence_button->setEnabled(!scanning);
+
+   if (scanning)
+      flim_data_source->readData();
    if (tcspc)
       tcspc->setLive(scanning);
 }
@@ -301,6 +309,8 @@ void FlimDisplay::acquireSequenceImpl(QString filename, bool indeterminate)
       else
          filename = workspace->getFileName(filename); // todo: add this to workspace
       file_writer->startRecording(filename);
+
+      flim_data_source->readData();
 
       tcspc->startAcquisition(indeterminate);
    }

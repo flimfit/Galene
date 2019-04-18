@@ -21,6 +21,7 @@ set(SOURCE
    CronologicControlDisplay.cpp
    FlimServer.cpp
    SimTcspcControlDisplay.cpp
+   LiveFlimDataSource.cpp
 )
 
 set(HEADERS
@@ -31,6 +32,7 @@ set(HEADERS
    FlimServer.h
    FlimServerInterface.h
    SimTcspcControlDisplay.h
+   LiveFlimDataSource.h
 )
 
 include_directories(${QT_USE_FILE}

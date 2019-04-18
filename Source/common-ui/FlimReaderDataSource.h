@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FlimDataSource.h"
-#include "FlimReader.h"
+#include "LiveFlimReader.h"
 #include "FlimCube.h"
 #include "TaskProgress.h"
 #include "RealignableDataSource.h"
@@ -11,7 +11,7 @@
 #include <mutex>
 #include <vector>
 
-class FlimReaderDataSource : public FlimDataSource, public RealignableDataSource
+class FlimDataSource : public RealignableDataSource
 {
    Q_OBJECT
 
@@ -22,8 +22,11 @@ signals:
    
 public:
 
-   FlimReaderDataSource(const QString& filename_, QObject* parent = 0);
-   ~FlimReaderDataSource();
+   FlimDataSource(const QString& filename, QObject* parent = 0);
+
+   ~FlimDataSource();
+
+   void init();
 
    std::shared_ptr<FlimReader> getReader() { return reader; }
    std::shared_ptr<FlimCube> getData() { return data; }
@@ -48,10 +51,18 @@ public:
 
    //   virtual std::list<std::vector<quint16>>& getHistogramData() = 0;
    std::vector<uint>& getCurrentDecay(int channel) { return current_decay_dummy; };
-   std::vector<double>& getCountRates() { return count_rates_dummy; };
-   std::vector<double>& getMaxInstantCountRates() { return count_rates_dummy; };
+   const std::vector<double>& getCountRates() { return reader->getCountRates(); };
+//   std::vector<double>& getMaxInstantCountRates() { return count_rates; };
+
+signals:
+   void decayUpdated();
+   void countRatesUpdated();
+   void readComplete();
 
 protected:
+
+   FlimDataSource(QObject* parent = 0);
+
 
    void update();
    void setupForRead();
@@ -66,7 +77,6 @@ protected:
    QString filename;
 
    std::vector<uint> current_decay_dummy;
-   std::vector<double> count_rates_dummy;
 
    cv::Mat intensity;
    cv::Mat mean_arrival_time;
@@ -76,3 +86,4 @@ protected:
    std::mutex image_mutex;
    std::mutex read_mutex;
 };
+

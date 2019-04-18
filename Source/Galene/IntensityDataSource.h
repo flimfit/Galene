@@ -5,7 +5,7 @@
 
 #include <QObject>
 
-class IntensityDataSource : public QObject, public RealignableDataSource
+class IntensityDataSource : public RealignableDataSource
 {
    Q_OBJECT
 

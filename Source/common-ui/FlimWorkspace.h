@@ -57,6 +57,7 @@ signals:
    void sequenceNumberChanged(int sequence_number);
    void openRequest(const QString& file);
    void infoRequest(const QString& file);
+   void workspaceOpened(const QString& workspace);
 
 protected:
 

@@ -1,24 +1,34 @@
-#include "FlimReaderDataSource.h"
+#include "FlimDataSource.h"
 #include "LifetimeDisplayWidget.h"
 #include "Cv3dUtils.h"
 #include "FlimCubeWriter.h"
 
 #include <memory>
 
-FlimReaderDataSource::FlimReaderDataSource(const QString& filename_, QObject* parent) :
+FlimDataSource::FlimDataSource(const QString& filename_, QObject* parent) :
    FlimDataSource(parent)
 {
    filename = filename_;
    reader = std::shared_ptr<FlimReader>(FlimReader::createReader(filename.toStdString()));
 
+   init();
+}
+
+FlimDataSource::FlimDataSource(QObject* parent) :
+   FlimDataSource(parent)
+{
+}
+
+void FlimDataSource::init()
+{
    worker = new DataSourceWorker(this);
    connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 
    int n_chan = reader->getNumChannels();
-   count_rates_dummy.resize(n_chan);
+   count_rates.resize(n_chan);
 }
 
-FlimReaderDataSource::~FlimReaderDataSource()
+FlimDataSource::~FlimDataSource()
 {
    terminate = true;
    currently_reading = false;
@@ -32,26 +42,26 @@ FlimReaderDataSource::~FlimReaderDataSource()
       reader_thread.join();
 }
 
-cv::Mat FlimReaderDataSource::getIntensity()
+cv::Mat FlimDataSource::getIntensity()
 {
    std::lock_guard<std::mutex> lk(image_mutex);
    return intensity;
 };
 
-cv::Mat FlimReaderDataSource::getMeanArrivalTime()
+cv::Mat FlimDataSource::getMeanArrivalTime()
 {
    std::lock_guard<std::mutex> lk(image_mutex);
    return mean_arrival_time;
 };
 
-double FlimReaderDataSource::getTimeResolution()
+double FlimDataSource::getTimeResolution()
 {
    auto& t = reader->getTimepoints();
    return (t.size() > 0) ? (t[1] - t[0]) : 1;
 }
 
 
-void FlimReaderDataSource::update()
+void FlimDataSource::update()
 {
    if (terminate)
       return;
@@ -87,13 +97,15 @@ void FlimReaderDataSource::update()
    emit decayUpdated();
 }
 
-void FlimReaderDataSource::setupForRead()
+void FlimDataSource::setupForRead()
 {
    std::lock_guard<std::mutex> lk(read_mutex);
 
-   connect(task.get(), &TaskProgress::cancelRequested, this, &FlimReaderDataSource::cancelRead);
+   connect(task.get(), &TaskProgress::cancelRequested, this, &FlimDataSource::cancelRead);
 
    reader->clearStopSignal();
+
+   reader->determineDimensions();
    
    int n_px = reader->dataSizePerChannel();
    int n_chan = reader->getNumChannels();
@@ -111,7 +123,7 @@ void FlimReaderDataSource::setupForRead()
    data = std::make_shared<FlimCube>();
 }
 
-void FlimReaderDataSource::alignFrames()
+void FlimDataSource::alignFrames()
 {
    try
    {
@@ -123,11 +135,11 @@ void FlimReaderDataSource::alignFrames()
    }
 }
 
-void FlimReaderDataSource::readAlignedData()
+void FlimDataSource::readAlignedData()
 {
    try
    {
-      reader->readData(data);      
+      reader->readData(data);
    }
    catch (std::runtime_error e)
    {
@@ -135,21 +147,21 @@ void FlimReaderDataSource::readAlignedData()
    }
 }
 
-void FlimReaderDataSource::cancelRead()
+void FlimDataSource::cancelRead()
 {
    reader->stopReading(); 
    terminate = true;
 }
 
 
-QWidget* FlimReaderDataSource::getWidget()
+QWidget* FlimDataSource::getWidget()
 {
    auto widget = new LifetimeDisplayWidget;
    widget->setFlimDataSource(this);
    return widget;
 }
 
-void FlimReaderDataSource::saveData(const QString& root_name, bool interpolate)
+void FlimDataSource::saveData(const QString& root_name, bool interpolate)
 {
    auto tags = reader->getTags();
    auto reader_tags = reader->getReaderTags();
@@ -166,7 +178,7 @@ void FlimReaderDataSource::saveData(const QString& root_name, bool interpolate)
    }
 }
 
-void FlimReaderDataSource::savePreview(const QString& filename)
+void FlimDataSource::savePreview(const QString& filename)
 {
    writeScaledImage(filename.toStdString(), getIntensity());   
 }

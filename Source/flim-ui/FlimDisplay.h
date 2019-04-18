@@ -13,6 +13,7 @@
 #include "FlimFileWriter.h"
 #include "FlimWorkspace.h"
 #include "FlimServer.h"
+#include "LiveFlimDataSource.h"
 
 #include "ui_FlimDisplay.h"
 #include <memory>
@@ -34,6 +35,7 @@ public:
    void updateProgress(double progress);
    void showTcspcSettings();
 
+   void openFile(const QString& filename);
    void generateSimulatedDataset();
 
 signals:
@@ -41,6 +43,8 @@ signals:
    void measurementRequestResponse(E_ERROR_CODES code);
 
 protected:
+
+   void workspaceOpened(const QString& workspace);
 
    void processMeasurementRequest(T_DATAFRAME_SRVREQUEST request, std::map<QString, QVariant> metadata);
    void processClientError(const QString);
@@ -66,6 +70,7 @@ private:
    QWidget* tcspc_control = nullptr;
    QMdiSubWindow* tcspc_settings_window = nullptr;
    FifoTcspc* tcspc = nullptr;
+   LiveFlimDataSource* flim_data_source;
 
    std::shared_ptr<FlimFileWriter> file_writer;
    LifetimeDisplayWidget* preview_widget;

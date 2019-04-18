@@ -15,18 +15,25 @@ set(SOURCE FlimWorkspace.cpp
            LifetimeDisplayWidget.cpp
            qcustomplot.cpp
            UiUtils.cpp
+           FlimDataSource.cpp
+           RealignableDataSource.cpp
+           RealignmentResultsWriter.cpp
 )
-
+            
 set(HEADERS FlimWorkspace.h
             LifetimeDisplayWidget.h
             qcustomplot.h
             MetaDataDialog.h
-            UiUtils.cpp
+            UiUtils.h
+            FlimDataSource.h
+            RealignableDataSource.h
+            RealignmentResultsWriter.h
 )
 
 set (LIBS InstrumentControlUI
           QSimpleUpdater
           fifo-flim
+          FlimReader
           Qt5::Core
           Qt5::Widgets
           Qt5::PrintSupport

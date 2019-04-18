@@ -9,7 +9,7 @@
 #include "ControlBinder.h"
 #include "LifetimeDisplayWidget.h"
 #include "FlimWorkspace.h"
-#include "FlimReaderDataSource.h"
+#include "FlimDataSource.h"
 #include "SpectralCorrectionListModel.h"
 
 #include "ui_RealignmentStudio.h"

@@ -228,6 +228,8 @@ void FlimWorkspace::setWorkspace(const QString& dir)
       recent_workspaces.pop_back();
    recent_workspaces.removeDuplicates();
    settings.setValue("workspace/recent_workspaces", recent_workspaces);
+
+   emit workspaceOpened(dir);
 }
 
 

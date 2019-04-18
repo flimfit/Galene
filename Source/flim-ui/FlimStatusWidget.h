@@ -23,7 +23,7 @@ private:
    void setupUi(QWidget* parent);
    double convertToLog(double rate);
    QString compactNumberString(double rate);
-   double max_rate = 80e6;
+   double max_rate = 120e6;
 
    QLabel* name_label;
    QLabel* rate_label;

@@ -22,6 +22,8 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    setupPlots();
    connect(lifetime_image_widget, &ImageRenderWidget::ConstrainWidth, this, &LifetimeDisplayWidget::setMaximumWidth);
 
+   timer = new QTimer(this);
+
    line_colors.push_back(Qt::blue);
    line_colors.push_back(Qt::green);
    line_colors.push_back(Qt::red);
@@ -35,19 +37,16 @@ LifetimeDisplayWidget::LifetimeDisplayWidget(QWidget* parent) :
    QueuedBind(intensity_max_spin, this, &LifetimeDisplayWidget::setDisplayIntensityMax, &LifetimeDisplayWidget::getDisplayIntensityMax, &LifetimeDisplayWidget::displayIntensityMaxChanged);
 
    connect(rate_type_combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &LifetimeDisplayWidget::updateCountRates);
-
    connect(z_scroll, &QScrollBar::valueChanged, this, &LifetimeDisplayWidget::updateLifetimeImage);
+   connect(timer, &QTimer::timeout, this, &LifetimeDisplayWidget::update);
+
+   timer->start(100);
 }
 
 void LifetimeDisplayWidget::setFlimDataSource(FlimDataSource* flimage_)
 {
-   //FlimDataSourceWatcher::setFlimDataSource(flimage_);
-
    flimage = flimage_;
    connect(flimage, &FlimDataSource::readComplete, this, &LifetimeDisplayWidget::updateLifetimeImage, Qt::QueuedConnection);
-   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateDecay, Qt::QueuedConnection);
-   connect(flimage, &FlimDataSource::decayUpdated, this, &LifetimeDisplayWidget::updateLifetimeScale, Qt::QueuedConnection);
-   connect(flimage, &FlimDataSource::countRatesUpdated, this, &LifetimeDisplayWidget::updateCountRates, Qt::QueuedConnection);
 
    while (auto w = count_rate_layout->findChild<QWidget*>())
       delete w;
@@ -73,12 +72,21 @@ void LifetimeDisplayWidget::setFlimDataSource(FlimDataSource* flimage_)
    updateDecay();
 }
 
+void LifetimeDisplayWidget::update()
+{
+   updateCountRates();
+   updateLifetimeScale();
+   updateDecay();
+}
+
 void LifetimeDisplayWidget::updateCountRates()
 {
    if (!flimage)
       return;
 
-   auto& rates = (rate_type_combo->currentIndex()) ? flimage->getMaxInstantCountRates() : flimage->getCountRates();
+//   auto& rates = (rate_type_combo->currentIndex()) ? flimage->getMaxInstantCountRates() : flimage->getCountRates();
+   auto& rates = flimage->getCountRates();
+
    QStringList label = { "", "k", "M", "G" };
 
    for (int i = 0; i < rate_labels.size(); i++)

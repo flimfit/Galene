@@ -4,7 +4,7 @@
 #include <QCoreApplication>
 #include "QSimpleUpdater.h"
 #include "RealignmentStudio.h"
-#include "FlimReaderDataSource.h"
+#include "FlimDataSource.h"
 #include "IntensityDataSource.h"
 #include <boost/filesystem.hpp>
 #include <ome/files/CoreMetadata.h>
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
    ome::common::setLogLevel(ome::logging::trivial::warning);
 
-   qRegisterMetaType<std::shared_ptr<FlimReaderDataSource>>("std::shared_ptr<RealignableDataSource>");
+   qRegisterMetaType<std::shared_ptr<FlimDataSource>>("std::shared_ptr<RealignableDataSource>");
    registerMetaTypes();
 
    QCoreApplication::setOrganizationName("FLIMfit");

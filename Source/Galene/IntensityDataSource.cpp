@@ -3,7 +3,7 @@
 #include "OmeIntensityWriter.h"
 
 IntensityDataSource::IntensityDataSource(const QString& filename, QObject* parent) : 
-QObject(parent), filename(filename)
+RealignableDataSource(parent), filename(filename)
 {
    reader = IntensityReader::getReader(filename.toStdString());
 

@@ -9,7 +9,6 @@
 #include <iostream>
 #include <fstream>
 #include "ConstrainedMdiSubWindow.h"
-#include "FlimFileReader.h"
 #include "ImageRenderWindow.h"
 #include "RealignmentDisplayWidget.h"
 #include "RealignmentResultsWriter.h"
@@ -153,12 +152,12 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
          }
          else
          {
-            auto s = std::make_shared<FlimReaderDataSource>(filename);
+            auto s = std::make_shared<FlimDataSource>(filename);
 
             auto spectral_correction = spectral_correction_files->getMatching(filename);
             s->getReader()->setSpectralCorrection(spectral_correction);
 
-            connect(s.get(), &FlimReaderDataSource::error, this, &RealignmentStudio::displayErrorMessage);
+            connect(s.get(), &FlimDataSource::error, this, &RealignmentStudio::displayErrorMessage);
             source = s;
          }
 

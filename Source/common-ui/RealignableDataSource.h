@@ -4,7 +4,7 @@
 #include <QString>
 #include <QTimer>
 #include <memory>
-#include <thread>
+#include <future>
 #include <vector>
 #include "TaskProgress.h"
 #include "ThreadedObject.h"
@@ -30,6 +30,7 @@ private:
    bool initalised = false;
 };
 
+// TODO: merge with RealignableDataSource
 class DataSourceWorker : public ThreadedObject
 {
    Q_OBJECT
@@ -52,11 +53,14 @@ private:
    QTimer* timer;
 };
 
-class RealignableDataSource
+class RealignableDataSource : public QObject
 {
+   Q_OBJECT 
 
 public:
    
+   RealignableDataSource(QObject* parent = 0);
+
    virtual ~RealignableDataSource();
 
    void readData(bool realign = true);   
@@ -103,7 +107,7 @@ protected:
    bool read_again_when_finished = false;
    bool terminate = false;
    bool read_is_complete = false;
-   std::thread reader_thread;
+   std::future<void> reader_thread;
    
    std::shared_ptr<TaskProgress> task;
    

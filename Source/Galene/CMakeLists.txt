@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 
 project(flim-ui LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network SerialPort)
+find_package(Qt5 REQUIRED COMPONENTS Widgets PrintSupport OpenGL Network)
 find_package(Boost REQUIRED COMPONENTS log iostreams thread)
 find_package(OMEFiles REQUIRED)
 find_package(bioimage REQUIRED)
@@ -28,12 +28,9 @@ qt5_wrap_ui(UI_HEADERS
 set(SOURCE
    Main.cpp
    RealignmentStudio.cpp
-   FlimReaderDataSource.cpp
    RealignmentDisplayWidget.cpp
-   RealignmentResultsWriter.cpp
    IntensityReader.cpp
    IntensityDataSource.cpp
-   RealignableDataSource.cpp
    BioImageIntensityReader.cpp
    OmeIntensityReader.cpp
    OmeIntensityWriter.cpp
@@ -47,13 +44,10 @@ set(SOURCE
 )
 
 set(HEADERS
-   FlimReaderDataSource.h
    IntensityDataSource.h
    RealignmentStudio.h
    RealignmentDisplayWidget.h
    RealignmentStudioBatchProcessor.h
-   RealignmentResultsWriter.h
-   RealignableDataSource.h
    IntensityReader.h
    IntensityDataSource.h
    BioImageIntensityReader.h
@@ -90,7 +84,6 @@ set (Galene_OBJECTS ${SOURCE}
 
 set (Galene_LIBS    ${HDF5_LIBRARIES}
                     bioimage
-                    fifo-flim
                     common-ui
                     FlimReader
                     InstrumentControlUI
@@ -100,7 +93,6 @@ set (Galene_LIBS    ${HDF5_LIBRARIES}
                     Qt5::Core
                     Qt5::Widgets
                     Qt5::PrintSupport
-                    Qt5::SerialPort
                     Qt5::Network)
 
 if(WIN32)

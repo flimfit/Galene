@@ -36,6 +36,12 @@ void DataSourceWorker::update()
 }
 
 
+RealignableDataSource::RealignableDataSource(QObject* parent) : 
+   QObject(parent)
+{
+
+}
+
 RealignableDataSource::~RealignableDataSource()
 {
    terminate = true;
@@ -44,22 +50,22 @@ RealignableDataSource::~RealignableDataSource()
 
 void RealignableDataSource::waitForComplete()
 {
-   if (reader_thread.joinable())
-      reader_thread.join();
+   if (reader_thread.valid())
+      reader_thread.get();
 }
 
 void RealignableDataSource::readData(bool realign)
 {
    if (currently_reading)
    {
+      std::cout << "Currently reading" << std::endl;
       //read_again_when_finished = true;
    }
    else
    {
-      if (reader_thread.joinable())
-         reader_thread.join();
-
-      reader_thread = std::thread(&RealignableDataSource::readDataThread, this, realign);
+      if (reader_thread.valid())
+         reader_thread.get();
+      reader_thread = std::async(std::launch::async, &RealignableDataSource::readDataThread, this, realign);
    }
 }
 

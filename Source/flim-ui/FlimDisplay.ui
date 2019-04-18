@@ -268,7 +268,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="new_workspace_action"/>
     <addaction name="open_workspace_action"/>
     <addaction name="separator"/>
     <addaction name="set_output_folder_action"/>

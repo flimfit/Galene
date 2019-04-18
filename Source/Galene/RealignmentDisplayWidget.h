@@ -1,7 +1,7 @@
 #pragma once
 #include "ui_RealignmentDisplayWidget.h"
 #include "ControlBinder.h"
-#include "FlimReaderDataSource.h"
+#include "FlimDataSource.h"
 #include "qcustomplot.h"
 #include <memory>
 #include <QStandardPaths>

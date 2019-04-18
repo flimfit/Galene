@@ -55,6 +55,7 @@ protected:
    int getDisplayIntensityMax() { return display_intensity_max; };
 
 
+   void update();
    void updateDecay();
 
    void updateLifetimeImage() { updateLifetimeImageImpl(false); }
@@ -82,6 +83,8 @@ protected:
 
    int z = 0;
 
-   QString unit = "ps";
+   QString unit = "ns";
    double scale_factor = 1e-3;
+
+   QTimer* timer;
 };
