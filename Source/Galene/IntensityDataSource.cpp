@@ -6,9 +6,6 @@ IntensityDataSource::IntensityDataSource(const QString& filename, QObject* paren
 RealignableDataSource(parent), filename(filename)
 {
    reader = IntensityReader::getReader(filename.toStdString());
-
-   worker = new DataSourceWorker(this);
-   connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
 }
 
 

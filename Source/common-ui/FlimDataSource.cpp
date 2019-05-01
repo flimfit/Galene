@@ -10,8 +10,7 @@ FlimDataSource::FlimDataSource(const QString& filename_, QObject* parent) :
 {
    filename = filename_;
    reader = std::shared_ptr<FlimReader>(FlimReader::createReader(filename.toStdString()));
-
-   init();
+   int n_chan = reader->getNumChannels();
 }
 
 FlimDataSource::FlimDataSource(QObject* parent) :
@@ -19,21 +18,15 @@ FlimDataSource::FlimDataSource(QObject* parent) :
 {
 }
 
-void FlimDataSource::init()
-{
-   worker = new DataSourceWorker(this);
-   connect(this, &QObject::destroyed, worker, &QObject::deleteLater);
-
-   int n_chan = reader->getNumChannels();
-}
-
 FlimDataSource::~FlimDataSource()
 {
    terminate = true;
    currently_reading = false;
-   reader->stopReading();
 
-   QMetaObject::invokeMethod(worker, "stop");
+   if (reader)
+      reader->stopReading();
+
+   QMetaObject::invokeMethod(this, "stop");
 
    std::lock_guard<std::mutex> lk(read_mutex);
 

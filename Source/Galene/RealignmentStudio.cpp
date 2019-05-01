@@ -57,15 +57,13 @@ RealignmentStudio::RealignmentStudio() :
    connect(export_alignment_info_action, &QAction::triggered, this, &RealignmentStudio::writeAlignmentInfoCurrent);
    connect(workspace, &FlimWorkspace::openRequest, this, &RealignmentStudio::openFile);
    connect(workspace, &FlimWorkspace::infoRequest, this, &RealignmentStudio::showFileInfo);
-   connect(realign_button, &QPushButton::pressed, this, &RealignmentStudio::realign);
-   connect(reload_button, &QPushButton::pressed, this, &RealignmentStudio::reload);
+   connect(realignment_parameters_widget, &RealignmentParametersWidget::realignRequested, this, &RealignmentStudio::realign);
+   connect(realignment_parameters_widget, &RealignmentParametersWidget::reloadRequested, this, &RealignmentStudio::reload);
    connect(save_button, &QPushButton::pressed, this, &RealignmentStudio::saveCurrent);
    connect(process_selected_button, &QPushButton::pressed, this, &RealignmentStudio::processSelectedIndividually);
    connect(process_selected_group_button, &QPushButton::pressed, this, &RealignmentStudio::processSelectedAsGroup);
 
    connect(this, &RealignmentStudio::error, this, &RealignmentStudio::displayErrorMessage, Qt::QueuedConnection);
-
-   connect(mode_combo, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &RealignmentStudio::updateParameterGroupBox);
 
    connect(this, &RealignmentStudio::newDataSource, this, &RealignmentStudio::openWindows, Qt::QueuedConnection);
 
@@ -86,23 +84,9 @@ RealignmentStudio::RealignmentStudio() :
    BindProperty(save_preview_check, this, save_preview);
    BindProperty(save_realignment_info_check, this, save_realignment_info);
    BindProperty(save_movie_check, this, save_movie);
-   BindProperty(default_reference_combo, this, default_reference);
-   BindProperty(use_gpu_check, this, use_gpu);
-   BindProperty(mode_combo, this, mode);
-   BindProperty(realignment_points_spin, this, realignment_points);
-   BindProperty(smoothing_spin, this, smoothing);
-   BindProperty(threshold_spin, this, threshold);
-   BindProperty(coverage_threshold_spin, this, coverage_threshold);
-   BindProperty(store_frames_check, this, store_frames);
-   BindProperty(spatial_binning_combo, this, spatial_binning);
 
    auto support_info = GpuFrameWarper::getGpuSupportInformation();
-   use_gpu_check->setEnabled(support_info.supported);
-   gpu_stacked_widget->setCurrentIndex(support_info.supported);
-   gpu_info_label->setText(QString::fromStdString(support_info.message));
-
-   if (support_info.remedy_message != "")
-      QMessageBox::information(this, "GPU Support", QString::fromStdString(support_info.remedy_message));
+   realignment_parameters_widget->setGpuSupportInfo(support_info);
 
    spectral_correction_files = new SpectralCorrectionListModel(this);
    spectral_correction_list_view->setModel(spectral_correction_files);
@@ -111,12 +95,6 @@ RealignmentStudio::RealignmentStudio() :
    connect(spectral_correction_remove_pushbutton, &QPushButton::clicked, this, &RealignmentStudio::removeSelectedSpectralCorrectionFiles);
    
    connect(spectral_correction_group, &QGroupBox::toggled, spectral_correction_frame, &QFrame::setVisible);
-}
-
-void RealignmentStudio::updateParameterGroupBox(int index)
-{
-	int page = index;
-	parameter_stackedwidget->setCurrentIndex(page);
 }
 
 
@@ -167,7 +145,9 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
          source->setRealignmentOptions(options);
 
          emit newDataSource(source);
-         source->setRealignmentParameters(getRealignmentParameters());
+
+         auto realignment_parameters = realignment_parameters_widget->getParameters();
+         source->setRealignmentParameters(realignment_parameters);
          source->readData();
       }
    }
@@ -306,7 +286,7 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::getCurrentSource()
    return weak_source.lock();
 }
 
-void RealignmentStudio::realign()
+void RealignmentStudio::realign(const RealignmentParameters& params)
 {
    auto source = getCurrentSource();
    
@@ -316,11 +296,11 @@ void RealignmentStudio::realign()
       return;
    }
 
-   source->setRealignmentParameters(getRealignmentParameters());
+   source->setRealignmentParameters(params);
    source->readData();
 }
 
-void RealignmentStudio::reload()
+void RealignmentStudio::reload(const RealignmentParameters& params)
 {
    auto source = getCurrentSource();
 
@@ -330,7 +310,8 @@ void RealignmentStudio::reload()
       return;
    }
 
-   source->setRealignmentParameters(getRealignmentParameters());
+   
+   source->setRealignmentParameters(params);
    source->readData(false);
 }
 
@@ -459,38 +440,6 @@ void RealignmentStudio::processSelected(bool as_group)
       new RealignmentStudioBatchProcessor(this, files, as_group); // deletes itself
 }
 
-RealignmentParameters RealignmentStudio::getRealignmentParameters()
-{
-   RealignmentParameters params;
-
-   params.type = static_cast<RealignmentType>(mode_combo->currentIndex());
-   params.n_resampling_points = realignment_points_spin->value();
-   
-   switch (params.type)
-   {
-   case RealignmentType::Warp:
-      params.frame_binning = 1;
-      params.spatial_binning = 4;
-      break;
-   default:
-      params.frame_binning = frame_binning_combo->value();
-      params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
-   }
-
-   // Fix spatial binning until we expose GUI properly
-   params.spatial_binning = pow(2, spatial_binning_combo->currentIndex());
-
-
-   params.correlation_threshold = threshold_spin->value();
-   params.coverage_threshold = coverage_threshold_spin->value() / 100.;
-   params.smoothing = smoothing_spin->value();
-   params.prefer_gpu = use_gpu_check->isChecked();
-   params.default_reference_frame = (DefaultReferenceFrame) default_reference_combo->currentIndex();
-   params.store_frames = store_frames_check->isChecked();
-
-   return params;
-}
-
 void RealignmentStudio::displayErrorMessage(const QString& msg)
 {
    QMessageBox::critical(this, "Error", msg);
@@ -504,7 +453,6 @@ void RealignmentStudio::about()
 
    QMessageBox::about(this, "About Galene", text);
 }
-
 
 RealignmentStudio::~RealignmentStudio()
 {

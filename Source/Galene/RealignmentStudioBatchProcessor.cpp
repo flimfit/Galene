@@ -26,7 +26,7 @@ void RealignmentStudioBatchProcessor::processNext()
    if (source)
    {
       source->setReferenceFrame(reference_frame);
-      connect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+      connect(source.get(), &RealignableDataSource::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
    }
    else
    {
@@ -37,7 +37,7 @@ void RealignmentStudioBatchProcessor::processNext()
 
 void RealignmentStudioBatchProcessor::saveCurrent()
 {
-   disconnect(source->getWorker(), &DataSourceWorker::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
+   disconnect(source.get(), &RealignableDataSource::readComplete, this, &RealignmentStudioBatchProcessor::saveCurrent);
 
    if (align_together && reference_frame.empty())
       reference_frame = source->getReferenceFrame();

@@ -15,21 +15,25 @@ void RateWidget::setRate(float rate)
 
 void RateWidget::setupUi(QWidget* parent)
 {
-   setMinimumSize(50, 100);
-   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+   setMinimumWidth(50);
 
    name_label = new QLabel();
    name_label->setText(name);
    name_label->setAlignment(Qt::AlignCenter);
+   name_label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
    rate_label = new QLabel();
    rate_label->setText(0);
    rate_label->setAlignment(Qt::AlignCenter);
+   rate_label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
    rate_bar = new QProgressBar();
    rate_bar->setOrientation(Qt::Vertical);
    rate_bar->setValue(0);
-   rate_bar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+   rate_bar->setTextVisible(false);
+   rate_bar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+   rate_bar->setMinimumHeight(150);
 
    auto layout = new QVBoxLayout();
    layout->setContentsMargins(0, 0, 0, 0);

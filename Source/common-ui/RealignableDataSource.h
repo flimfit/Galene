@@ -30,30 +30,8 @@ private:
    bool initalised = false;
 };
 
-// TODO: merge with RealignableDataSource
-class DataSourceWorker : public ThreadedObject
-{
-   Q_OBJECT
 
-public:
-   DataSourceWorker(RealignableDataSource* source, QObject* parent = nullptr);
-
-   Q_INVOKABLE void stop();
-   void init();
-   void update();
-   
-signals:
-
-   void readComplete();
-
-private:
-
-   bool executing = false;
-   RealignableDataSource* source;
-   QTimer* timer;
-};
-
-class RealignableDataSource : public QObject
+class RealignableDataSource : public ThreadedObject
 {
    Q_OBJECT 
 
@@ -65,6 +43,10 @@ public:
 
    void readData(bool realign = true);   
    void waitForComplete();
+
+   void init();
+   Q_INVOKABLE void stop();
+   void checkStatus();
 
    virtual void writeRealignmentMovies(const QString& filename_root); 
    void writeRealignmentInfo(const QString& filename_root);
@@ -85,12 +67,13 @@ public:
    virtual void requestDelete() = 0;
    virtual QWidget* getWidget() { return nullptr; }
 
-   DataSourceWorker* getWorker() { return worker; } // bit of a hack for now - we need to merge FlimDataSource and RealignableDataSource long term
-
    bool readIsComplete() { return read_is_complete; }
 
-protected:
+signals:
 
+   void readComplete();
+
+protected:
    
    virtual void update() = 0;
    virtual void setupForRead() = 0;
@@ -101,8 +84,9 @@ protected:
    // Use readData to call 
    void readDataThread(bool realign = true);   
 
-   DataSourceWorker* worker;
-   
+   bool executing = false;
+   QTimer* timer;
+
    bool currently_reading = false;
    bool read_again_when_finished = false;
    bool terminate = false;

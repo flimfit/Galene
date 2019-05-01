@@ -4,42 +4,11 @@
 #include <QSettings>
 #include <QBitArray>
 
-DataSourceWorker::DataSourceWorker(RealignableDataSource* source, QObject* parent) :
-ThreadedObject(parent), source(source)
-{
-   startThread();
-}
-
-Q_INVOKABLE void DataSourceWorker::stop()
-{
-   timer->stop();
-   bool executing = false;
-}
-
-void DataSourceWorker::init() 
-{
-   timer = new QTimer();
-   connect(timer, &QTimer::timeout, this, &DataSourceWorker::update);
-   connect(this, &QObject::destroyed, timer, &QObject::deleteLater);
-
-   timer->setInterval(1000);
-   timer->start();
-   executing = true;
-}
-
-void DataSourceWorker::update()
-{
-   if (executing) 
-      source->update();
-   if (source->readIsComplete())
-      emit readComplete();
-}
-
 
 RealignableDataSource::RealignableDataSource(QObject* parent) : 
-   QObject(parent)
+   ThreadedObject(parent)
 {
-
+   startThread();
 }
 
 RealignableDataSource::~RealignableDataSource()
@@ -47,6 +16,31 @@ RealignableDataSource::~RealignableDataSource()
    terminate = true;
    waitForComplete();
 }
+
+void RealignableDataSource::init()
+{
+   timer = new QTimer();
+   connect(timer, &QTimer::timeout, this, &RealignableDataSource::checkStatus);
+
+   timer->setInterval(1000);
+   timer->start();
+   executing = true;
+}
+
+Q_INVOKABLE void RealignableDataSource::stop()
+{
+   timer->stop();
+   bool executing = false;
+}
+
+void RealignableDataSource::checkStatus()
+{
+   if (executing)
+      update();
+   if (readIsComplete())
+      emit readComplete();
+}
+
 
 void RealignableDataSource::waitForComplete()
 {

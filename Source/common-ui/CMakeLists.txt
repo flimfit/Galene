@@ -9,7 +9,8 @@ cmake_policy(SET CMP0071 OLD)
 
 qt5_wrap_ui(UI_HEADERS
             LifetimeDisplayWidget.ui
-            MetaDataDialog.ui)
+            MetaDataDialog.ui
+            RealignmentParametersWidget.ui)
 
 set(SOURCE FlimWorkspace.cpp
            LifetimeDisplayWidget.cpp
@@ -17,9 +18,8 @@ set(SOURCE FlimWorkspace.cpp
            UiUtils.cpp
            FlimDataSource.cpp
            RealignableDataSource.cpp
-           RealignmentResultsWriter.cpp
-)
-            
+           RealignmentResultsWriter.cpp)
+
 set(HEADERS FlimWorkspace.h
             LifetimeDisplayWidget.h
             qcustomplot.h
@@ -28,7 +28,7 @@ set(HEADERS FlimWorkspace.h
             FlimDataSource.h
             RealignableDataSource.h
             RealignmentResultsWriter.h
-)
+            RealignmentParametersWidget.h)
 
 set (LIBS InstrumentControlUI
           QSimpleUpdater

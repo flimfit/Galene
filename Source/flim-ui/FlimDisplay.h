@@ -65,6 +65,8 @@ private:
 
    void updateFlimStatus();
 
+   void updateSizes(int index = -1);
+
    ImageRenderWindow* flim_display = nullptr;
 
    QWidget* tcspc_control = nullptr;

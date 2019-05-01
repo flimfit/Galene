@@ -44,6 +44,7 @@ ControlBinder(this, "FLIMDisplay")
    connect(this, &FlimDisplay::statusUpdate, server, &FlimServer::sendProgress);
    connect(this, &FlimDisplay::measurementRequestResponse, server, &FlimServer::sendMesurementRequestResponse);
 
+   connect(options_tab, &QTabWidget::currentChanged, this, &FlimDisplay::updateSizes);
 
    setupTCSPC();
   
@@ -66,6 +67,22 @@ ControlBinder(this, "FLIMDisplay")
 
    update_timer->start(100);
 
+   updateSizes(0);
+
+}
+
+void FlimDisplay::updateSizes(int index)
+{
+   if (index == -1)
+      index = options_tab->currentIndex();
+
+   for (int i = 0; i < options_tab->count(); i++)
+      if (i != index)
+         options_tab->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+   options_tab->widget(index)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+   options_tab->widget(index)->resize(options_tab->widget(index)->minimumSizeHint());
+   options_tab->widget(index)->adjustSize();
 }
 
 void FlimDisplay::openFile(const QString& filename)
@@ -223,8 +240,6 @@ void FlimDisplay::setupTCSPC()
    bh_rates_widget->setStatus(tcspc->getStatus());
 
    connect(tcspc, &FifoTcspc::acquisitionStatusChanged, this, &FlimDisplay::acquisitionStatusChanged);
-   //connect(tcspc, &FifoTcspc::ratesUpdated, bh_rates_widget, &FlimStatusWidget::SetRates, Qt::QueuedConnection);
-   //connect(tcspc, &FifoTcspc::fifoUsageUpdated, bh_rates_widget, &FlimStatusWidget::SetFifoUsage);
    connect(tcspc, &FifoTcspc::progressUpdated, this, &FlimDisplay::updateProgress);
 
    tcspc->addTcspcEventConsumer(file_writer);

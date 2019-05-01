@@ -26,8 +26,6 @@ public:
 
    ~FlimDataSource();
 
-   void init();
-
    std::shared_ptr<FlimReader> getReader() { return reader; }
    std::shared_ptr<FlimCube> getData() { return data; }
 
