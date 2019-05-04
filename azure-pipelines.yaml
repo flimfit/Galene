@@ -40,10 +40,28 @@ jobs:
 
   steps:
 
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.6'
-        architecture: 'x64'
+  # Download vcpkg
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'specific' # Options: current, specific
+      project: 'FLIMfit'
+      pipeline: 'FLIMfit vcpkg'
+      specificBuildWithTriggering: true
+      buildVersionToDownload: 'latestFronBranch'
+      allowPartiallySucceededBuilds: true
+      branchName: 'refs/heads/master' # Required when buildType == Specific && BuildVersionToDownload == LatestFromBranch
+      #buildId: # Required when buildType == Specific && BuildVersionToDownload == Specific
+      #tags: # Optional
+      #downloadType: 'single' # Options: single, specific
+      artifactName: 'flimfit-env-$(buildPlatform)'
+      #itemPattern: '**' # Optional
+      #downloadPath: '$(System.ArtifactsDirectory)' 
+      #parallelizationLimit: '8' # Optional
 
-    - script: ./build-flim-ui
-      displayName: 'Build Galene'
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(System.ArtifactsDirectory)/*.zip' 
+      destinationFolder: $(System.ArtifactsDirectory)
+
+  - script: ./build-flim-ui
+    displayName: 'Build Galene'
