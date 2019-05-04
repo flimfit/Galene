@@ -32,7 +32,7 @@ jobs:
         buildPlatform: 'windows'
 
   variables:
-    VCPKG_ROOT: '$(Build.SourcesDirectory)'
+    VCPKG_ROOT: '$(Build.SourcesDirectory)/vcpkg'
     archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
 
   pool:
@@ -55,13 +55,13 @@ jobs:
       #downloadType: 'single' # Options: single, specific
       artifactName: 'flimfit-env-$(buildPlatform)'
       #itemPattern: '**' # Optional
-      #downloadPath: '$(System.ArtifactsDirectory)' 
+      downloadPath: '$(System.ArtifactsDirectory)' 
       #parallelizationLimit: '8' # Optional
 
   - task: ExtractFiles@1
     inputs:
-      archiveFilePatterns: '$(System.ArtifactsDirectory)/*.zip' 
-      destinationFolder: $(System.ArtifactsDirectory)
+      archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip' 
+      destinationFolder: $(VCPKG_ROOT)
 
   - script: ./build-flim-ui
     displayName: 'Build Galene'
