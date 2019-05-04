@@ -46,4 +46,4 @@ jobs:
         architecture: 'x64'
 
     - script: ./build-flim-ui
-      displayName: 'Build Galene
+      displayName: 'Build Galene'
