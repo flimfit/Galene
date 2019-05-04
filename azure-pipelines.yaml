@@ -20,7 +20,7 @@ jobs:
         CXX: '/usr/bin/clang++'
         CC: '/usr/bin/clang'
         buildPlatform: 'linux'
-        setupCommand: 'sudo apt-get install ninja'
+        setupCommand: 'sudo apt-get install ninja-build'
         buildCommand: './build-flim-ui.sh'
 
 
