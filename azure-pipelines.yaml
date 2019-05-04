@@ -1,0 +1,49 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pr:
+- master
+
+jobs:
+- job: Build
+  timeoutInMinutes: 360
+
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-16.04'
+        CXX: '/usr/bin/clang++'
+        CC: '/usr/bin/clang'
+        buildPlatform: 'linux'
+
+      mac:
+        imageName: 'macos-10.13'
+        DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
+        VCPKG_ALLOW_APPLE_CLANG: true
+        buildPlatform: 'osx'
+
+      windows:
+        imageName: 'vs2017-win2016'
+        buildPlatform: 'windows'
+
+  variables:
+    VCPKG_ROOT: '$(Build.SourcesDirectory)'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
+
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.6'
+        architecture: 'x64'
+
+    - script: ./build-flim-ui
+      displayName: 'Build Galene
