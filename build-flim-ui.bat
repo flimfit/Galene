@@ -4,10 +4,12 @@ SETLOCAL
 
 SET VSCOMMUNITYCMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 SET VSBUILDCMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat"
+SET VSENTERPRISECMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
 
 :: Set up Visual Studio environment variables
 IF EXIST %VSCOMMUNITYCMD% CALL %VSCOMMUNITYCMD% -arch=amd64 && GOTO :BUILD
 IF EXIST %VSBUILDCMD% CALL %VSBUILDCMD% -arch=amd64 && GOTO :BUILD
+IF EXIST %VSENTERPRISECMD% CALL %VSENTERPRISECMD% -arch=amd64 && GOTO :BUILD
 ECHO Error: Visual Studio install not found && EXIT /B 1
 
 :BUILD
