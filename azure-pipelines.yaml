@@ -20,6 +20,7 @@ jobs:
         CXX: '/usr/bin/clang++'
         CC: '/usr/bin/clang'
         buildPlatform: 'linux'
+        setupCommand: 'apt-get install ninja'
         buildCommand: './build-flim-ui.sh'
 
 
@@ -28,11 +29,13 @@ jobs:
         DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
         VCPKG_ALLOW_APPLE_CLANG: true
         buildPlatform: 'osx'
+        setupCommand: 'brew install ninja'
         buildCommand: './build-flim-ui.sh'
 
       windows:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
+        setupCommand: ''
         buildCommand: './build-flim-ui.bat'
 
 
@@ -44,6 +47,9 @@ jobs:
     vmImage: $(imageName)
 
   steps:
+
+  - script: $(setupCommand)
+    displayName: 'Setup environment'
 
   # Download vcpkg
   - task: DownloadBuildArtifacts@0
