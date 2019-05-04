@@ -20,19 +20,24 @@ jobs:
         CXX: '/usr/bin/clang++'
         CC: '/usr/bin/clang'
         buildPlatform: 'linux'
+        buildCommand: './build-flim-ui.sh'
+
 
       mac:
         imageName: 'macos-10.13'
         DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
         VCPKG_ALLOW_APPLE_CLANG: true
         buildPlatform: 'osx'
+        buildCommand: './build-flim-ui.sh'
 
       windows:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
+        buildCommand: './build-flim-ui.bat'
+
 
   variables:
-    VCPKG_ROOT: '$(Build.SourcesDirectory)/vcpkg'
+    VCPKG_ROOT: '$(Build.SourcesDirectory)/vcpkg/s'
     archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
 
   pool:
@@ -61,7 +66,7 @@ jobs:
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip' 
-      destinationFolder: $(VCPKG_ROOT)
+      destinationFolder: $(Build.SourcesDirectory)/vcpkg
 
-  - script: ./build-flim-ui
+  - script: $(buildCommand)
     displayName: 'Build Galene'
