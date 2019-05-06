@@ -40,7 +40,7 @@ jobs:
 
 
   variables:
-    VCPKG_ROOT: '$(Build.SourcesDirectory)/vcpkg'
+    VCPKG_ROOT: '$(Build.SourcesDirectory)/env/vcpkg'
     archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
 
   pool:
@@ -72,7 +72,9 @@ jobs:
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip' 
-      destinationFolder: '$(Build.SourcesDirectory)'
+      destinationFolder: '$(Build.SourcesDirectory)/env'
+      cleanDestinationFolder: false
+      
 
   - script: $(buildCommand)
     displayName: 'Build Galene'
