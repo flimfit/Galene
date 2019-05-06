@@ -15,6 +15,6 @@ BUILD_TYPE=Release
 cmake -GNinja -HSource -BBuild/$BUILD_TYPE \
    -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
    -DOME_FILES_ROOT="$OME_FILES_ROOT" \
-   -DCMAKE_TOOLCHAIN_FILE=$VCPKGROOT/scripts/buildsystems/vcpkg.cmake 
+   -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake 
 
 cmake --build Build/$BUILD_TYPE  # --clean-first

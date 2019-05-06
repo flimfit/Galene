@@ -1,0 +1,78 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- refactor-flim-ui
+
+pr:
+- master
+
+jobs:
+- job: Build
+  timeoutInMinutes: 360
+
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-16.04'
+        CXX: '/usr/bin/clang++'
+        CC: '/usr/bin/clang'
+        buildPlatform: 'linux'
+        setupCommand: 'sudo apt-get install ninja-build'
+        buildCommand: './build-flim-ui.sh'
+
+
+      mac:
+        imageName: 'macos-10.13'
+        DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
+        VCPKG_ALLOW_APPLE_CLANG: true
+        buildPlatform: 'osx'
+        setupCommand: 'brew install ninja'
+        buildCommand: './build-flim-ui.sh'
+
+      windows:
+        imageName: 'vs2017-win2016'
+        buildPlatform: 'windows'
+        setupCommand: './install-cuda.ps1'
+        buildCommand: './build-flim-ui.bat'
+
+
+  variables:
+    VCPKG_ROOT: '$(Build.SourcesDirectory)/vcpkg'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
+
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+
+  - script: $(setupCommand)
+    displayName: 'Setup environment'
+
+  # Download vcpkg
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'specific' # Options: current, specific
+      project: 'FLIMfit'
+      pipeline: 'FLIMfit vcpkg'
+      specificBuildWithTriggering: true
+      buildVersionToDownload: 'latestFronBranch'
+      allowPartiallySucceededBuilds: true
+      branchName: 'refs/heads/master' # Required when buildType == Specific && BuildVersionToDownload == LatestFromBranch
+      #buildId: # Required when buildType == Specific && BuildVersionToDownload == Specific
+      #tags: # Optional
+      #downloadType: 'single' # Options: single, specific
+      artifactName: 'flimfit-env-$(buildPlatform)'
+      #itemPattern: '**' # Optional
+      downloadPath: '$(System.ArtifactsDirectory)' 
+      #parallelizationLimit: '8' # Optional
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip' 
+      destinationFolder: $(Build.SourcesDirectory)
+
+  - script: $(buildCommand)
+    displayName: 'Build Galene'
