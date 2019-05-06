@@ -35,7 +35,7 @@ jobs:
       windows:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
-        setupCommand: ''
+        setupCommand: './install-cuda.ps1'
         buildCommand: './build-flim-ui.bat'
 
 
