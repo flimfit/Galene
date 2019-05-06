@@ -72,7 +72,7 @@ jobs:
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip' 
-      destinationFolder: $(Build.SourcesDirectory)
+      destinationFolder: '$(Build.SourcesDirectory)'
 
   - script: $(buildCommand)
     displayName: 'Build Galene'
