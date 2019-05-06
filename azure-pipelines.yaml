@@ -42,11 +42,22 @@ jobs:
   variables:
     VCPKG_ROOT: '$(Build.SourcesDirectory)/env/vcpkg'
     archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
+    CUDA_ROOT: '$(Build.SourcesDirectory)/env/cuda_10.1.105_418.96_win10/nvcc'
 
   pool:
     vmImage: $(imageName)
 
   steps:
+
+  - task: DownloadFileshareArtifacts@1
+    inputs:
+    filesharePath: 'https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.96_win10.exe'
+    artifactName: 'cuda_install.zip'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(System.ArtifactsDirectory)/cuda_install.zip'
+      destinationFolder: '$(Build.SourcesDirectory)/env'
 
   - script: $(setupCommand)
     displayName: 'Setup environment'
