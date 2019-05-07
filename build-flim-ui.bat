@@ -44,9 +44,14 @@ IF NOT "%1"=="" (
 
 echo Generating CMake Project
 echo Using Generator: %GENERATOR%
-cmake -G%GENERATOR% -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" -DOME_FILES_ROOT="%OME_FILES_ROOT%" -DVCPKG_TARGET_TRIPLET=%TRIPLET%
+cmake -G%GENERATOR% -HSource -BBuild ^
+   -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" ^
+   -DOME_FILES_ROOT="%OME_FILES_ROOT%" ^
+   -DVCPKG_TARGET_TRIPLET=%TRIPLET% ^
+   -DCMAKE_C_COMPILER=cl.exe ^
+   -DCMAKE_CXX_COMPILER=cl.exe
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
-F
+
 echo Building 64bit Project in Release mode
 cmake --build Build --config Release --target package
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
