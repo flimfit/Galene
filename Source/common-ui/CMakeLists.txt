@@ -49,5 +49,5 @@ endif()
 
 add_library(common-ui ${SOURCE} ${HEADERS} ${UI_HEADERS})
 target_link_libraries(common-ui ${LIBS})
-target_include_directories(common-ui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
-                                     PUBLIC    ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(common-ui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+                                            ${CMAKE_CURRENT_BINARY_DIR})
