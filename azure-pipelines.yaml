@@ -27,7 +27,6 @@ jobs:
       mac:
         imageName: 'macos-10.13'
         DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
-        VCPKG_ALLOW_APPLE_CLANG: true
         buildPlatform: 'osx'
         setupCommand: 'brew install ninja'
         buildCommand: './build-flim-ui.sh'
@@ -42,7 +41,6 @@ jobs:
   variables:
     VCPKG_ROOT: '$(Build.SourcesDirectory)/env/vcpkg'
     archiveFile: '$(Build.ArtifactStagingDirectory)/galene-$(buildPlatform).zip'
-    CUDA_ROOT: '$(Build.SourcesDirectory)/env/cuda_10.1.105_418.96_win10/nvcc'
 
   pool:
     vmImage: $(imageName)
