@@ -1,4 +1,10 @@
 @echo off
+:: Build Galene package
+:: 
+:: Options
+::    --clean            Clean build directory before build
+::    --generator <gen>  Use specified generator (default is Visual Studio 15 2017 Win64)
+
 
 SETLOCAL
 
