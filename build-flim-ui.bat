@@ -5,7 +5,6 @@
 ::    --clean            Clean build directory before build
 ::    --generator <gen>  Use specified generator (default is Visual Studio 15 2017 Win64)
 
-
 SETLOCAL
 
 SET VSCOMMUNITYCMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
@@ -28,13 +27,26 @@ SET OME_FILES_ROOT=%VCPKG_ROOT%\installed\%TRIPLET%
 :: Override CMAKE_PREFIX_PATH
 SET CMAKE_PREFIX_PATH=
 
-IF "%1"=="--clean" rmdir Build /s /q
+SET GENERATOR="Visual Studio 15 2017 Win64"
+
+:loop
+IF NOT "%1"=="" (
+    IF "%1"=="--clean" (
+      rmdir Build /s /q
+    )
+    IF "%1"=="--generator" (
+        SET GENERATOR=%2
+        SHIFT
+    )
+    SHIFT
+    GOTO :loop
+)
 
 echo Generating CMake Project
-echo Using Generator: "Visual Studio 15 2017 Win64"
-cmake -G "Visual Studio 15 2017 Win64" -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" -DOME_FILES_ROOT="%OME_FILES_ROOT%" -DVCPKG_TARGET_TRIPLET=%TRIPLET%
+echo Using Generator: %GENERATOR%
+cmake -G%GENERATOR% -HSource -BBuild -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" -DOME_FILES_ROOT="%OME_FILES_ROOT%" -DVCPKG_TARGET_TRIPLET=%TRIPLET%
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
-
+F
 echo Building 64bit Project in Release mode
-cmake --build Build --config Release --target PACKAGE
+cmake --build Build --config Release --target package
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
