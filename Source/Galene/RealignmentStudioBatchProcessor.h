@@ -5,7 +5,7 @@
 #include "TaskProgress.h"
 #include <QStringList>
 
-class RealignmentStudioBatchProcessor : public QObject //: public ThreadedObject
+class RealignmentStudioBatchProcessor : public QObject
 {
    Q_OBJECT
 

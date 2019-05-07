@@ -91,8 +91,16 @@ RealignmentStudio::RealignmentStudio() :
    spectral_correction_files = new SpectralCorrectionListModel(this);
    spectral_correction_list_view->setModel(spectral_correction_files);
 
-   connect(spectral_correction_add_pushbutton, &QPushButton::clicked, this, &RealignmentStudio::addSpectralCorrectionFile);
+   connect(spectral_correction_add_pushbutton, &QToolButton::clicked, this, &RealignmentStudio::requestSpectralCorrectionFile);
    connect(spectral_correction_remove_pushbutton, &QPushButton::clicked, this, &RealignmentStudio::removeSelectedSpectralCorrectionFiles);
+
+   recent_spectral_correction_files_menu = new QMenu();
+   spectral_correction_add_pushbutton->setMenu(recent_spectral_correction_files_menu);
+
+   auto settings = new QSettings(this);
+   QStringList recent_files = settings->value("recent_spectral_correction_files").toStringList();
+   for (auto file : recent_files)
+      recent_spectral_correction_files_menu->addAction(file, this, [this,file]() { addSpectralCorrectionFile(file); });
    
    connect(spectral_correction_group, &QGroupBox::toggled, spectral_correction_frame, &QFrame::setVisible);
 }
@@ -140,7 +148,7 @@ std::shared_ptr<RealignableDataSource> RealignmentStudio::openFileWithOptions(co
             source = s;
          }
 
-         options.requestFromUserIfRequired(source->aligningReader());
+         options.requestFromUserIfRequired(source->aligningReader(), this);
 
          source->setRealignmentOptions(options);
 
@@ -469,8 +477,30 @@ void RealignmentStudio::removeSelectedSpectralCorrectionFiles()
 
 }
 
-void RealignmentStudio::addSpectralCorrectionFile()
+void RealignmentStudio::addSpectralCorrectionFile(const QString& file)
+{
+   addSpectralCorrectionFiles({file});
+}
+
+void RealignmentStudio::addSpectralCorrectionFiles(const QStringList& files)
+{
+   auto settings = new QSettings(this);
+   QStringList recent_files = settings->value("recent_spectral_correction_files").toStringList();
+   for(auto& file : files)
+   if (!recent_files.contains(file))
+      recent_files.append(file);
+   while (recent_files.length() > 10)
+      recent_files.pop_front();
+   settings->setValue("recent_spectral_correction_files", recent_files);
+
+   for(auto& file : files)
+      recent_spectral_correction_files_menu->addAction(file, this, [this, file]() { addSpectralCorrectionFile(file); });
+
+   spectral_correction_files->add(files);
+}
+
+void RealignmentStudio::requestSpectralCorrectionFile()
 {
    QStringList files = QFileDialog::getOpenFileNames(this, "Choose file names", workspace->getWorkspace(), "tif file (*.tif)");
-   spectral_correction_files->add(files);
+   addSpectralCorrectionFiles(files);
 }

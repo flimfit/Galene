@@ -65,7 +65,9 @@ protected:
    void saveMergedImage();
 
    void removeSelectedSpectralCorrectionFiles();
-   void addSpectralCorrectionFile();
+   void requestSpectralCorrectionFile();
+   void addSpectralCorrectionFile(const QString& file);
+   void addSpectralCorrectionFiles(const QStringList& file);
 
 private:
 
@@ -80,6 +82,7 @@ private:
    Q_PROPERTY(bool save_realignment_info MEMBER save_realignment_info);
 
    SpectralCorrectionListModel* spectral_correction_files;
+   QMenu* recent_spectral_correction_files_menu;
 
    void displayErrorMessage(const QString& error);
 

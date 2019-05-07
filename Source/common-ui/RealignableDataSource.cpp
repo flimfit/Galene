@@ -132,7 +132,7 @@ void RealignableDataSource::setRealignmentOptions(RealignableDataOptions& option
    reader->setNumZ(options.getNumZ());
 }
 
-void RealignableDataOptions::requestFromUserIfRequired(std::shared_ptr<AligningReader> reader)
+void RealignableDataOptions::requestFromUserIfRequired(std::shared_ptr<AligningReader> reader, QWidget* parent)
 {
    int n_chan = reader->getNumChannels();
    bool request_bidirectional = !reader->canReadBidirectionalScan();
@@ -152,7 +152,7 @@ void RealignableDataOptions::requestFromUserIfRequired(std::shared_ptr<AligningR
 
    bool* use_chan = new bool[n_chan];
 
-   CustomDialog d("Realignment Options", nullptr, BS_OKAY_ONLY);
+   CustomDialog d("Realignment Options", parent, BS_OKAY_ONLY);
 
    if (n_chan > 1)
    {

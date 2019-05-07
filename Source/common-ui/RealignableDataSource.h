@@ -17,7 +17,7 @@ class RealignableDataOptions
 {
 public:
 
-   void requestFromUserIfRequired(std::shared_ptr<AligningReader> reader);
+   void requestFromUserIfRequired(std::shared_ptr<AligningReader> reader, QWidget* parent = nullptr);
    std::vector<bool> getChannelsToUse(size_t n_chan);
 
    bool getBidirectional() { return bidirectional; }

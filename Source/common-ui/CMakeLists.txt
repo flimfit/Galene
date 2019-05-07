@@ -18,7 +18,8 @@ set(SOURCE FlimWorkspace.cpp
            UiUtils.cpp
            FlimDataSource.cpp
            RealignableDataSource.cpp
-           RealignmentResultsWriter.cpp)
+           RealignmentResultsWriter.cpp
+           RealignmentParametersWidget.cpp)
 
 set(HEADERS FlimWorkspace.h
             LifetimeDisplayWidget.h
