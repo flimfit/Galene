@@ -1,6 +1,6 @@
 $version = "10.1.105_418.96_win10"
 $url = "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_$version.exe"
-$output = "$PSScriptRoot\install-cuda.zip"
+$output = "$PSScriptRoot\install-cuda.exe"
 $cuda_root = "$PSScriptRoot\cuda\nvcc\"
 
 Write-Output "Downloading: $url"
