@@ -29,6 +29,7 @@ SET CMAKE_PREFIX_PATH=
 
 SET GENERATOR="Visual Studio 15 2017 Win64"
 
+:: Parse command line arguments
 :loop
 IF NOT "%1"=="" (
     IF "%1"=="--clean" (
@@ -42,8 +43,12 @@ IF NOT "%1"=="" (
     GOTO :loop
 )
 
-dir cuda\nvcc
-echo %CUDA_PATH%
+:: Check if local CUDA install exists
+IF EXIST cuda\ (
+   SET CUDA_PATH=cuda\nvcc
+   SET CUDA_PATH_V10_1=%CUDA_PATH%
+   SET PATH=%PATH%;%CUDA_PATH%\bin
+)
 
 echo Generating CMake Project
 echo Using Generator: %GENERATOR%
