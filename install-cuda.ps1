@@ -10,5 +10,8 @@ Write-Output "Expanding: $output"
 &7z x $output -ocuda nvcc
 Remove-Item $output
 
-Write-Output "Setting environment variable: CUDA_PATH = $cuda_root" 
+Write-Output "Setting environment variable: CUDA_PATH = $cuda_root"
 [Environment]::SetEnvironmentVariable("CUDA_PATH", $cuda_root, "User")
+[Environment]::SetEnvironmentVariable("Path",
+    [Environment]::GetEnvironmentVariable("Path", "User") + ";" + $cuda_root + "bin",
+    "User")
