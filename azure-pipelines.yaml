@@ -36,7 +36,7 @@ jobs:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
         setupCommand: powershell .\install-cuda.ps1
-        buildCommand: .\build-flim-ui.bat
+        buildCommand: .\build-flim-ui.bat --generator Ninja
 
 
   variables:
