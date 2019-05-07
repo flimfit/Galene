@@ -1,8 +1,10 @@
 Build/*
 .vscode/*
+cuda/*
 *.mex*
 *.log
 *.autosave
 *.dmg
 *.jar
 *.exp
+*.zip

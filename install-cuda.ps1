@@ -1,4 +1,14 @@
-$url = "https://developer.nvidia.com/compute/cuda/10.1/Prod/network_installers/cuda_10.1.105_win10_network.exe"
-$output = "$PSScriptRoot\install-cuda.exe"
+$version = "10.1.105_418.96_win10"
+$url = "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_$version.exe"
+$output = "$PSScriptRoot\install-cuda.zip"
+$cuda_root = "$PSScriptRoot\cuda\nvcc\"
+
+Write-Output "Downloading: $url"
 (New-Object System.Net.WebClient).DownloadFile($url, $output)
-.\install-cuda.exe -s nvcc_10.1 
+
+Write-Output "Expanding: $output"
+&7z x $output -ocuda nvcc
+Remove-Item $output
+
+Write-Output "Setting environment variable: CUDA_PATH = $cuda_root" 
+[Environment]::SetEnvironmentVariable("CUDA_PATH", $cuda_root, "User")
