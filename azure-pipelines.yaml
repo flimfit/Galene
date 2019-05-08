@@ -30,7 +30,7 @@ jobs:
         DEVELOPER_DIR: '/Applications/Xcode_10.1.app'
         buildPlatform: 'osx'
         setupCommand: 'brew install ninja'
-        buildCommand: './build-flim-ui.sh'
+        buildCommand: 'sudo xcode-select -s /Applications/Xcode_10.1.app/Contents/Developer & ./build-flim-ui.sh'
 
       windows:
         imageName: 'vs2017-win2016'
