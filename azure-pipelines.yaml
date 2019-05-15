@@ -16,14 +16,13 @@ jobs:
   strategy:
     matrix:
 
-      # Don't build linux for the moment
-      #linux:
-      #  imageName: 'ubuntu-16.04'
-      #  CXX: '/usr/bin/clang++'
-      #  CC: '/usr/bin/clang'
-      #  buildPlatform: 'linux'
-      #  setupCommand: 'sudo apt-get install ninja-build'
-      #  buildCommand: './build-flim-ui.sh'
+      linux:
+        imageName: 'ubuntu-16.04'
+        CXX: '/usr/bin/clang++'
+        CC: '/usr/bin/clang'
+        buildPlatform: 'linux'
+        setupCommand: 'sudo apt-get install ninja-build'
+        buildCommand: './build-flim-ui.sh'
 
       mac:
         imageName: 'macos-10.13'
