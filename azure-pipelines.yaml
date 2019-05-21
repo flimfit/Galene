@@ -9,6 +9,9 @@ trigger:
 pr:
 - master
 
+variables:
+- group: passwords
+
 jobs:
 - job: Build
   timeoutInMinutes: 360
