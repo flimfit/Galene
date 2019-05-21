@@ -28,7 +28,7 @@ jobs:
         imageName: 'macos-10.14'
         DEVELOPER_DIR: '/Applications/Xcode_10.2.1.app'
         buildPlatform: 'osx'
-        setupCommand: 'brew install ninja'
+        setupCommand: 'brew install ninja && npm install -g appdmg'
         buildCommand: './build-flim-ui.sh && ./create-dmg.sh'
         publishPath: '*.dmg'
 
@@ -36,7 +36,7 @@ jobs:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
         setupCommand: powershell .\install-cuda.ps1
-        buildCommand: .\build-flim-ui.bat --generator Ninja
+        buildCommand: .\build-flim-ui.bat
         publishPath: .\Build\*.exe
 
 
@@ -48,6 +48,13 @@ jobs:
     vmImage: $(imageName)
 
   steps:
+
+  - task: InstallAppleCertificate@2
+    condition: eq(variables['buildPlatform'],'osx')
+    inputs:
+      certSecureFile: 'sean-warren-apple-dev-cert-azure.p12'
+      certPwd: '$(apple-dev-cert-password)'
+      keychain: 'temp'
 
   - script: $(setupCommand)
     displayName: 'Setup environment'
