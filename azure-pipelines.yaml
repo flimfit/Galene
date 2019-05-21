@@ -40,7 +40,7 @@ jobs:
         buildPlatform: 'windows'
         setupCommand: powershell .\install-cuda.ps1
         buildCommand: .\build-flim-ui.bat
-        publishPath: .\Build\*.exe
+        publishPath: Build\*.exe
 
 
   variables:
