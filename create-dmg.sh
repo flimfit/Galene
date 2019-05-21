@@ -9,7 +9,7 @@
 # sign code (requires that signature is installed in keychain)
 #security unlock-keychain -p $keychain_password
 echo $APPLE_CERTIFICATE_SIGNING_IDENTITY
-codesign --verbose --deep -s $APPLE_CERTIFICATE_SIGNING_IDENTITY Build/Release/Galene/Galene.app/
+codesign --verbose --deep -s "$APPLE_CERTIFICATE_SIGNING_IDENTITY" Build/Release/Galene/Galene.app/
 
 GIT_DESCRIBE=$(git describe)
 appdmg Assets/appdmg.json "Galene $GIT_DESCRIBE.dmg"
