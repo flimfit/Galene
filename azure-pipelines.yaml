@@ -84,7 +84,12 @@ jobs:
   - script: $(buildCommand)
     displayName: 'Build Galene'
 
+  - task: CopyFiles@2
+    inputs:
+      contents: '$(publishPath)'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'Galene'
-      targetPath: '$(publishPath)'
+      targetPath: '$(Build.ArtifactStagingDirectory)'
