@@ -91,5 +91,5 @@ jobs:
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'Galene macOS'
+      artifactName: 'Galene-$(buildPlatform)'
       targetPath: '$(Build.ArtifactStagingDirectory)/build'
