@@ -13,6 +13,8 @@ include(CheckLanguage)
 
 if(DEFINED ENV{OME_FILES_ROOT})
    set(OME_FILES_ROOT "$ENV{OME_FILES_ROOT}" CACHE PATH "OME root file directory")
+elseif(DEFINED VCPKG_TARGET_TRIPLET)
+   set(OME_FILES_ROOT ${_VCPKG_ROOT_DIR}/installed/${VCPKG_TARGET_TRIPLET})
 endif()
 
 # Download bioformats exporter tool

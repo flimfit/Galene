@@ -22,7 +22,6 @@ SET TRIPLET=x64-windows-static
 SET PATH=%PATH%;%VCPKG_ROOT%\installed\%TRIPLET%\bin;%VCPKG_ROOT%\installed\%TRIPLET%\debug\bin
 SET TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
 SET TOOLCHAIN_FILE=%TOOLCHAIN_FILE:\=/%
-SET OME_FILES_ROOT=%VCPKG_ROOT%\installed\%TRIPLET%
 
 :: Override CMAKE_PREFIX_PATH
 SET CMAKE_PREFIX_PATH=
@@ -50,7 +49,6 @@ echo Generating CMake Project
 echo Using Generator: %GENERATOR%
 cmake -G%GENERATOR% -HSource -BBuild ^
    -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAIN_FILE%" ^
-   -DOME_FILES_ROOT="%OME_FILES_ROOT%" ^
    -DVCPKG_TARGET_TRIPLET=%TRIPLET% ^
    -DCMAKE_C_COMPILER=cl.exe ^
    -DCMAKE_CXX_COMPILER=cl.exe ^
