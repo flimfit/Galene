@@ -26,7 +26,7 @@ jobs:
         buildPlatform: 'linux'
         setupCommand: 'sudo apt-get install ninja-build'
         buildCommand: './build-flim-ui.sh'
-        publishPath: 'Build/Galene/*'
+        publishPath: 'Build/Release/Galene/*'
 
       mac:
         imageName: 'macos-10.14'
