@@ -1,11 +1,8 @@
-$version = "10.1.105_418.96_win10"
-$url = "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_$version.exe"
+$url = "https://developer.nvidia.com/compute/cuda/10.1/Prod/network_installers/cuda_10.1.168_win10_network.exe"
 $output = "$PSScriptRoot\install-cuda.exe"
-$cuda_root = "$PSScriptRoot\cuda\nvcc\"
 
 Write-Output "Downloading: $url"
 (New-Object System.Net.WebClient).DownloadFile($url, $output)
 
-Write-Output "Expanding: $output"
-&7z x $output -ocuda nvcc
-Remove-Item $output
+Write-Output "Installing"
+Start-Process -FilePath $output -ArgumentList "-s nvcc_10.1 visual_studio_integration_10.1" -Wait -NoNewWindow
