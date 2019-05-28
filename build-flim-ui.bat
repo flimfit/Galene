@@ -42,8 +42,7 @@ IF NOT "%1"=="" (
     GOTO :loop
 )
 
-:: Check if local CUDA install exists
-IF EXIST %cd%\cuda\ SET PATH=%PATH%;%CD%\cuda\nvcc\bin
+echo CUDA PATH: %CUDA_PATH%
 
 echo Generating CMake Project
 echo Using Generator: %GENERATOR%
