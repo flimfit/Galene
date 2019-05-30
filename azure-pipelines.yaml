@@ -89,7 +89,7 @@ jobs:
   - task: CopyFiles@2
     condition: always() 
     inputs:
-      contents: 'Build/CMakeFiles/**'
+      contents: 'Build/**/CMakeFiles/**'
       targetFolder: '$(Build.ArtifactStagingDirectory)/logs'
 
   - task: PublishBuildArtifacts@1
