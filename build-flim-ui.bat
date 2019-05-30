@@ -57,5 +57,5 @@ cmake -G%GENERATOR% -HSource -BBuild ^
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 echo Building 64bit Project in Release mode
-cmake --build Build --config Release --target PACKAGE
+cmake --build Build --config Release --target package
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
