@@ -40,7 +40,7 @@ jobs:
         imageName: 'vs2017-win2016'
         buildPlatform: 'windows'
         setupCommand: choco install cuda -y
-        buildCommand: .\build-flim-ui.bat
+        buildCommand: .\build-flim-ui.bat --clean --generator Ninja
         publishPath: Build\*.exe
         CUDA_PATH: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1
 
