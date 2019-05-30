@@ -42,7 +42,8 @@ IF NOT "%1"=="" (
     GOTO :loop
 )
 
-echo CUDA PATH: %CUDA_PATH%
+SET CUDA_COMPILER=%CUDA_PATH%\bin\nvcc.exe
+SET CUDA_COMPILER=%CUDA_COMPILER:\=/%
 
 echo Generating CMake Project
 echo Using Generator: %GENERATOR%
@@ -51,7 +52,8 @@ cmake -G%GENERATOR% -HSource -BBuild ^
    -DVCPKG_TARGET_TRIPLET=%TRIPLET% ^
    -DCMAKE_C_COMPILER=cl.exe ^
    -DCMAKE_CXX_COMPILER=cl.exe ^
-   -DCMAKE_BUILD_TYPE=Release
+   -DCMAKE_BUILD_TYPE=Release ^
+   -DCMAKE_CUDA_COMPILER="%CUDA_COMPILER%"
 if %ERRORLEVEL% GEQ 1 EXIT /B %ERRORLEVEL%
 
 echo Building 64bit Project in Release mode
